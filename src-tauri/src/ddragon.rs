@@ -136,20 +136,48 @@ fn newest_cached(dir: &Path) -> Option<DdragonData> {
     read_cache(&newest.path()).map(|d| DdragonData { offline: true, ..d })
 }
 
-/// Only plain champion ids are served — no path traversal.
-fn icon_id(path: &str) -> Option<&str> {
-    let id = path.trim_start_matches('/').strip_suffix(".png")?;
+/// Assets the webview may request. Ids are strictly validated — no path traversal.
+#[derive(Debug, PartialEq)]
+enum Asset<'a> {
+    /// `/Gwen.png` — square champion icon.
+    Champion(&'a str),
+    /// `/item/3074.png`
+    Item(u32),
+    /// `/spell/Gwen/Q.png` — ability icon, key P/Q/W/E/R.
+    Spell(&'a str, usize),
+    /// `/splash/Gwen.jpg` — centered default-skin splash (version independent).
+    Splash(&'a str),
+}
+
+fn champion_id(id: &str) -> Option<&str> {
     (!id.is_empty() && id.len() <= 32 && id.chars().all(|c| c.is_ascii_alphanumeric())).then_some(id)
+}
+
+fn parse_asset(path: &str) -> Option<Asset<'_>> {
+    let parts: Vec<&str> = path.trim_start_matches('/').split('/').collect();
+    match parts.as_slice() {
+        [file] => Some(Asset::Champion(champion_id(file.strip_suffix(".png")?)?)),
+        ["item", file] => {
+            let id = file.strip_suffix(".png")?;
+            (id.len() <= 7 && id.chars().all(|c| c.is_ascii_digit())).then(|| id.parse().ok()).flatten().map(Asset::Item)
+        }
+        ["spell", champ, file] => {
+            let slot = ["P", "Q", "W", "E", "R"].iter().position(|k| Some(*k) == file.strip_suffix(".png"))?;
+            Some(Asset::Spell(champion_id(champ)?, slot))
+        }
+        ["splash", file] => Some(Asset::Splash(champion_id(file.strip_suffix(".jpg")?)?)),
+        _ => None,
+    }
 }
 
 pub fn icon_protocol(ctx: UriSchemeContext<'_, tauri::Wry>, request: Request<Vec<u8>>, responder: UriSchemeResponder) {
     let app = ctx.app_handle().clone();
     let path = request.uri().path().to_string();
     tauri::async_runtime::spawn(async move {
-        let response = match serve_icon(&app, &path).await {
+        let response = match serve_asset(&app, &path).await {
             Ok(bytes) => Response::builder()
                 .status(StatusCode::OK)
-                .header("Content-Type", "image/png")
+                .header("Content-Type", if path.ends_with(".jpg") { "image/jpeg" } else { "image/png" })
                 .header("Cache-Control", "max-age=604800")
                 .body(bytes),
             Err((status, msg)) => Response::builder().status(status).body(msg.into_bytes()),
@@ -158,8 +186,50 @@ pub fn icon_protocol(ctx: UriSchemeContext<'_, tauri::Wry>, request: Request<Vec
     });
 }
 
-async fn serve_icon(app: &AppHandle, path: &str) -> Result<Vec<u8>, (StatusCode, String)> {
-    let id = icon_id(path).ok_or((StatusCode::BAD_REQUEST, "bad icon path".into()))?;
+type ServeError = (StatusCode, String);
+
+async fn download(url: &str) -> Result<Vec<u8>, ServeError> {
+    http()
+        .get(url)
+        .send()
+        .await
+        .and_then(|r| r.error_for_status())
+        .map_err(|e| (StatusCode::BAD_GATEWAY, e.to_string()))?
+        .bytes()
+        .await
+        .map(|b| b.to_vec())
+        .map_err(|e| (StatusCode::BAD_GATEWAY, e.to_string()))
+}
+
+/// Disk cache in front of `download`.
+async fn cached(file: PathBuf, url: String) -> Result<Vec<u8>, ServeError> {
+    if let Ok(bytes) = std::fs::read(&file) {
+        return Ok(bytes);
+    }
+    let bytes = download(&url).await?;
+    if let Some(dir) = file.parent() {
+        let _ = std::fs::create_dir_all(dir);
+    }
+    let _ = std::fs::write(&file, &bytes);
+    Ok(bytes)
+}
+
+/// Image file name of a champion's passive (slot 0) or Q/W/E/R (1–4), from `champion/<id>.json`.
+pub fn spell_image(detail: &Value, id: &str, slot: usize) -> Option<(String, &'static str)> {
+    let champ = &detail["data"][id];
+    if slot == 0 {
+        Some((champ["passive"]["image"]["full"].as_str()?.to_string(), "passive"))
+    } else {
+        Some((champ["spells"][slot - 1]["image"]["full"].as_str()?.to_string(), "spell"))
+    }
+}
+
+async fn serve_asset(app: &AppHandle, path: &str) -> Result<Vec<u8>, ServeError> {
+    let asset = parse_asset(path).ok_or((StatusCode::BAD_REQUEST, "bad asset path".into()))?;
+    let root = cache_dir(app).ok_or((StatusCode::INTERNAL_SERVER_ERROR, "no cache dir".into()))?;
+    if let Asset::Splash(id) = asset {
+        return cached(root.join("splash").join(format!("{id}.jpg")), format!("{BASE}/cdn/img/champion/centered/{id}_0.jpg")).await;
+    }
     let version = app
         .state::<DdragonState>()
         .0
@@ -168,24 +238,22 @@ async fn serve_icon(app: &AppHandle, path: &str) -> Result<Vec<u8>, (StatusCode,
         .as_ref()
         .map(|d| d.version.clone())
         .ok_or((StatusCode::SERVICE_UNAVAILABLE, "Data Dragon not loaded".into()))?;
-    let dir = cache_dir(app).ok_or((StatusCode::INTERNAL_SERVER_ERROR, "no cache dir".into()))?.join("icons").join(&version);
-    let file = dir.join(format!("{id}.png"));
-    if let Ok(bytes) = std::fs::read(&file) {
-        return Ok(bytes);
+    let dir = root.join("icons").join(&version);
+    match asset {
+        Asset::Champion(id) => cached(dir.join(format!("{id}.png")), format!("{BASE}/cdn/{version}/img/champion/{id}.png")).await,
+        Asset::Item(id) => cached(dir.join("item").join(format!("{id}.png")), format!("{BASE}/cdn/{version}/img/item/{id}.png")).await,
+        Asset::Spell(id, slot) => {
+            let file = dir.join("spell").join(format!("{id}-{slot}.png"));
+            if let Ok(bytes) = std::fs::read(&file) {
+                return Ok(bytes);
+            }
+            let raw = cached(dir.join(format!("champion-{id}.json")), format!("{BASE}/cdn/{version}/data/en_US/champion/{id}.json")).await?;
+            let detail: Value = serde_json::from_slice(&raw).map_err(|e| (StatusCode::BAD_GATEWAY, e.to_string()))?;
+            let (image, kind) = spell_image(&detail, id, slot).ok_or((StatusCode::NOT_FOUND, "no such ability".into()))?;
+            cached(file, format!("{BASE}/cdn/{version}/img/{kind}/{image}")).await
+        }
+        Asset::Splash(_) => unreachable!(),
     }
-    let bytes = http()
-        .get(format!("{BASE}/cdn/{version}/img/champion/{id}.png"))
-        .send()
-        .await
-        .and_then(|r| r.error_for_status())
-        .map_err(|e| (StatusCode::BAD_GATEWAY, e.to_string()))?
-        .bytes()
-        .await
-        .map_err(|e| (StatusCode::BAD_GATEWAY, e.to_string()))?
-        .to_vec();
-    let _ = std::fs::create_dir_all(&dir);
-    let _ = std::fs::write(&file, &bytes);
-    Ok(bytes)
 }
 
 #[cfg(test)]
@@ -204,10 +272,25 @@ mod tests {
     }
 
     #[test]
-    fn icon_paths_are_sanitized() {
-        assert_eq!(icon_id("/Gwen.png"), Some("Gwen"));
-        assert_eq!(icon_id("/../secrets.png"), None);
-        assert_eq!(icon_id("/Gwen"), None);
-        assert_eq!(icon_id("/a/b.png"), None);
+    fn asset_paths_are_sanitized() {
+        assert_eq!(parse_asset("/Gwen.png"), Some(Asset::Champion("Gwen")));
+        assert_eq!(parse_asset("/item/3074.png"), Some(Asset::Item(3074)));
+        assert_eq!(parse_asset("/spell/Gwen/R.png"), Some(Asset::Spell("Gwen", 4)));
+        assert_eq!(parse_asset("/spell/Gwen/P.png"), Some(Asset::Spell("Gwen", 0)));
+        assert_eq!(parse_asset("/splash/Amumu.jpg"), Some(Asset::Splash("Amumu")));
+        for bad in ["/../secrets.png", "/Gwen", "/a/b.png", "/item/../1.png", "/item/12a.png", "/spell/Gwen/X.png", "/spell/../Q.png", "/splash/Gwen.png"] {
+            assert_eq!(parse_asset(bad), None, "{bad}");
+        }
+    }
+
+    #[test]
+    fn finds_ability_images() {
+        let detail = serde_json::json!({"data": {"Gwen": {
+            "passive": {"image": {"full": "Gwen_Passive.png"}},
+            "spells": [{"image": {"full": "GwenQ.png"}}, {"image": {"full": "GwenW.png"}}, {"image": {"full": "GwenE.png"}}, {"image": {"full": "GwenR.png"}}]
+        }}});
+        assert_eq!(spell_image(&detail, "Gwen", 0), Some(("Gwen_Passive.png".into(), "passive")));
+        assert_eq!(spell_image(&detail, "Gwen", 4), Some(("GwenR.png".into(), "spell")));
+        assert_eq!(spell_image(&detail, "Fiora", 1), None);
     }
 }

@@ -15,6 +15,7 @@ use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::Connector;
 
 use crate::lockfile::{self, Lockfile};
+use crate::ranked::{self, RANKED_EVENT, RANKED_PATH};
 use crate::state::{self, AppState};
 use crate::tls;
 use crate::types::{ChampSelectSession, ConnectionStatus, Transport};
@@ -26,6 +27,8 @@ const SESSION_EVENT: &str = "OnJsonApiEvent_lol-champ-select_v1_session";
 
 const RETRY: Duration = Duration::from_secs(3);
 const POLL: Duration = Duration::from_millis(1000);
+/// Rank changes rarely; when polling, re-read it every this many polls.
+const RANK_POLL_EVERY: u32 = 30;
 
 struct Lcu {
     lock: Lockfile,
@@ -64,6 +67,18 @@ impl Lcu {
         state::set_champ_select(app, session.and_then(parse_session));
         Ok(())
     }
+
+    /// Ranked stats are optional: a failure here must not drop the connection.
+    async fn refresh_rank(&self, app: &AppHandle) {
+        match self.get(RANKED_PATH).await {
+            Ok(Some(v)) => match ranked::from_ranked_stats(&v) {
+                Some(rank) => state::set_rank(app, rank),
+                None => log::warn!("unexpected ranked-stats payload"),
+            },
+            Ok(None) => {}
+            Err(e) => log::debug!("ranked stats unavailable: {e}"),
+        }
+    }
 }
 
 fn parse_session(v: Value) -> Option<ChampSelectSession> {
@@ -94,6 +109,7 @@ async fn run_once(app: &AppHandle) {
         reset(app);
         return;
     }
+    lcu.refresh_rank(app).await;
 
     match websocket(app, &lcu).await {
         Ok(()) => log::info!("LCU websocket closed"),
@@ -102,7 +118,12 @@ async fn run_once(app: &AppHandle) {
 
     // Polling fallback (also covers the gap after a websocket drop): runs until HTTP fails.
     state::set_connection(app, ConnectionStatus::Connected { port: lcu.lock.port, transport: Transport::Polling });
+    let mut polls: u32 = 0;
     loop {
+        polls = polls.wrapping_add(1);
+        if polls % RANK_POLL_EVERY == 0 {
+            lcu.refresh_rank(app).await;
+        }
         if let Err(e) = lcu.refresh(app).await {
             log::info!("LCU unreachable, rediscovering: {e}");
             state::set_connection(app, ConnectionStatus::ApiUnreachable { message: short_error(&e) });
@@ -118,6 +139,7 @@ async fn run_once(app: &AppHandle) {
 }
 
 fn reset(app: &AppHandle) {
+    state::mark_rank_cached(app);
     state::set_phase(app, "None");
     state::set_champ_select(app, None);
 }
@@ -141,7 +163,7 @@ async fn websocket(app: &AppHandle, lcu: &Lcu) -> Result<(), Box<dyn std::error:
     let (mut ws, _) = tokio_tungstenite::connect_async_tls_with_config(request, None, false, Some(connector)).await?;
 
     // WAMP 1.0: [5, topic] = subscribe; events arrive as [8, topic, {data, eventType, uri}].
-    for topic in [PHASE_EVENT, SESSION_EVENT] {
+    for topic in [PHASE_EVENT, SESSION_EVENT, RANKED_EVENT] {
         ws.send(Message::text(serde_json::json!([5, topic]).to_string())).await?;
     }
     state::set_connection(app, ConnectionStatus::Connected { port: lcu.lock.port, transport: Transport::Websocket });
@@ -185,6 +207,11 @@ fn handle_event(app: &AppHandle, topic: &str, event: &Value) {
             }
         }
         SESSION_EVENT => state::set_champ_select(app, if deleted { None } else { parse_session(data) }),
+        RANKED_EVENT if !deleted => {
+            if let Some(rank) = ranked::from_ranked_stats(&data) {
+                state::set_rank(app, rank);
+            }
+        }
         _ => {}
     }
 }

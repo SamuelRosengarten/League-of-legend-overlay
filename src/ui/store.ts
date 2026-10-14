@@ -16,6 +16,8 @@ export interface UiState {
   lastEnemies: EnemySnapshot[] | null;
   /** Last non-empty champ-select session (the plan stays visible on the loading screen). */
   lastChampSelect: ChampSelectSession | null;
+  /** "settings" = the Appearance view (rank theme, companions, motion). */
+  view: "main" | "settings";
 }
 
 type Listener = (s: UiState) => void;
@@ -38,6 +40,7 @@ class Store {
     notes: [],
     lastEnemies: null,
     lastChampSelect: null,
+    view: "main",
   };
   private listeners: Listener[] = [];
   private queued = false;

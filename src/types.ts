@@ -89,6 +89,35 @@ export interface OverlayState {
   hotkeys: { toggleVisibility: string; toggleInteractive: string };
 }
 
+export interface RankInfo {
+  /** "iron" … "challenger" or "unranked". */
+  tier: string;
+  division: string | null;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  queue: "solo" | "flex";
+  provisionalGamesRemaining: number;
+  /** "client" = live, "cached" = last client value (client closed), "mock". */
+  source: "client" | "cached" | "mock";
+}
+
+export interface CompanionSettings {
+  gwen: boolean;
+  amumu: boolean;
+  placement: string;
+  size: number;
+  inGame: boolean;
+}
+
+/** Persisted in settings.json (Rust); option lists live in src/theme/ and src/ui/companions/. */
+export interface Appearance {
+  /** "auto" or a tier id. */
+  theme: string;
+  motion: string;
+  companions: CompanionSettings;
+}
+
 export interface Snapshot {
   mock: boolean;
   connection: ConnectionStatus;
@@ -96,6 +125,8 @@ export interface Snapshot {
   champSelect: ChampSelectSession | null;
   live: LivePayload;
   overlay: OverlayState;
+  rank: RankInfo | null;
+  appearance: Appearance;
 }
 
 export interface MockStatus {

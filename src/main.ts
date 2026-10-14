@@ -1,3 +1,10 @@
+import "@fontsource/cinzel/latin-600.css";
+import "@fontsource/cinzel/latin-700.css";
+import "./styles/theme.css";
+import "./styles/panel.css";
+import "./styles/components.css";
+import "./styles/companions.css";
+
 import { backend, on } from "./bridge";
 import { render } from "./ui/app";
 import { notesPatch } from "./ui/notes";
@@ -26,11 +33,26 @@ async function start() {
     on("rift:overlay", (overlay) => store.patchSnapshot({ overlay })),
     on("rift:mock", (mock) => store.update({ mock })),
     on("rift:ddragon", (data) => store.setDdragon(data)),
+    on("rift:rank", (rank) => store.patchSnapshot({ rank })),
+    on("rift:appearance", (appearance) => store.patchSnapshot({ appearance })),
   ]);
+
+  // Re-render when Windows animation settings or page visibility change (pauses animations).
+  window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => store.update({}));
+  document.addEventListener("visibilitychange", () => store.update({}));
 
   const [snapshot, ddragon] = await Promise.all([backend.snapshot(), backend.ddragon()]);
   store.setDdragon(ddragon);
   store.update({ snapshot, lastChampSelect: snapshot.champSelect, mock: snapshot.mock ? await backend.mock.status() : null });
+  // Leaving the overlay on the Appearance view across a mode change would hide the advisor.
+  let lastMode = snapshot.overlay.mode;
+  store.subscribe((st) => {
+    const mode = st.snapshot?.overlay.mode;
+    if (mode && mode !== lastMode) {
+      lastMode = mode;
+      if (st.view === "settings" && mode !== "idle") store.update({ view: "main" });
+    }
+  });
 }
 
 start().catch((e) => {

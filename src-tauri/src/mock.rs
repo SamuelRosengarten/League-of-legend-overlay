@@ -233,6 +233,8 @@ pub fn start(app: &AppHandle) {
     if let Some(e) = &error {
         log::error!("mock fixtures: {e}");
     }
+    // RIFT_MOCK_RANK="gold II 47" picks the mock rank (theme); default emerald II.
+    state::set_rank(app, crate::ranked::mock_rank(std::env::var("RIFT_MOCK_RANK").ok().as_deref()));
     let wanted = std::env::var("RIFT_MOCK_SCENARIO").ok();
     let first = wanted
         .filter(|w| scenarios.iter().any(|(m, _)| &m.id == w))

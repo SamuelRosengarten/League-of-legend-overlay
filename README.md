@@ -5,6 +5,9 @@ A small desktop overlay for League of Legends with pre-game matchup notes for **
 - **Champ select:** threat ranking of the enemy team with the reason for every point, lane matchup card (tips, danger abilities, power spikes, item/rune adjustments), team-comp warnings and, for Amumu, a pre-game jungle path plan.
 - **In game:** a compact panel docked to a screen edge with the same reference info, item counters the enemy has bought, and the lane opponent's level spikes.
 
+- **Your rank, your theme:** the whole overlay takes on the look of your current ranked tier, from Iron to Challenger, with the official crest in the header.
+- **Gwen and Amumu companions** sit on, peek over or hang from the panel's borders. Optional and configurable.
+
 Built with Tauri 2 (Rust) and TypeScript.
 
 ## What it does not do
@@ -13,15 +16,17 @@ Rift Advisor reads data **only** from Riot's official local APIs:
 
 | API | Used for |
 | --- | --- |
-| LCU API (League client, `https://127.0.0.1:<port>`; auth from the client's `lockfile`) | `/lol-gameflow/v1/gameflow-phase` and `/lol-champ-select/v1/session`, via the LCU WebSocket (`OnJsonApiEvent`) with HTTP polling as a fallback |
+| LCU API (League client, `https://127.0.0.1:<port>`; auth from the client's `lockfile`) | `/lol-gameflow/v1/gameflow-phase`, `/lol-champ-select/v1/session` and `/lol-ranked/v1/current-ranked-stats` (rank theme), via the LCU WebSocket (`OnJsonApiEvent`) with HTTP polling as a fallback |
 | Live Client Data API (`https://127.0.0.1:2999/liveclientdata/allgamedata`) | Champions, levels and items while in game |
-| Data Dragon (`ddragon.leagueoflegends.com`) | Champion list and icons, cached locally |
+| Data Dragon (`ddragon.leagueoflegends.com`) | Champion list, champion/item/ability icons and splash art, cached locally |
 
 It does **not** use keyboard/mouse hooks, memory reading, screen capture, minimap reading or injection. Global hotkeys are registered with the standard Windows `RegisterHotKey` API. The self-signed Riot certificates are accepted **only for `127.0.0.1`** (see `src-tauri/src/tls.rs`). Every other host gets normal certificate verification.
 
 It also never makes decisions for you or gives real-time "go here now" instructions in game. Everything shown is pre-game planning or static reference info. The jungle plan is visible for the first 90 s of the game (loading screen and the first clear), then collapses to a single line.
 
-> Rift Advisor is not endorsed by Riot Games. It is designed to stay within Riot's third-party application rules (official APIs only, no automation, no information the game does not already give you), but you use it at your own risk. Check Riot's current developer policies before you distribute it.
+> Rift Advisor isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, League of Legends and all associated properties are trademarks or registered trademarks of Riot Games, Inc. The ranked emblems (`src/assets/ranks/`) come from Riot's developer portal and the champion art from Data Dragon. The Gwen and Amumu companions are original fan art, not Riot artwork.
+>
+> Rift Advisor is designed to stay within Riot's third-party application rules (official APIs only, no automation, no information the game does not already give you), but you use it at your own risk. Check Riot's current developer policies before you distribute it.
 
 ## Requirements
 
@@ -78,6 +83,17 @@ The window is transparent, frameless, always on top and **click-through**, so th
 | `Ctrl+Shift+A` | Show / hide the overlay |
 | `Ctrl+Shift+Z` | Toggle interactive mode (click-through off / on) |
 
+### Appearance: rank theme, companions, motion
+
+Click the gear in the header (in interactive mode) to open **Appearance**. Changes apply immediately and are saved to the settings file.
+
+- **Rank theme.** *My rank* (default) follows your current Solo/Duo tier as the League client reports it, or Flex if you have no Solo/Duo tier. An account without a tier this season gets the neutral hextech theme and shows "Unranked · N placements left". The app never guesses a rank. While the client is closed, the last reported rank is used and labelled "last known". You can also pin any of the ten tiers manually.
+  Each tier sets the panel frame, background glow, buttons, selections, headings, score meters, LP bar, particles and the gems on the companions. Apex tiers (Master and up) get brighter frame corners, and Challenger adds a light sweep along the top edge. On a rank change the colors cross-fade over about 0.8 s.
+- **Companions.** Turn Gwen and Amumu on or off and choose a placement: *Opposite corners* (default), *Top border*, *Hanging below*, *Left corner*, *Right corner*, *Peeking* or *Minimal*. You can also set their size (70–140 %) and whether they stay on the in-game panel. They only ever sit above the top border or hang below the bottom border, so they never cover advice. The window grows by that much transparent space, and they never receive mouse clicks.
+- **Motion.** *Full* (idle animations, sparkles, ambient particles), *Calm* (slow breathing and blinking) or *Off*. In game, motion is capped at Calm and particles are off. If Windows *Animation effects* is off (`prefers-reduced-motion`), everything stays still. While the overlay is hidden, all animations pause.
+
+Raster art for the companions can replace the built-in vector art without code changes. See `src/assets/companions/README.md`.
+
 ### Settings file
 
 `%APPDATA%\dev.rosengarten.riftadvisor\settings.json` is created on first start. Any field you leave out falls back to its default. Restart the app after editing it.
@@ -87,12 +103,19 @@ The window is transparent, frameless, always on top and **click-through**, so th
   "hotkeys": { "toggleVisibility": "Ctrl+Shift+A", "toggleInteractive": "Ctrl+Shift+Z" },
   "leagueInstallDir": "D:/Games/League of Legends",
   "positions": {},
-  "dock": "right"
+  "dock": "right",
+  "appearance": {
+    "theme": "auto",
+    "motion": "full",
+    "companions": { "gwen": true, "amumu": true, "placement": "corners", "size": 1, "inGame": true }
+  }
 }
 ```
 
 - `leagueInstallDir`: only needed if the client cannot be found. By default the app looks in `C:\Riot Games\League of Legends`, then next to the running `LeagueClientUx.exe`.
 - `positions` / `dock`: saved window positions and the docking edge. Delete them to reset placement.
+- `appearance`: edited from the Appearance view. `theme` is `auto` or a tier id (`iron` … `challenger`, `unranked`). Unknown values fall back to the defaults.
+- `lastRank`: written by the app, the last rank the client reported.
 
 Data Dragon files are cached in `%LOCALAPPDATA%\dev.rosengarten.riftadvisor\ddragon`. The app also works offline with the last cached version.
 
@@ -117,6 +140,7 @@ This replays recorded API payloads from `fixtures/scenarios/*.json` through the 
 | `RIFT_MOCK_SCENARIO=<id>` | Start with this scenario |
 | `RIFT_MOCK_STEP=<n>` | Start paused on step *n* (1-based) |
 | `RIFT_FIXTURES_DIR=<path>` | Load scenarios from another folder |
+| `RIFT_MOCK_RANK="gold II 47"` | Mock rank for the theme (default `emerald II 63`; e.g. `challenger 1203`, `unranked`) |
 
 ```powershell
 $env:RIFT_MOCK_SCENARIO="amumu-vs-leesin-red"; $env:RIFT_MOCK_STEP="3"; npm run dev:mock
@@ -216,8 +240,8 @@ Paths name camps by buff side (`blue-buff-side` / `red-buff-side`). The app maps
 
 ```powershell
 npm run typecheck
-npm test               # vitest: threat scoring, role inference, path selection, data validation, fixtures end-to-end
-npm run test:rust      # cargo: lockfile parsing, loopback-only TLS, WAMP frames, overlay geometry, settings, fixtures
+npm test               # vitest: threat scoring, role inference, path selection, data validation, rank themes, companion layout, fixtures end-to-end
+npm run test:rust      # cargo: lockfile parsing, loopback-only TLS, WAMP frames, ranked stats, asset paths, overlay geometry, settings, fixtures
 npm run validate:data
 ```
 
@@ -232,14 +256,19 @@ scripts/            validate-data.ts, make-fixtures.mjs
 src/                frontend (vanilla TypeScript)
   data/             loading + validation of the curated data
   domain/           pure logic: match normalization, roles, threat, warnings, jungle planner, in-game notes
-  ui/               store + views (champ select, in game, idle, dev panel)
+  theme/            rank palettes (ranks.ts), theme resolution, appearance settings
+  ui/               shell (app.ts), store, crest, particles, views (champ select, in game, idle, appearance, dev panel)
+  ui/companions/    Gwen/Amumu vector art, placement presets, persistent companion layer
+  styles/           theme.css (tokens), panel.css, components.css, companions.css
+  assets/           ranked emblems, optional companion art
 src-tauri/src/      Rust backend
   lockfile.rs       LCU lockfile discovery and parsing
   tls.rs            127.0.0.1-only certificate verifier
   lcu.rs            LCU WebSocket + polling connector
+  ranked.rs         ranked tier from the LCU (rank theme)
   live.rs           Live Client Data poller
   overlay.rs        window modes, click-through, placement, docking
   settings.rs       settings.json
-  ddragon.rs        Data Dragon cache + icon protocol
+  ddragon.rs        Data Dragon cache + art protocol (champion/item/ability icons, splash)
   mock.rs           fixture replay
 ```

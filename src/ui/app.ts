@@ -1,22 +1,88 @@
 import { backend } from "../bridge";
 import { fromChampSelect, fromLive } from "../domain/match";
-import { h } from "./h";
+import { effectiveMotion, normalizeAppearance } from "../theme/appearance";
+import { applyTheme, resolveTheme } from "../theme/theme";
+import { CompanionLayer } from "./companions/layer";
+import { layoutCompanions } from "./companions/layout";
+import { Crest } from "./crest";
+import { Particles } from "./particles";
 import type { UiState } from "./store";
 import { champSelectView } from "./views/champSelect";
 import { devPanel } from "./views/devPanel";
-import { header } from "./views/header";
+import { headerContent } from "./views/header";
 import { idleView } from "./views/idle";
 import { inGameView } from "./views/inGame";
+import { settingsView } from "./views/settings";
+
+// The shell is built once. Only the header content and the body are re-rendered on each
+// backend event; the crest, frame, particles and companions are persistent so their
+// animations never restart.
+interface Shell {
+  stage: HTMLElement;
+  panel: HTMLElement;
+  headerSlot: HTMLElement;
+  content: HTMLElement;
+  crest: Crest;
+  particles: Particles;
+  companions: CompanionLayer;
+}
+
+let shell: Shell | null = null;
+let screenKey = "";
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+function buildShell(root: HTMLElement): Shell {
+  const stage = document.createElement("div");
+  stage.className = "stage";
+  const panel = document.createElement("main");
+  const frame = document.createElement("div");
+  frame.className = "frame";
+  frame.setAttribute("aria-hidden", "true");
+  frame.innerHTML = "<i class='c tl'></i><i class='c tr'></i><i class='c bl'></i><i class='c br'></i><b class='gem'></b><span class='sheen'></span>";
+  const particles = new Particles();
+  const header = document.createElement("header");
+  header.className = "header";
+  header.setAttribute("data-tauri-drag-region", "");
+  const crest = new Crest();
+  const headerSlot = document.createElement("div");
+  headerSlot.className = "header-slot";
+  headerSlot.setAttribute("data-tauri-drag-region", "");
+  header.append(crest.el, headerSlot);
+  const content = document.createElement("div");
+  content.className = "content";
+  panel.append(particles.el, frame, header, content);
+  const companions = new CompanionLayer();
+  stage.append(panel, companions.el);
+  root.replaceChildren(stage);
+  return { stage, panel, headerSlot, content, crest, particles, companions };
+}
 
 export function render(root: HTMLElement, state: UiState) {
   const snap = state.snapshot;
   if (!snap) return;
+  shell ??= buildShell(root);
+  const s = shell;
   const { mode } = snap.overlay;
   const compact = mode !== "champ-select";
-  const collapsed = mode === "in-game" && state.collapsed;
+  const collapsed = mode === "in-game" && state.collapsed && state.view === "main";
+  const appearance = normalizeAppearance(snap.appearance);
+
+  // Theme + motion on <html>, so everything (including the companion layer) follows.
+  const resolved = resolveTheme(appearance, snap.rank);
+  applyTheme(resolved.theme);
+  const html = document.documentElement;
+  html.dataset.motion = effectiveMotion(appearance.motion, { inGame: mode === "in-game", reducedMotion: reducedMotion.matches });
+  html.dataset.paused = String(!snap.overlay.visible || document.hidden);
+
+  s.crest.update(resolved.theme, compact);
+  s.panel.className = `panel mode-${mode}${snap.overlay.interactive ? " interactive" : ""}${collapsed ? " collapsed" : ""}`;
+  s.stage.className = `stage stage-${mode}`;
+  s.headerSlot.replaceChildren(...headerContent(snap, resolved, { collapsible: mode === "in-game", collapsed, view: state.view }));
 
   let body: HTMLElement | null = null;
-  if (!collapsed) {
+  if (state.view === "settings") {
+    body = settingsView(appearance, snap.rank, resolved, { compact });
+  } else if (!collapsed) {
     if (mode === "champ-select" && snap.champSelect) {
       body = champSelectView(fromChampSelect(snap.champSelect, state.champions), state.champions, state.data, snap.champSelect.timer.phase);
     } else if (mode === "in-game") {
@@ -24,26 +90,43 @@ export function render(root: HTMLElement, state: UiState) {
       const preGame = state.lastChampSelect ? fromChampSelect(state.lastChampSelect, state.champions) : null;
       body = inGameView(game ? fromLive(game, state.champions) : null, snap.live.status, state.champions, state.data, state.notes, preGame);
     } else {
-      body = idleView(snap);
+      body = idleView(snap, resolved);
     }
   }
+  s.content.replaceChildren(...[body, devPanel(state.mock)].filter((x): x is HTMLElement => !!x));
 
-  const panel = h(
-    "main",
-    { class: `panel mode-${mode}${snap.overlay.interactive ? " interactive" : ""}` },
-    header(snap, { collapsible: mode === "in-game" }),
-    body,
-    devPanel(state.mock),
+  // Companions: hidden in game unless the user wants them there.
+  const showCompanions = mode !== "hidden" && (mode !== "in-game" || appearance.companions.inGame);
+  const layout = layoutCompanions(
+    showCompanions ? appearance.companions : { ...appearance.companions, gwen: false, amumu: false },
+    window.innerWidth,
+    { compact: mode === "in-game" },
   );
-  root.replaceChildren(panel);
+  s.stage.style.setProperty("--gutter-top", `${layout.gutterTop}px`);
+  s.stage.style.setProperty("--gutter-bottom", `${layout.gutterBottom}px`);
+  s.companions.update(layout);
+  s.particles.update(html.dataset.motion === "full" && mode !== "in-game", resolved.theme.prestige);
 
-  if (compact) reportHeight(panel);
+  // Screen changes (mode, settings, collapse) get a short fade and a companion hop.
+  const key = `${mode}|${state.view}|${collapsed}`;
+  if (screenKey && key !== screenKey) {
+    s.content.animate([{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "ease-out" });
+    s.companions.react();
+  }
+  screenKey = key;
+
+  if (compact) reportHeight(s, layout.gutterTop + layout.gutterBottom);
 }
 
 let lastHeight = 0;
-/** Compact panels hug their content: tell Rust the height so it can resize + re-clamp. */
-function reportHeight(panel: HTMLElement) {
-  const height = Math.ceil(panel.getBoundingClientRect().height) + 2;
+/**
+ * Compact panels hug their content: tell Rust the natural height (incl. companion gutters).
+ * Measured from scrollHeight, so a panel capped at the screen height still reports what it
+ * needs (Rust clamps the window to the monitor and the content scrolls).
+ */
+function reportHeight(s: Shell, gutters: number) {
+  const header = s.panel.querySelector(".header") as HTMLElement;
+  const height = Math.ceil(header.offsetHeight + s.content.scrollHeight + gutters) + 4;
   if (Math.abs(height - lastHeight) >= 2) {
     lastHeight = height;
     void backend.fitContent(height);

@@ -2,12 +2,14 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import type {
+  Appearance,
   ChampSelectSession,
   ConnectionStatus,
   DdragonData,
   LivePayload,
   MockStatus,
   OverlayState,
+  RankInfo,
   Snapshot,
 } from "./types";
 
@@ -19,6 +21,8 @@ export interface BackendEvents {
   "rift:overlay": OverlayState;
   "rift:mock": MockStatus;
   "rift:ddragon": DdragonData | null;
+  "rift:rank": RankInfo | null;
+  "rift:appearance": Appearance;
 }
 
 export function on<K extends keyof BackendEvents>(event: K, handler: (payload: BackendEvents[K]) => void) {
@@ -31,6 +35,7 @@ export const backend = {
   setInteractive: (interactive: boolean) => invoke<void>("set_interactive", { interactive }),
   toggleVisibility: () => invoke<void>("toggle_visibility"),
   fitContent: (height: number) => invoke<void>("fit_content", { height }),
+  setAppearance: (appearance: Appearance) => invoke<void>("set_appearance", { appearance }),
   mock: {
     status: () => invoke<MockStatus>("mock_status"),
     load: (id: string) => invoke<void>("mock_load", { id }),
@@ -39,8 +44,23 @@ export const backend = {
   },
 };
 
-/** URL of a cached Data Dragon champion icon (served by the Rust `ddicon` protocol). */
+// Data Dragon art, cached on disk and served by the Rust `ddicon` protocol.
+const ASSET_BASE = navigator.userAgent.includes("Windows") ? "http://ddicon.localhost" : "ddicon://localhost";
+
 export function championIconUrl(championId: string): string {
-  const windows = navigator.userAgent.includes("Windows");
-  return windows ? `http://ddicon.localhost/${championId}.png` : `ddicon://localhost/${championId}.png`;
+  return `${ASSET_BASE}/${championId}.png`;
+}
+
+export function itemIconUrl(itemId: number): string {
+  return `${ASSET_BASE}/item/${itemId}.png`;
+}
+
+/** Ability icon; key is P (passive), Q, W, E or R. */
+export function spellIconUrl(championId: string, key: string): string {
+  return `${ASSET_BASE}/spell/${championId}/${key}.png`;
+}
+
+/** Centered default-skin splash art. */
+export function splashUrl(championId: string): string {
+  return `${ASSET_BASE}/splash/${championId}.jpg`;
 }

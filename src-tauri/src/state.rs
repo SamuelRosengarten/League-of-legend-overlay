@@ -7,7 +7,8 @@ use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 
 use crate::overlay::{self, OverlayState};
-use crate::settings::Settings;
+use crate::ranked::RankInfo;
+use crate::settings::{self, Appearance, Settings};
 use crate::types::{ChampSelectSession, ConnectionStatus, LiveGame, LiveStatus};
 
 pub mod events {
@@ -18,6 +19,8 @@ pub mod events {
     pub const OVERLAY: &str = "rift:overlay";
     pub const MOCK: &str = "rift:mock";
     pub const DDRAGON: &str = "rift:ddragon";
+    pub const RANK: &str = "rift:rank";
+    pub const APPEARANCE: &str = "rift:appearance";
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -30,6 +33,9 @@ pub struct Snapshot {
     pub champ_select: Option<ChampSelectSession>,
     pub live: LivePayload,
     pub overlay: OverlayState,
+    /// Current ranked tier (client, mock, or the cached last client value); None = never known.
+    pub rank: Option<RankInfo>,
+    pub appearance: Appearance,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -54,6 +60,12 @@ impl AppState {
                 champ_select: None,
                 live: LivePayload { status: LiveStatus::Idle, game: None },
                 overlay: OverlayState::new(mock, &settings),
+                rank: if mock {
+                    None
+                } else {
+                    settings.last_rank.clone().map(|r| RankInfo { source: "cached".into(), ..r })
+                },
+                appearance: settings.appearance.clone(),
             }),
             settings: Mutex::new(settings),
         }
@@ -114,4 +126,44 @@ pub fn set_live(app: &AppHandle, status: LiveStatus, game: Option<LiveGame>) {
 
 pub fn phase(app: &AppHandle) -> String {
     app.state::<AppState>().snapshot.lock().unwrap().phase.clone()
+}
+
+/// New rank from the client/mock. Client ranks are remembered for the next start.
+pub fn set_rank(app: &AppHandle, rank: RankInfo) {
+    let from_client = rank.source == "client";
+    if update(app, events::RANK, |s| &mut s.rank, Some(rank.clone())) && from_client {
+        let state = app.state::<AppState>();
+        let saved = {
+            let mut s = state.settings.lock().unwrap();
+            if s.last_rank.as_ref() == Some(&rank) {
+                None
+            } else {
+                s.last_rank = Some(rank);
+                Some(s.clone())
+            }
+        };
+        if let Some(saved) = saved {
+            settings::save(app, &saved);
+        }
+    }
+}
+
+/// Client went away: keep the rank but mark it as cached so the UI can say so.
+pub fn mark_rank_cached(app: &AppHandle) {
+    let current = app.state::<AppState>().snapshot.lock().unwrap().rank.clone();
+    if let Some(r) = current.filter(|r| r.source == "client") {
+        update(app, events::RANK, |s| &mut s.rank, Some(RankInfo { source: "cached".into(), ..r }));
+    }
+}
+
+pub fn set_appearance(app: &AppHandle, appearance: Appearance) {
+    if update(app, events::APPEARANCE, |s| &mut s.appearance, appearance.clone()) {
+        let state = app.state::<AppState>();
+        let saved = {
+            let mut s = state.settings.lock().unwrap();
+            s.appearance = appearance;
+            s.clone()
+        };
+        settings::save(app, &saved);
+    }
 }

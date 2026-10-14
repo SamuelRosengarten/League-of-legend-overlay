@@ -5,8 +5,9 @@ import type { GameNote } from "../../domain/gameNotes";
 import { type MatchView, formatGameTime } from "../../domain/match";
 import type { LiveStatus } from "../../types";
 import { h } from "../h";
+import { icon } from "../icons";
 import { adviceStatus, laneCard, notesFeed, threatList } from "./advisor";
-import { notice } from "./common";
+import { heading, notice } from "./common";
 import { pathCard, pathSummary } from "./jungle";
 
 /** The jungle plan stays expanded on the loading screen and for the first 90 s of game time. */
@@ -31,7 +32,12 @@ export function inGameView(
     return h("section", { class: "body" }, msg, plan ? pathCard(plan, champs, { compact: true }) : null);
   }
   const advice = buildAdvice(match, champs, data);
-  const clock = h("div", { class: "row" }, h("span", { class: "clock" }, formatGameTime(match.gameTime ?? 0)), advice.status === "ok" ? h("span", { class: "muted" }, `${champs.name(advice.me)} advisor`) : null);
+  const clock = h(
+    "div",
+    { class: "game-bar" },
+    h("span", { class: "clock" }, icon("clock", 13), formatGameTime(match.gameTime ?? 0)),
+    advice.status === "ok" ? h("span", { class: "muted" }, `${champs.name(advice.me)} · ${match.side === "red" ? "red" : "blue"} side`) : null,
+  );
   if (advice.status !== "ok") return h("section", { class: "body" }, clock, adviceStatus(advice, champs));
 
   const plan = advice.plan
@@ -44,7 +50,7 @@ export function inGameView(
     { class: "body" },
     clock,
     plan,
-    h("h3", null, "Top threats"),
+    heading("Top threats"),
     threatList(advice.threats.ranked, advice.threats.hidden, champs, { limit: 3, compact: true }),
     laneCard(advice, champs, { compact: true }),
     notesFeed(notes.slice(-3).reverse(), champs),

@@ -35,7 +35,7 @@ function firstGankLine(option: PathOption): HTMLElement {
 
 /** Curated reasons name buff sides; show the actual map side for this game instead. */
 function localize(text: string, side: JunglePlan["side"]): string {
-  return text.replace(/(blue|red)-buff side/g, (_, buff: string) => `${laneForBuffSide(`${buff}-buff-side` as BuffSide, side)} side`);
+  return text.replace(/\b(blue|red)-buff side\b/g, (_, buff: string) => `${laneForBuffSide(`${buff}-buff-side` as BuffSide, side)} side`);
 }
 
 function reasons(option: PathOption, side: JunglePlan["side"]): HTMLElement | null {

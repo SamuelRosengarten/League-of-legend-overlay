@@ -3,6 +3,7 @@
 use tauri::{AppHandle, Manager};
 
 use crate::ddragon::{DdragonData, DdragonState};
+use crate::settings::Appearance;
 use crate::state::{self, Snapshot};
 use crate::{mock, overlay};
 
@@ -24,6 +25,11 @@ pub fn set_interactive(app: AppHandle, interactive: bool) {
 #[tauri::command]
 pub fn toggle_visibility(app: AppHandle) {
     overlay::toggle_visibility(&app);
+}
+
+#[tauri::command]
+pub fn set_appearance(app: AppHandle, appearance: Appearance) {
+    state::set_appearance(&app, appearance);
 }
 
 #[tauri::command]

@@ -2,9 +2,10 @@ import type { CuratedData } from "../../data";
 import { buildAdvice } from "../../domain/advisor";
 import type { ChampionIndex } from "../../domain/champions";
 import type { MatchView } from "../../domain/match";
+import { splashUrl } from "../../bridge";
 import { h } from "../h";
 import { adviceStatus, laneCard, threatList, warningsList } from "./advisor";
-import { ROLE_LABEL, champIcon, notice } from "./common";
+import { ROLE_LABEL, champIcon, heading, notice } from "./common";
 import { pathCard } from "./jungle";
 
 export function champSelectView(match: MatchView, champs: ChampionIndex, data: CuratedData, timerPhase: string): HTMLElement {
@@ -12,13 +13,17 @@ export function champSelectView(match: MatchView, champs: ChampionIndex, data: C
   const advice = buildAdvice(match, champs, data);
   const ok = advice.status === "ok" ? advice : null;
 
+  // Splash art banner behind my champion (Data Dragon, cached locally).
+  const art = me?.championId ? (h("img", { class: "hero-art", src: splashUrl(me.championId), alt: "", draggable: "false" }) as HTMLImageElement) : null;
+  if (art) art.onerror = () => art.remove();
   const hero = h(
     "div",
-    { class: "hero" },
+    { class: `hero${me?.hovering ? " hero-hover" : ""}` },
+    art,
     champIcon(me?.championId ?? null, champs, 56),
     h(
       "div",
-      null,
+      { class: "hero-text" },
       h("div", { class: "hero-title" }, me?.championId ? champs.name(me.championId) : "No champion yet", me?.hovering ? h("span", { class: "tag" }, "hovering") : null),
       h(
         "div",
@@ -44,19 +49,19 @@ export function champSelectView(match: MatchView, champs: ChampionIndex, data: C
     body.push(
       warningsList(ok.warnings),
       ok.plan ? pathCard(ok.plan, champs) : null,
-      h("h3", null, "Threat ranking", h("span", { class: "count" }, `vs ${champs.name(ok.me)}`)),
+      heading("Threat ranking", `vs ${champs.name(ok.me)}`),
       threatList(ok.threats.ranked, ok.threats.hidden, champs),
       laneCard(ok, champs),
     );
   } else {
     body.push(
-      h("h3", null, "Enemy team"),
+      heading("Enemy team"),
       h("div", { class: "team-row" }, match.enemies.map((s) => champIcon(s.championId, champs, 34))),
     );
   }
 
   body.push(
-    h("h3", null, "Your team"),
+    heading("Your team"),
     h(
       "div",
       { class: "team-row" },

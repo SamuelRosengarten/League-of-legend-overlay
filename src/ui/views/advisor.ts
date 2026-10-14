@@ -6,7 +6,7 @@ import type { Threat, ThreatReason } from "../../domain/threat";
 import type { TeamWarning } from "../../domain/warnings";
 import type { Confidence, Phase } from "../../data/types";
 import { h } from "../h";
-import { ROLE_LABEL, champIcon, notice } from "./common";
+import { ROLE_LABEL, champIcon, itemIcon, notice, spellIcon } from "./common";
 
 type OkAdvice = Extract<Advice, { status: "ok" }>;
 
@@ -46,9 +46,14 @@ function phaseRow(p: { early: Phase; mid: Phase; late: Phase }): HTMLElement {
   );
 }
 
-function section(title: string, items: (HTMLElement | null)[]): HTMLElement | null {
+function section(title: string, items: (HTMLElement | null)[], cls = ""): HTMLElement | null {
   const content = items.filter((i): i is HTMLElement => !!i);
-  return content.length ? h("div", { class: "card-section" }, h("h4", null, title), h("ul", null, content)) : null;
+  return content.length ? h("div", { class: `card-section ${cls}` }, h("h4", null, title), h("ul", null, content)) : null;
+}
+
+/** Guide row: art on the left, title + note on the right. */
+function guideRow(art: HTMLElement | null, title: string | null, note: string, confidence?: Confidence): HTMLElement {
+  return h("li", { class: "guide-row" }, art, h("div", { class: "guide-text" }, title ? h("b", null, title) : null, title ? " " : null, note, lowMark(confidence)));
 }
 
 export function laneCard(advice: OkAdvice, champs: ChampionIndex, opts: { compact?: boolean } = {}): HTMLElement {
@@ -72,19 +77,22 @@ export function laneCard(advice: OkAdvice, champs: ChampionIndex, opts: { compac
   if (!opp.entry) return uncuratedCard(head, opp, opts);
 
   const e = opp.entry;
+  const champ = opp.championId;
   if (opts.compact) {
-    return h("div", { class: "card compact-card" }, head, section("Key tips", e.tips.slice(0, 3).map((t) => h("li", null, t.text, lowMark(t.confidence)))));
+    return h("div", { class: "card compact-card" }, head, section("Key tips", e.tips.slice(0, 3).map((t) => h("li", null, t.text, lowMark(t.confidence))), "tips"));
   }
+  const spikeArt = (s: (typeof e.powerSpikes)[number]) =>
+    s.kind === "item" && s.item ? itemIcon(s.item, "Item spike", 26) : h("span", { class: "spike-badge" }, s.kind === "level" ? h("small", null, "Lv") : null, s.kind === "level" ? String(s.level) : "★");
   return h(
     "div",
-    { class: "card" },
+    { class: "card guide" },
     head,
     phaseRow(e.phaseAdvantage),
-    section("Watch out for", e.dangerAbilities.map((a) => h("li", null, h("b", { class: "key" }, a.key), h("b", null, a.name), ` — ${a.note}`, lowMark(a.confidence)))),
-    section("Power spikes", e.powerSpikes.map((s) => h("li", null, h("b", null, s.kind === "level" ? `Lv ${s.level}` : s.kind === "item" ? "Item" : "Spike"), ` ${s.note}`, lowMark(s.confidence)))),
-    section("How to beat them", e.tips.map((t) => h("li", null, t.text, lowMark(t.confidence)))),
-    section("Items", e.itemAdjustments.map((i) => h("li", null, h("b", null, i.name), ` — ${i.note}`, lowMark(i.confidence)))),
-    section("Runes", e.runeAdjustments.map((r) => h("li", null, h("b", null, r.rune), ` — ${r.note}`, lowMark(r.confidence)))),
+    section("Watch out for", e.dangerAbilities.map((a) => guideRow(spellIcon(champ, a.key, a.name), a.name, a.note, a.confidence)), "rows"),
+    section("Power spikes", e.powerSpikes.map((s) => guideRow(spikeArt(s), null, s.note, s.confidence)), "rows"),
+    section("How to beat them", e.tips.map((t) => h("li", null, t.text, lowMark(t.confidence))), "tips"),
+    section("Items", e.itemAdjustments.map((i) => guideRow(i.item ? itemIcon(i.item, i.name, 26) : null, i.name, i.note, i.confidence)), "rows"),
+    section("Runes", e.runeAdjustments.map((r) => guideRow(h("span", { class: "rune-badge" }, "✦"), r.rune, r.note, r.confidence)), "rows"),
     e.reviewNotes ? h("p", { class: "review" }, `Review: ${e.reviewNotes}`) : null,
   );
 }
@@ -124,14 +132,15 @@ function reasonChip(r: ThreatReason): HTMLElement {
 
 export function threatList(threats: Threat[], hidden: number, champs: ChampionIndex, opts: { limit?: number; compact?: boolean } = {}): HTMLElement {
   const shown = threats.slice(0, opts.limit ?? threats.length);
+  const max = Math.max(1, ...threats.map((t) => t.score));
   return h(
     "div",
     { class: "threats" },
     shown.map((t, rank) =>
       h(
         "div",
-        { class: `threat${opts.compact ? " threat-compact" : ""}` },
-        h("span", { class: "rank" }, String(rank + 1)),
+        { class: `threat${opts.compact ? " threat-compact" : ""}${rank === 0 ? " threat-top" : ""}`, style: `--meter:${Math.round((t.score / max) * 100)}%` },
+        h("span", { class: "rank" }, h("span", null, String(rank + 1))),
         champIcon(t.championId, champs, opts.compact ? 30 : 34),
         h(
           "div",

@@ -1,23 +1,24 @@
+import type { ResolvedTheme } from "../../theme/theme";
 import type { Snapshot } from "../../types";
 import { h } from "../h";
 import { notice } from "./common";
+import { rankShowcase } from "./rank";
 
-export function idleView(snap: Snapshot): HTMLElement {
+export function idleView(snap: Snapshot, resolved: ResolvedTheme): HTMLElement {
   const c = snap.connection;
-  const hide = snap.overlay.hotkeys.toggleVisibility;
-  let body: HTMLElement;
+  let status: HTMLElement;
   switch (c.state) {
     case "client-not-running":
-      body = notice("muted", "League client not running", "Start League of Legends — Rift Advisor connects automatically.");
+      status = notice("muted", "League client not running", "Start League of Legends — Rift Advisor connects automatically.");
       break;
     case "connecting":
-      body = notice("muted", "Connecting to the League client…");
+      status = notice("muted", "Connecting to the League client…");
       break;
     case "api-unreachable":
-      body = notice("warn", "Client found, but its API is not answering", `${c.message}. Retrying every few seconds.`);
+      status = notice("warn", "Client found, but its API is not answering", `${c.message}. Retrying every few seconds.`);
       break;
     default:
-      body = notice("info", "Waiting for champ select", `Phase: ${snap.phase}. The advisor opens automatically when you enter champ select.`);
+      status = notice("info", "Waiting for champ select", `Phase: ${snap.phase}. The advisor opens automatically when you enter champ select.`);
   }
-  return h("section", { class: "body" }, body, h("p", { class: "hint" }, `${hide} hides/shows this overlay.`));
+  return h("section", { class: "body" }, rankShowcase(snap.rank, resolved, { compact: true }), status);
 }

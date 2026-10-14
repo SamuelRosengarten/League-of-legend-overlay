@@ -1,7 +1,8 @@
-import { championIconUrl } from "../../bridge";
+import { championIconUrl, itemIconUrl, spellIconUrl } from "../../bridge";
 import type { ChampionIndex } from "../../domain/champions";
 import type { Role, Slot } from "../../domain/match";
 import { h } from "../h";
+import { type IconName, icon } from "../icons";
 
 export const ROLE_LABEL: Record<Role, string> = {
   top: "Top",
@@ -11,18 +12,29 @@ export const ROLE_LABEL: Record<Role, string> = {
   utility: "Support",
 };
 
-export function champIcon(id: string | null, champs: ChampionIndex, size = 36): HTMLElement {
-  const box = h("div", { class: "icon", style: `width:${size}px;height:${size}px` });
-  if (!id) {
-    box.classList.add("icon-hidden");
-    box.textContent = "?";
-    return box;
-  }
-  box.textContent = champs.name(id).slice(0, 2);
-  const img = h("img", { src: championIconUrl(id), alt: champs.name(id), draggable: "false" }) as HTMLImageElement;
+/** Image tile with a text fallback if the art cannot load (offline, unknown id). */
+function artTile(cls: string, size: number, url: string, alt: string, fallback: string): HTMLElement {
+  const box = h("div", { class: `icon ${cls}`, style: `width:${size}px;height:${size}px` }, h("span", { class: "icon-fallback" }, fallback));
+  const img = h("img", { src: url, alt, draggable: "false" }) as HTMLImageElement;
   img.onerror = () => img.remove();
   box.append(img);
   return box;
+}
+
+export function champIcon(id: string | null, champs: ChampionIndex, size = 36): HTMLElement {
+  if (!id) return h("div", { class: "icon icon-hidden", style: `width:${size}px;height:${size}px`, title: "Not revealed yet" }, "?");
+  return artTile("icon-champ", size, championIconUrl(id), champs.name(id), champs.name(id).slice(0, 2));
+}
+
+export function itemIcon(itemId: number, name: string, size = 24): HTMLElement {
+  return artTile("icon-item", size, itemIconUrl(itemId), name, "◆");
+}
+
+/** Ability icon with its key (P/Q/W/E/R) badge. */
+export function spellIcon(championId: string, key: string, name: string, size = 26): HTMLElement {
+  const tile = artTile("icon-spell", size, spellIconUrl(championId, key), name, key);
+  tile.append(h("b", { class: "key-badge" }, key));
+  return tile;
 }
 
 export function slotRow(slot: Slot, champs: ChampionIndex, extra?: HTMLElement | null): HTMLElement {
@@ -42,6 +54,18 @@ export function slotRow(slot: Slot, champs: ChampionIndex, extra?: HTMLElement |
   );
 }
 
+const NOTICE_ICON: Record<"info" | "warn" | "muted", IconName> = { info: "info", warn: "warn", muted: "plug" };
+
 export function notice(kind: "info" | "warn" | "muted", title: string, body?: string): HTMLElement {
-  return h("div", { class: `notice notice-${kind}` }, h("strong", null, title), body ? h("p", null, body) : null);
+  return h(
+    "div",
+    { class: `notice notice-${kind}` },
+    h("span", { class: "notice-icon" }, icon(NOTICE_ICON[kind], 16)),
+    h("div", null, h("strong", null, title), body ? h("p", null, body) : null),
+  );
+}
+
+/** Section heading with an ornamental rule. */
+export function heading(text: string, aside?: string | HTMLElement | null): HTMLElement {
+  return h("h3", null, h("span", null, text), h("i", { class: "rule" }), aside ? h("span", { class: "count" }, aside) : null);
 }

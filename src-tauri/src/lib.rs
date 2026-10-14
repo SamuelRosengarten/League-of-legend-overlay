@@ -9,6 +9,7 @@ mod live;
 mod lockfile;
 mod mock;
 mod overlay;
+mod ranked;
 mod settings;
 mod state;
 mod tls;
@@ -108,6 +109,7 @@ pub fn run() {
             commands::set_interactive,
             commands::toggle_visibility,
             commands::fit_content,
+            commands::set_appearance,
             commands::mock_status,
             commands::mock_load,
             commands::mock_step,

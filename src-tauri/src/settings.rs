@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 
 use crate::geometry::Edge;
+use crate::ranked::RankInfo;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", default)]
@@ -20,6 +21,47 @@ pub struct Settings {
     pub positions: BTreeMap<String, SavedPosition>,
     /// Screen edge the in-game panel is docked to.
     pub dock: Edge,
+    /// Theme, companions and motion (edited from the overlay's Appearance view).
+    pub appearance: Appearance,
+    /// Last rank the client reported; themes the overlay while the client is closed.
+    pub last_rank: Option<RankInfo>,
+}
+
+/// Visual preferences. Values are validated by the frontend, which owns the option lists
+/// (`src/theme/`); unknown values fall back to defaults there.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct Appearance {
+    /// "auto" (current rank from the client) or a tier id ("iron" … "challenger", "unranked").
+    pub theme: String,
+    /// "full" | "calm" | "off" — "off" also applies when Windows asks for reduced motion.
+    pub motion: String,
+    pub companions: Companions,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct Companions {
+    pub gwen: bool,
+    pub amumu: bool,
+    /// Placement preset id, e.g. "top", "corners", "bottom", "left", "right", "hanging", "minimal".
+    pub placement: String,
+    /// Scale factor, 0.7 – 1.4.
+    pub size: f64,
+    /// Keep them visible on the in-game panel.
+    pub in_game: bool,
+}
+
+impl Default for Appearance {
+    fn default() -> Self {
+        Self { theme: "auto".into(), motion: "full".into(), companions: Companions::default() }
+    }
+}
+
+impl Default for Companions {
+    fn default() -> Self {
+        Self { gwen: true, amumu: true, placement: "corners".into(), size: 1.0, in_game: true }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -43,7 +85,14 @@ impl Default for Hotkeys {
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { hotkeys: Hotkeys::default(), league_install_dir: None, positions: BTreeMap::new(), dock: Edge::Right }
+        Self {
+            hotkeys: Hotkeys::default(),
+            league_install_dir: None,
+            positions: BTreeMap::new(),
+            dock: Edge::Right,
+            appearance: Appearance::default(),
+            last_rank: None,
+        }
     }
 }
 
@@ -87,6 +136,16 @@ mod tests {
         assert_eq!(s.hotkeys.toggle_interactive, "Ctrl+Shift+Z");
         assert_eq!(s.league_install_dir.as_deref(), Some("D:/Games/League"));
         assert_eq!(s.dock, Edge::Right);
+        assert_eq!(s.appearance, Appearance::default());
+    }
+
+    #[test]
+    fn partial_appearance_keeps_other_defaults() {
+        let s: Settings = serde_json::from_str(r#"{ "appearance": { "theme": "gold", "companions": { "amumu": false } } }"#).unwrap();
+        assert_eq!(s.appearance.theme, "gold");
+        assert_eq!(s.appearance.motion, "full");
+        assert!(s.appearance.companions.gwen && !s.appearance.companions.amumu);
+        assert_eq!(s.appearance.companions.placement, "corners");
     }
 
     #[test]
