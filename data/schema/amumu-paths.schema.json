@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rift-advisor.local/schema/amumu-paths.schema.json",
+  "title": "Curated Amumu first-clear paths (data/jungle/amumu-paths.json)",
+  "description": "Camps are named by buff side, not map side, so one path works on blue and red side; the planner maps 'blue-buff-side' / 'red-buff-side' to top/bot for the actual side.",
+  "type": "object",
+  "required": ["paths"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "paths": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/path" } }
+  },
+  "$defs": {
+    "camp": {
+      "description": "blue/gromp/wolves are on the blue-buff side; red/krugs/raptors on the red-buff side. Scuttles are named by the side of the map the path ends on.",
+      "enum": ["blue", "gromp", "wolves", "raptors", "red", "krugs", "scuttle-blue-buff-side", "scuttle-red-buff-side"]
+    },
+    "buffSide": { "enum": ["blue-buff-side", "red-buff-side"] },
+    "condition": {
+      "description": "Conditions the planner evaluates (src/domain/pathPlanner.ts).",
+      "enum": [
+        "end-lane-priority",
+        "end-lane-losing",
+        "end-lane-gank-setup",
+        "end-lane-enemy-immobile",
+        "start-lane-priority",
+        "mid-priority",
+        "enemy-jungler-invader",
+        "enemy-jungler-passive",
+        "enemy-jungler-strong-early"
+      ]
+    },
+    "rule": {
+      "type": "object",
+      "required": ["condition", "weight", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "condition": { "$ref": "#/$defs/condition" },
+        "weight": { "type": "number", "minimum": 0.5, "maximum": 3 },
+        "reason": { "type": "string", "minLength": 3, "maxLength": 200 }
+      }
+    },
+    "path": {
+      "type": "object",
+      "required": ["id", "name", "clear", "endsOn", "approxFinish", "firstGank", "favors", "avoid", "notes", "confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string", "minLength": 3 },
+        "clear": {
+          "description": "Camps in order; the first is the start camp.",
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/camp" }
+        },
+        "endsOn": { "$ref": "#/$defs/buffSide" },
+        "approxFinish": {
+          "description": "Approximate game time when the clear ends (m:ss). Rough guide only.",
+          "type": "string",
+          "pattern": "^[0-9]{1,2}:[0-5][0-9]$"
+        },
+        "firstGank": {
+          "description": "Where the first gank goes: the lane on the side the path ends on, or mid.",
+          "enum": ["end-side-lane", "mid", "none"]
+        },
+        "favors": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
+        "avoid": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
+        "notes": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/text" } },
+        "confidence": { "$ref": "common.schema.json#/$defs/confidence" }
+      }
+    }
+  }
+}

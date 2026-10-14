@@ -1,0 +1,32 @@
+{
+  "$schema": "../schema/item-counters.schema.json",
+  "items": {
+    "3140": { "name": "Quicksilver Sash", "effects": ["cleanse"], "relevantTo": ["Amumu"], "note": "Active removes crowd control: can break out of Bandage Toss / Curse of the Sad Mummy.", "confidence": "high" },
+    "3139": { "name": "Mercurial Scimitar", "effects": ["cleanse"], "relevantTo": ["Amumu"], "note": "QSS upgrade: cleanses your engage CC. Bait it out before committing R.", "confidence": "high" },
+    "6035": { "name": "Silvermere Dawn", "effects": ["cleanse", "tank"], "relevantTo": ["Amumu"], "note": "QSS upgrade for bruisers/tanks; cleanses CC.", "confidence": "low" },
+    "3102": { "name": "Banshee's Veil", "effects": ["spell-shield"], "relevantTo": ["Amumu"], "note": "Spell shield can block Bandage Toss — pop it before engaging on the carrier.", "confidence": "medium" },
+    "3814": { "name": "Edge of Night", "effects": ["spell-shield"], "relevantTo": ["Amumu"], "note": "Spell shield (after channel) can block Bandage Toss.", "confidence": "medium" },
+    "3157": { "name": "Zhonya's Hourglass", "effects": ["untargetable"], "relevantTo": ["Amumu", "Gwen"], "note": "Stasis wastes your R / burst; wait it out.", "confidence": "high" },
+    "3153": { "name": "Blade of the Ruined King", "effects": ["percent-hp-damage"], "relevantTo": ["Amumu"], "note": "Current-HP damage shreds tanks; don't front-line it alone for long.", "confidence": "high" },
+    "3033": { "name": "Mortal Reminder", "effects": ["grievous-wounds"], "relevantTo": ["Gwen"], "note": "Grievous Wounds cuts Gwen's passive healing.", "confidence": "high" },
+    "3123": { "name": "Executioner's Calling", "effects": ["grievous-wounds"], "relevantTo": ["Gwen"], "note": "Early Grievous Wounds — your passive sustain is weaker in extended trades.", "confidence": "high" },
+    "3075": { "name": "Thornmail", "effects": ["grievous-wounds", "tank"], "relevantTo": ["Gwen"], "note": "Grievous Wounds when you auto them; less relevant than vs pure AD on-hit, but cuts healing.", "confidence": "medium" },
+    "3076": { "name": "Bramble Vest", "effects": ["grievous-wounds"], "relevantTo": ["Gwen"], "note": "Thornmail component: early Grievous Wounds on your autos.", "confidence": "high" },
+    "3165": { "name": "Morellonomicon", "effects": ["grievous-wounds"], "relevantTo": ["Gwen"], "note": "Mage Grievous Wounds.", "confidence": "high" },
+    "3916": { "name": "Oblivion Orb", "effects": ["grievous-wounds"], "relevantTo": ["Gwen"], "note": "Morellonomicon component: Grievous Wounds.", "confidence": "high" },
+    "6609": { "name": "Chempunk Chainsword", "effects": ["grievous-wounds"], "relevantTo": ["Gwen"], "note": "Bruiser Grievous Wounds — common on top laners.", "confidence": "medium" },
+    "3011": { "name": "Chemtech Putrifier", "effects": ["grievous-wounds"], "relevantTo": ["Gwen"], "note": "Support Grievous Wounds.", "confidence": "medium" },
+    "3156": { "name": "Maw of Malmortius", "effects": ["burst"], "relevantTo": ["Gwen"], "note": "Magic-damage lifeline shield blunts your all-in; trade around its cooldown.", "confidence": "medium" },
+    "4401": { "name": "Force of Nature", "effects": ["tank"], "relevantTo": ["Gwen"], "note": "Stacking MR makes them much harder to kill as a magic-damage champion.", "confidence": "medium" },
+    "3065": { "name": "Spirit Visage", "effects": ["tank", "healing"], "relevantTo": ["Gwen"], "note": "MR + increased healing: extended trades get worse.", "confidence": "high" },
+    "3111": { "name": "Mercury's Treads", "effects": ["tank"], "relevantTo": ["Amumu", "Gwen"], "note": "Tenacity shortens your CC chain and adds MR.", "confidence": "high" },
+    "3074": { "name": "Ravenous Hydra", "effects": ["sustained-dps", "healing"], "relevantTo": ["Gwen"], "note": "Big wave clear + healing spike on fighters (e.g. Fiora).", "confidence": "medium" },
+    "3077": { "name": "Tiamat", "effects": ["sustained-dps"], "relevantTo": ["Gwen"], "note": "Hydra component: stronger short trades and wave clear.", "confidence": "high" },
+    "3071": { "name": "Black Cleaver", "effects": ["sustained-dps"], "relevantTo": ["Amumu"], "note": "Armor shred stacks on you in extended fights.", "confidence": "high" },
+    "3036": { "name": "Lord Dominik's Regards", "effects": ["percent-hp-damage"], "relevantTo": ["Amumu"], "note": "Armor penetration vs bonus-HP targets — tanks take a lot more damage.", "confidence": "high" },
+    "3302": { "name": "Terminus", "effects": ["percent-hp-damage"], "relevantTo": ["Amumu"], "note": "Penetration that ramps in long fights against tanks.", "confidence": "low" },
+    "3078": { "name": "Trinity Force", "effects": ["sustained-dps"], "relevantTo": ["Gwen"], "note": "Duelist spike for bruisers.", "confidence": "high" },
+    "6610": { "name": "Sundered Sky", "effects": ["healing", "sustained-dps"], "relevantTo": ["Gwen"], "note": "Guaranteed crit + healing on fighters; longer trades favor them.", "confidence": "low" },
+    "3053": { "name": "Sterak's Gage", "effects": ["tank"], "relevantTo": ["Gwen"], "note": "Shield on burst — your all-in has to outlast it.", "confidence": "high" }
+  }
+}

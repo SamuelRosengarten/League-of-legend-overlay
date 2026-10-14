@@ -1,0 +1,96 @@
+{
+  "$schema": "../schema/amumu-paths.schema.json",
+  "paths": [
+    {
+      "id": "full-clear-red-start",
+      "name": "Full clear: red start → ends at blue buff",
+      "clear": ["red", "krugs", "raptors", "wolves", "blue", "gromp"],
+      "endsOn": "blue-buff-side",
+      "approxFinish": "3:15",
+      "firstGank": "end-side-lane",
+      "favors": [
+        { "condition": "end-lane-priority", "weight": 2, "reason": "your laner on the blue-buff side has priority, so a gank there after the clear is likely to work" },
+        { "condition": "end-lane-gank-setup", "weight": 1, "reason": "your laner on the blue-buff side has CC to follow up Bandage Toss" },
+        { "condition": "end-lane-enemy-immobile", "weight": 1, "reason": "the enemy laner on the blue-buff side has little mobility to escape" },
+        { "condition": "enemy-jungler-passive", "weight": 0.5, "reason": "a full clear is safe against a farming enemy jungler" }
+      ],
+      "avoid": [
+        { "condition": "enemy-jungler-invader", "weight": 1.5, "reason": "a full clear leaves your start buff side exposed to an early invader" },
+        { "condition": "end-lane-losing", "weight": 1, "reason": "your laner on the blue-buff side is likely to be pushed in" }
+      ],
+      "notes": [
+        { "text": "Standard Amumu full clear; ask your bot lane (or top) for a leash at the start buff." },
+        { "text": "Times are approximate and depend on leash and smite usage.", "confidence": "low" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "full-clear-blue-start",
+      "name": "Full clear: blue start → ends at red buff",
+      "clear": ["blue", "gromp", "wolves", "raptors", "red", "krugs"],
+      "endsOn": "red-buff-side",
+      "approxFinish": "3:15",
+      "firstGank": "end-side-lane",
+      "favors": [
+        { "condition": "end-lane-priority", "weight": 2, "reason": "your laner on the red-buff side has priority, so a gank there after the clear is likely to work" },
+        { "condition": "end-lane-gank-setup", "weight": 1, "reason": "your laner on the red-buff side has CC to follow up Bandage Toss" },
+        { "condition": "end-lane-enemy-immobile", "weight": 1, "reason": "the enemy laner on the red-buff side has little mobility to escape" },
+        { "condition": "enemy-jungler-passive", "weight": 0.5, "reason": "a full clear is safe against a farming enemy jungler" }
+      ],
+      "avoid": [
+        { "condition": "enemy-jungler-invader", "weight": 1.5, "reason": "a full clear leaves your start buff side exposed to an early invader" },
+        { "condition": "end-lane-losing", "weight": 1, "reason": "your laner on the red-buff side is likely to be pushed in" }
+      ],
+      "notes": [
+        { "text": "Mirror of the red start; pick the one that ends next to the lane you want to play for." },
+        { "text": "Times are approximate and depend on leash and smite usage.", "confidence": "low" }
+      ],
+      "confidence": "medium"
+    },
+    {
+      "id": "three-camp-gank",
+      "name": "3-camp into level 3 gank (red-buff side)",
+      "clear": ["red", "krugs", "raptors"],
+      "endsOn": "red-buff-side",
+      "approxFinish": "2:30",
+      "firstGank": "end-side-lane",
+      "favors": [
+        { "condition": "end-lane-priority", "weight": 2.5, "reason": "your laner on the red-buff side has priority — an early level 3 gank there is the highest-value play" },
+        { "condition": "end-lane-gank-setup", "weight": 1.5, "reason": "your laner on the red-buff side has CC to chain with Bandage Toss" },
+        { "condition": "end-lane-enemy-immobile", "weight": 1.5, "reason": "the enemy laner on the red-buff side is immobile and easy to catch at level 3" },
+        { "condition": "enemy-jungler-passive", "weight": 1, "reason": "a farming enemy jungler is unlikely to counter-gank early" }
+      ],
+      "avoid": [
+        { "condition": "end-lane-losing", "weight": 2, "reason": "a losing lane can't follow up an early gank" },
+        { "condition": "enemy-jungler-strong-early", "weight": 1, "reason": "a strong early enemy jungler can counter-gank your level 3 Amumu" }
+      ],
+      "notes": [
+        { "text": "Skip camps to arrive early; come back for the rest after the gank or reset." },
+        { "text": "Camp choice for a 3-camp path is a common pattern, not a fixed rule — adjust to your leash.", "confidence": "low" }
+      ],
+      "confidence": "low"
+    },
+    {
+      "id": "buff-scuttle",
+      "name": "Half clear into scuttle (blue-buff side)",
+      "clear": ["blue", "gromp", "wolves", "scuttle-blue-buff-side"],
+      "endsOn": "blue-buff-side",
+      "approxFinish": "3:30",
+      "firstGank": "mid",
+      "favors": [
+        { "condition": "mid-priority", "weight": 2, "reason": "your mid laner has priority to help you contest scuttle" },
+        { "condition": "end-lane-priority", "weight": 1, "reason": "your laner on the blue-buff side can rotate to the river" },
+        { "condition": "enemy-jungler-passive", "weight": 1, "reason": "a farming enemy jungler is unlikely to contest scuttle" }
+      ],
+      "avoid": [
+        { "condition": "enemy-jungler-strong-early", "weight": 2, "reason": "a strong early enemy jungler wins a scuttle contest against Amumu" },
+        { "condition": "enemy-jungler-invader", "weight": 1, "reason": "an invader may already be waiting at your river" }
+      ],
+      "notes": [
+        { "text": "Only contest scuttle with lane priority; otherwise finish your camps." },
+        { "text": "Scuttle spawn timing changes between seasons — verify the current timer.", "confidence": "low" }
+      ],
+      "confidence": "low"
+    }
+  ]
+}

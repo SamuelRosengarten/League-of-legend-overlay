@@ -1,0 +1,1883 @@
+{
+  "name": "Gwen vs Fiora (top, blue side)",
+  "description": "Ranked draft: enemies reveal as they lock, then in game Fiora completes Ravenous Hydra.",
+  "steps": [
+    {
+      "label": "Lobby",
+      "delayMs": 1500,
+      "phase": "Lobby",
+      "champSelect": null,
+      "liveGame": null
+    },
+    {
+      "label": "Champ select: hovering Gwen, enemies hidden",
+      "delayMs": 3000,
+      "phase": "ChampSelect",
+      "champSelect": {
+        "localPlayerCellId": 0,
+        "myTeam": [
+          {
+            "cellId": 0,
+            "championId": 0,
+            "championPickIntent": 887,
+            "assignedPosition": "top",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Sam",
+            "tagLine": "EUW",
+            "summonerId": 1000
+          },
+          {
+            "cellId": 1,
+            "championId": 254,
+            "championPickIntent": 0,
+            "assignedPosition": "jungle",
+            "spell1Id": 4,
+            "spell2Id": 11,
+            "team": 1,
+            "gameName": "Player1",
+            "tagLine": "",
+            "summonerId": 1001
+          },
+          {
+            "cellId": 2,
+            "championId": 61,
+            "championPickIntent": 0,
+            "assignedPosition": "middle",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Player2",
+            "tagLine": "",
+            "summonerId": 1002
+          },
+          {
+            "cellId": 3,
+            "championId": 51,
+            "championPickIntent": 0,
+            "assignedPosition": "bottom",
+            "spell1Id": 4,
+            "spell2Id": 7,
+            "team": 1,
+            "gameName": "Player3",
+            "tagLine": "",
+            "summonerId": 1003
+          },
+          {
+            "cellId": 4,
+            "championId": 99,
+            "championPickIntent": 0,
+            "assignedPosition": "utility",
+            "spell1Id": 4,
+            "spell2Id": 14,
+            "team": 1,
+            "gameName": "Player4",
+            "tagLine": "",
+            "summonerId": 1004
+          }
+        ],
+        "theirTeam": [
+          {
+            "cellId": 5,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1005
+          },
+          {
+            "cellId": 6,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1006
+          },
+          {
+            "cellId": 7,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1007
+          },
+          {
+            "cellId": 8,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1008
+          },
+          {
+            "cellId": 9,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1009
+          }
+        ],
+        "actions": [],
+        "timer": {
+          "phase": "BAN_PICK"
+        },
+        "isSpectating": false
+      }
+    },
+    {
+      "label": "Gwen locked; Jinx + Thresh revealed",
+      "delayMs": 3000,
+      "champSelect": {
+        "localPlayerCellId": 0,
+        "myTeam": [
+          {
+            "cellId": 0,
+            "championId": 887,
+            "championPickIntent": 0,
+            "assignedPosition": "top",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Sam",
+            "tagLine": "EUW",
+            "summonerId": 1000
+          },
+          {
+            "cellId": 1,
+            "championId": 254,
+            "championPickIntent": 0,
+            "assignedPosition": "jungle",
+            "spell1Id": 4,
+            "spell2Id": 11,
+            "team": 1,
+            "gameName": "Player1",
+            "tagLine": "",
+            "summonerId": 1001
+          },
+          {
+            "cellId": 2,
+            "championId": 61,
+            "championPickIntent": 0,
+            "assignedPosition": "middle",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Player2",
+            "tagLine": "",
+            "summonerId": 1002
+          },
+          {
+            "cellId": 3,
+            "championId": 51,
+            "championPickIntent": 0,
+            "assignedPosition": "bottom",
+            "spell1Id": 4,
+            "spell2Id": 7,
+            "team": 1,
+            "gameName": "Player3",
+            "tagLine": "",
+            "summonerId": 1003
+          },
+          {
+            "cellId": 4,
+            "championId": 99,
+            "championPickIntent": 0,
+            "assignedPosition": "utility",
+            "spell1Id": 4,
+            "spell2Id": 14,
+            "team": 1,
+            "gameName": "Player4",
+            "tagLine": "",
+            "summonerId": 1004
+          }
+        ],
+        "theirTeam": [
+          {
+            "cellId": 5,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1005
+          },
+          {
+            "cellId": 6,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1006
+          },
+          {
+            "cellId": 7,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1007
+          },
+          {
+            "cellId": 8,
+            "championId": 222,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1008
+          },
+          {
+            "cellId": 9,
+            "championId": 412,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1009
+          }
+        ],
+        "actions": [],
+        "timer": {
+          "phase": "BAN_PICK"
+        },
+        "isSpectating": false
+      }
+    },
+    {
+      "label": "Viego + Ahri revealed, top still hidden",
+      "delayMs": 3000,
+      "champSelect": {
+        "localPlayerCellId": 0,
+        "myTeam": [
+          {
+            "cellId": 0,
+            "championId": 887,
+            "championPickIntent": 0,
+            "assignedPosition": "top",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Sam",
+            "tagLine": "EUW",
+            "summonerId": 1000
+          },
+          {
+            "cellId": 1,
+            "championId": 254,
+            "championPickIntent": 0,
+            "assignedPosition": "jungle",
+            "spell1Id": 4,
+            "spell2Id": 11,
+            "team": 1,
+            "gameName": "Player1",
+            "tagLine": "",
+            "summonerId": 1001
+          },
+          {
+            "cellId": 2,
+            "championId": 61,
+            "championPickIntent": 0,
+            "assignedPosition": "middle",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Player2",
+            "tagLine": "",
+            "summonerId": 1002
+          },
+          {
+            "cellId": 3,
+            "championId": 51,
+            "championPickIntent": 0,
+            "assignedPosition": "bottom",
+            "spell1Id": 4,
+            "spell2Id": 7,
+            "team": 1,
+            "gameName": "Player3",
+            "tagLine": "",
+            "summonerId": 1003
+          },
+          {
+            "cellId": 4,
+            "championId": 99,
+            "championPickIntent": 0,
+            "assignedPosition": "utility",
+            "spell1Id": 4,
+            "spell2Id": 14,
+            "team": 1,
+            "gameName": "Player4",
+            "tagLine": "",
+            "summonerId": 1004
+          }
+        ],
+        "theirTeam": [
+          {
+            "cellId": 5,
+            "championId": 0,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1005
+          },
+          {
+            "cellId": 6,
+            "championId": 234,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1006
+          },
+          {
+            "cellId": 7,
+            "championId": 103,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1007
+          },
+          {
+            "cellId": 8,
+            "championId": 222,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1008
+          },
+          {
+            "cellId": 9,
+            "championId": 412,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1009
+          }
+        ],
+        "actions": [],
+        "timer": {
+          "phase": "BAN_PICK"
+        },
+        "isSpectating": false
+      }
+    },
+    {
+      "label": "Fiora locked (finalization)",
+      "delayMs": 4000,
+      "champSelect": {
+        "localPlayerCellId": 0,
+        "myTeam": [
+          {
+            "cellId": 0,
+            "championId": 887,
+            "championPickIntent": 0,
+            "assignedPosition": "top",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Sam",
+            "tagLine": "EUW",
+            "summonerId": 1000
+          },
+          {
+            "cellId": 1,
+            "championId": 254,
+            "championPickIntent": 0,
+            "assignedPosition": "jungle",
+            "spell1Id": 4,
+            "spell2Id": 11,
+            "team": 1,
+            "gameName": "Player1",
+            "tagLine": "",
+            "summonerId": 1001
+          },
+          {
+            "cellId": 2,
+            "championId": 61,
+            "championPickIntent": 0,
+            "assignedPosition": "middle",
+            "spell1Id": 4,
+            "spell2Id": 12,
+            "team": 1,
+            "gameName": "Player2",
+            "tagLine": "",
+            "summonerId": 1002
+          },
+          {
+            "cellId": 3,
+            "championId": 51,
+            "championPickIntent": 0,
+            "assignedPosition": "bottom",
+            "spell1Id": 4,
+            "spell2Id": 7,
+            "team": 1,
+            "gameName": "Player3",
+            "tagLine": "",
+            "summonerId": 1003
+          },
+          {
+            "cellId": 4,
+            "championId": 99,
+            "championPickIntent": 0,
+            "assignedPosition": "utility",
+            "spell1Id": 4,
+            "spell2Id": 14,
+            "team": 1,
+            "gameName": "Player4",
+            "tagLine": "",
+            "summonerId": 1004
+          }
+        ],
+        "theirTeam": [
+          {
+            "cellId": 5,
+            "championId": 114,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1005
+          },
+          {
+            "cellId": 6,
+            "championId": 234,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1006
+          },
+          {
+            "cellId": 7,
+            "championId": 103,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1007
+          },
+          {
+            "cellId": 8,
+            "championId": 222,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1008
+          },
+          {
+            "cellId": 9,
+            "championId": 412,
+            "championPickIntent": 0,
+            "assignedPosition": "",
+            "spell1Id": 0,
+            "spell2Id": 0,
+            "team": 2,
+            "gameName": "",
+            "tagLine": "",
+            "summonerId": 1009
+          }
+        ],
+        "actions": [],
+        "timer": {
+          "phase": "FINALIZATION"
+        },
+        "isSpectating": false
+      }
+    },
+    {
+      "label": "Loading screen (Live API not up yet)",
+      "delayMs": 3000,
+      "phase": "InProgress",
+      "champSelect": null
+    },
+    {
+      "label": "1:35 — laning starts",
+      "delayMs": 4000,
+      "liveGame": {
+        "activePlayer": {
+          "riotId": "Sam#EUW",
+          "summonerName": "Sam",
+          "level": 1
+        },
+        "allPlayers": [
+          {
+            "championName": "Gwen",
+            "rawChampionName": "game_character_displayname_Gwen",
+            "riotId": "Sam#EUW",
+            "summonerName": "Sam",
+            "team": "ORDER",
+            "position": "TOP",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 2003,
+                "displayName": "Health Potion",
+                "slot": 1,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Vi",
+            "rawChampionName": "game_character_displayname_Vi",
+            "riotId": "Player1#EUW",
+            "summonerName": "Player1",
+            "team": "ORDER",
+            "position": "JUNGLE",
+            "level": 2,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1102,
+                "displayName": "Gustwalker Hatchling",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Smite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Orianna",
+            "rawChampionName": "game_character_displayname_Orianna",
+            "riotId": "Player2#EUW",
+            "summonerName": "Player2",
+            "team": "ORDER",
+            "position": "MIDDLE",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1056,
+                "displayName": "Doran's Ring",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Caitlyn",
+            "rawChampionName": "game_character_displayname_Caitlyn",
+            "riotId": "Player3#EUW",
+            "summonerName": "Player3",
+            "team": "ORDER",
+            "position": "BOTTOM",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Heal",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHeal_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Lux",
+            "rawChampionName": "game_character_displayname_Lux",
+            "riotId": "Player4#EUW",
+            "summonerName": "Player4",
+            "team": "ORDER",
+            "position": "UTILITY",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3865,
+                "displayName": "World Atlas",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Ignite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerIgnite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Fiora",
+            "rawChampionName": "game_character_displayname_Fiora",
+            "riotId": "Enemy5#EUW",
+            "summonerName": "Enemy5",
+            "team": "CHAOS",
+            "position": "TOP",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 2003,
+                "displayName": "Health Potion",
+                "slot": 1,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Viego",
+            "rawChampionName": "game_character_displayname_Viego",
+            "riotId": "Enemy6#EUW",
+            "summonerName": "Enemy6",
+            "team": "CHAOS",
+            "position": "JUNGLE",
+            "level": 2,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1103,
+                "displayName": "Mosstomper Seedling",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Smite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Ahri",
+            "rawChampionName": "game_character_displayname_Ahri",
+            "riotId": "Enemy7#EUW",
+            "summonerName": "Enemy7",
+            "team": "CHAOS",
+            "position": "MIDDLE",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1056,
+                "displayName": "Doran's Ring",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Ignite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerIgnite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Jinx",
+            "rawChampionName": "game_character_displayname_Jinx",
+            "riotId": "Enemy8#EUW",
+            "summonerName": "Enemy8",
+            "team": "CHAOS",
+            "position": "BOTTOM",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Heal",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHeal_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Thresh",
+            "rawChampionName": "game_character_displayname_Thresh",
+            "riotId": "Enemy9#EUW",
+            "summonerName": "Enemy9",
+            "team": "CHAOS",
+            "position": "UTILITY",
+            "level": 1,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3865,
+                "displayName": "World Atlas",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Exhaust",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerExhaust_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          }
+        ],
+        "events": {
+          "Events": []
+        },
+        "gameData": {
+          "gameMode": "CLASSIC",
+          "gameTime": 95,
+          "mapName": "Map11",
+          "mapNumber": 11,
+          "mapTerrain": "Default"
+        }
+      }
+    },
+    {
+      "label": "14:05 — Fiora has Tiamat",
+      "delayMs": 4000,
+      "liveGame": {
+        "activePlayer": {
+          "riotId": "Sam#EUW",
+          "summonerName": "Sam",
+          "level": 9
+        },
+        "allPlayers": [
+          {
+            "championName": "Gwen",
+            "rawChampionName": "game_character_displayname_Gwen",
+            "riotId": "Sam#EUW",
+            "summonerName": "Sam",
+            "team": "ORDER",
+            "position": "TOP",
+            "level": 9,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 3057,
+                "displayName": "Sheen",
+                "slot": 1,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 1001,
+                "displayName": "Boots",
+                "slot": 2,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Vi",
+            "rawChampionName": "game_character_displayname_Vi",
+            "riotId": "Player1#EUW",
+            "summonerName": "Player1",
+            "team": "ORDER",
+            "position": "JUNGLE",
+            "level": 9,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1102,
+                "displayName": "Gustwalker Hatchling",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Smite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Orianna",
+            "rawChampionName": "game_character_displayname_Orianna",
+            "riotId": "Player2#EUW",
+            "summonerName": "Player2",
+            "team": "ORDER",
+            "position": "MIDDLE",
+            "level": 10,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1056,
+                "displayName": "Doran's Ring",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Caitlyn",
+            "rawChampionName": "game_character_displayname_Caitlyn",
+            "riotId": "Player3#EUW",
+            "summonerName": "Player3",
+            "team": "ORDER",
+            "position": "BOTTOM",
+            "level": 8,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Heal",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHeal_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Lux",
+            "rawChampionName": "game_character_displayname_Lux",
+            "riotId": "Player4#EUW",
+            "summonerName": "Player4",
+            "team": "ORDER",
+            "position": "UTILITY",
+            "level": 7,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3865,
+                "displayName": "World Atlas",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Ignite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerIgnite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Fiora",
+            "rawChampionName": "game_character_displayname_Fiora",
+            "riotId": "Enemy5#EUW",
+            "summonerName": "Enemy5",
+            "team": "CHAOS",
+            "position": "TOP",
+            "level": 9,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 3077,
+                "displayName": "Tiamat",
+                "slot": 1,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 3047,
+                "displayName": "Plated Steelcaps",
+                "slot": 2,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 1036,
+                "displayName": "Long Sword",
+                "slot": 3,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Viego",
+            "rawChampionName": "game_character_displayname_Viego",
+            "riotId": "Enemy6#EUW",
+            "summonerName": "Enemy6",
+            "team": "CHAOS",
+            "position": "JUNGLE",
+            "level": 9,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1103,
+                "displayName": "Mosstomper Seedling",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Smite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Ahri",
+            "rawChampionName": "game_character_displayname_Ahri",
+            "riotId": "Enemy7#EUW",
+            "summonerName": "Enemy7",
+            "team": "CHAOS",
+            "position": "MIDDLE",
+            "level": 10,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1056,
+                "displayName": "Doran's Ring",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Ignite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerIgnite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Jinx",
+            "rawChampionName": "game_character_displayname_Jinx",
+            "riotId": "Enemy8#EUW",
+            "summonerName": "Enemy8",
+            "team": "CHAOS",
+            "position": "BOTTOM",
+            "level": 8,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Heal",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHeal_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Thresh",
+            "rawChampionName": "game_character_displayname_Thresh",
+            "riotId": "Enemy9#EUW",
+            "summonerName": "Enemy9",
+            "team": "CHAOS",
+            "position": "UTILITY",
+            "level": 7,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3865,
+                "displayName": "World Atlas",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Exhaust",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerExhaust_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          }
+        ],
+        "events": {
+          "Events": []
+        },
+        "gameData": {
+          "gameMode": "CLASSIC",
+          "gameTime": 845,
+          "mapName": "Map11",
+          "mapNumber": 11,
+          "mapTerrain": "Default"
+        }
+      }
+    },
+    {
+      "label": "21:50 — Fiora finished Ravenous Hydra, Jinx bought QSS",
+      "delayMs": 5000,
+      "liveGame": {
+        "activePlayer": {
+          "riotId": "Sam#EUW",
+          "summonerName": "Sam",
+          "level": 12
+        },
+        "allPlayers": [
+          {
+            "championName": "Gwen",
+            "rawChampionName": "game_character_displayname_Gwen",
+            "riotId": "Sam#EUW",
+            "summonerName": "Sam",
+            "team": "ORDER",
+            "position": "TOP",
+            "level": 12,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3115,
+                "displayName": "Nashor's Tooth",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 1001,
+                "displayName": "Boots",
+                "slot": 1,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 2,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Vi",
+            "rawChampionName": "game_character_displayname_Vi",
+            "riotId": "Player1#EUW",
+            "summonerName": "Player1",
+            "team": "ORDER",
+            "position": "JUNGLE",
+            "level": 12,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1102,
+                "displayName": "Gustwalker Hatchling",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Smite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Orianna",
+            "rawChampionName": "game_character_displayname_Orianna",
+            "riotId": "Player2#EUW",
+            "summonerName": "Player2",
+            "team": "ORDER",
+            "position": "MIDDLE",
+            "level": 13,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1056,
+                "displayName": "Doran's Ring",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Caitlyn",
+            "rawChampionName": "game_character_displayname_Caitlyn",
+            "riotId": "Player3#EUW",
+            "summonerName": "Player3",
+            "team": "ORDER",
+            "position": "BOTTOM",
+            "level": 11,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1055,
+                "displayName": "Doran's Blade",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Heal",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHeal_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Lux",
+            "rawChampionName": "game_character_displayname_Lux",
+            "riotId": "Player4#EUW",
+            "summonerName": "Player4",
+            "team": "ORDER",
+            "position": "UTILITY",
+            "level": 10,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3865,
+                "displayName": "World Atlas",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Ignite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerIgnite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Fiora",
+            "rawChampionName": "game_character_displayname_Fiora",
+            "riotId": "Enemy5#EUW",
+            "summonerName": "Enemy5",
+            "team": "CHAOS",
+            "position": "TOP",
+            "level": 11,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3074,
+                "displayName": "Ravenous Hydra",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 3047,
+                "displayName": "Plated Steelcaps",
+                "slot": 1,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 1036,
+                "displayName": "Long Sword",
+                "slot": 2,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Teleport",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerTeleport_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Viego",
+            "rawChampionName": "game_character_displayname_Viego",
+            "riotId": "Enemy6#EUW",
+            "summonerName": "Enemy6",
+            "team": "CHAOS",
+            "position": "JUNGLE",
+            "level": 12,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1103,
+                "displayName": "Mosstomper Seedling",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Smite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerSmite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Ahri",
+            "rawChampionName": "game_character_displayname_Ahri",
+            "riotId": "Enemy7#EUW",
+            "summonerName": "Enemy7",
+            "team": "CHAOS",
+            "position": "MIDDLE",
+            "level": 13,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 1056,
+                "displayName": "Doran's Ring",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Ignite",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerIgnite_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Jinx",
+            "rawChampionName": "game_character_displayname_Jinx",
+            "riotId": "Enemy8#EUW",
+            "summonerName": "Enemy8",
+            "team": "CHAOS",
+            "position": "BOTTOM",
+            "level": 12,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 6672,
+                "displayName": "Kraken Slayer",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 1001,
+                "displayName": "Boots",
+                "slot": 1,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              },
+              {
+                "itemID": 3140,
+                "displayName": "Quicksilver Sash",
+                "slot": 2,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Heal",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerHeal_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          },
+          {
+            "championName": "Thresh",
+            "rawChampionName": "game_character_displayname_Thresh",
+            "riotId": "Enemy9#EUW",
+            "summonerName": "Enemy9",
+            "team": "CHAOS",
+            "position": "UTILITY",
+            "level": 10,
+            "isBot": false,
+            "isDead": false,
+            "items": [
+              {
+                "itemID": 3865,
+                "displayName": "World Atlas",
+                "slot": 0,
+                "count": 1,
+                "canUse": false,
+                "consumable": false
+              }
+            ],
+            "summonerSpells": {
+              "summonerSpellOne": {
+                "displayName": "Flash",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerFlash_DisplayName"
+              },
+              "summonerSpellTwo": {
+                "displayName": "Exhaust",
+                "rawDisplayName": "GeneratedTip_SummonerSpell_SummonerExhaust_DisplayName"
+              }
+            },
+            "scores": {
+              "kills": 0,
+              "deaths": 0,
+              "assists": 0,
+              "creepScore": 0,
+              "wardScore": 0
+            }
+          }
+        ],
+        "events": {
+          "Events": []
+        },
+        "gameData": {
+          "gameMode": "CLASSIC",
+          "gameTime": 1310,
+          "mapName": "Map11",
+          "mapNumber": 11,
+          "mapTerrain": "Default"
+        }
+      }
+    },
+    {
+      "label": "Game over",
+      "delayMs": 3000,
+      "phase": "EndOfGame",
+      "liveGame": null
+    }
+  ]
+}

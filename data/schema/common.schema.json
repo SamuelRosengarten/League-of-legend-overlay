@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rift-advisor.local/schema/common.schema.json",
+  "title": "Shared definitions",
+  "$defs": {
+    "championId": {
+      "description": "Data Dragon champion id, e.g. \"MonkeyKing\" for Wukong, \"KSante\" for K'Sante.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z]*$"
+    },
+    "itemId": {
+      "description": "Data Dragon / Live Client item id.",
+      "type": "integer",
+      "minimum": 1000,
+      "maximum": 999999
+    },
+    "role": { "enum": ["top", "jungle", "middle", "bottom", "utility"] },
+    "confidence": {
+      "description": "How sure the author is. Anything \"low\" should be reviewed by a human before trusting it.",
+      "enum": ["high", "medium", "low"]
+    },
+    "patch": {
+      "description": "Patch the entry was last checked against (e.g. \"26.20\"), or \"draft\" if no human has reviewed it yet.",
+      "type": "string",
+      "pattern": "^(\\d{1,2}\\.\\d{1,2}|draft)$"
+    },
+    "abilityKey": { "enum": ["P", "Q", "W", "E", "R"] },
+    "damageType": { "enum": ["physical", "magic", "mixed"] },
+    "ccType": {
+      "enum": ["stun", "root", "knockup", "knockback", "pull", "slow", "charm", "fear", "taunt", "suppression", "silence", "sleep", "polymorph", "blind", "ground"]
+    },
+    "tag": {
+      "description": "Threat / profile tags. Matchup files weight these per champion (see threatWeights).",
+      "enum": [
+        "true-damage",
+        "percent-hp-damage",
+        "burst",
+        "sustained-dps",
+        "ranged-poke",
+        "kite",
+        "lane-bully",
+        "early-game",
+        "scaling",
+        "point-click-cc",
+        "aoe-cc",
+        "hard-engage",
+        "anti-engage",
+        "cleanse",
+        "spell-shield",
+        "untargetable",
+        "high-mobility",
+        "invisibility",
+        "tank",
+        "healing",
+        "shields-allies",
+        "grievous-wounds",
+        "split-push",
+        "dive",
+        "gank-setup",
+        "early-invader",
+        "global"
+      ]
+    },
+    "text": {
+      "description": "A piece of advice. Set confidence on individual lines you are unsure about.",
+      "type": "object",
+      "required": ["text"],
+      "additionalProperties": false,
+      "properties": {
+        "text": { "type": "string", "minLength": 3, "maxLength": 300 },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    }
+  }
+}

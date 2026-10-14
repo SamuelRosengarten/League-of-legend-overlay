@@ -1,0 +1,539 @@
+{
+  "$schema": "../schema/matchups.schema.json",
+  "champion": "Gwen",
+  "role": "top",
+  "threatWeights": {
+    "true-damage": 1.5,
+    "ranged-poke": 2,
+    "kite": 1.5,
+    "lane-bully": 1.5,
+    "point-click-cc": 1.5,
+    "grievous-wounds": 1,
+    "burst": 1,
+    "early-game": 0.5,
+    "high-mobility": 0.5,
+    "hard-engage": 0.5,
+    "aoe-cc": 0.5
+  },
+  "genericAdvice": {
+    "ranged-poke": { "text": "Ranged poke: start Doran's Shield / Second Wind, farm under tower and use Hallowed Mist to deny their autos and targeted spells when they step up." },
+    "kite": { "text": "Kiting champion: don't chase through slows; save Skip 'n Slash to close the final gap, not to start the fight." },
+    "lane-bully": { "text": "Strong early laner: concede some CS before level 6, trade only when they misuse their main cooldown, and play for mid-game scaling." },
+    "true-damage": { "text": "True damage ignores your MR/armor: avoid long all-ins while they have their true-damage tool up." },
+    "point-click-cc": { "text": "Targeted CC can't be dodged: Hallowed Mist makes you untargetable from outside — stand in it when they want to lock you down from range." },
+    "grievous-wounds": { "text": "They have Grievous Wounds: your passive healing is reduced, so prefer short trades over extended brawls." },
+    "burst": { "text": "Burst threat: respect their all-in windows and keep Hallowed Mist for the moment they commit." },
+    "tank": { "text": "Tank: your passive shreds high-HP targets — take extended fights, they will lose them later in the game." },
+    "early-game": { "text": "Early-game champion: survive the first levels without giving kills; you out-scale." }
+  },
+  "matchups": {
+    "Fiora": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Grand Challenge: four vitals + healing zone — very strong all-in." },
+        { "kind": "item", "item": 3074, "note": "Ravenous Hydra: big healing and wave clear, side-lane threat rises sharply." },
+        { "kind": "item", "item": 3077, "note": "Tiamat: stronger short trades and faster waves." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Riposte", "note": "Parries incoming damage; don't dump Snip Snip! or Needlework into it." },
+        { "key": "P", "name": "Duelist's Dance", "note": "Vitals deal true damage and heal her — keep moving so she has to reposition." },
+        { "key": "R", "name": "Grand Challenge", "note": "If she procs all vitals she gets a healing zone; disengage or burst her before she finishes." }
+      ],
+      "tips": [
+        { "text": "Bait Riposte first (auto/short trade), then commit while it is on cooldown." },
+        { "text": "Don't fight in the wave early: her Lunge + vital trades win short exchanges before your items." },
+        { "text": "Fight inside Hallowed Mist so she has to step in to hit you; reposition to rotate her vitals." },
+        { "text": "Match her side-lane pressure mid game; you scale well into her once you have core items." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Reduces her auto-attack damage in extended trades." },
+        { "item": 3157, "name": "Zhonya's Hourglass", "note": "Armor + stasis to wait out Grand Challenge burst.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [
+        { "rune": "Doran's Shield start / Second Wind", "note": "Helps survive her early trades if you are not confident in the matchup.", "confidence": "medium" }
+      ],
+      "threatTags": ["true-damage", "lane-bully", "percent-hp-damage"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium",
+      "reviewNotes": "Exact Riposte vs Needlework interaction (stun vs slow on parry) not stated on purpose — verify in game."
+    },
+    "Darius": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "them", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 1, "note": "Strong level 1-3 trades with passive stacks." },
+        { "kind": "level", "level": 6, "note": "Noxian Guillotine true-damage execute; resets on kill." },
+        { "kind": "other", "note": "Five stacks of Hemorrhage (Noxian Might): he wins almost every extended fight in lane." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Apprehend", "note": "Pull — stay out of its range or dodge it before committing." },
+        { "key": "Q", "name": "Decimate", "note": "Outer blade heals him; stand inside the ring or out of range." },
+        { "key": "R", "name": "Noxian Guillotine", "note": "True damage execute; don't stay in range when low." }
+      ],
+      "tips": [
+        { "text": "Avoid extended trades while he has stacks; short trades after he uses E." },
+        { "text": "Use Skip 'n Slash to dodge Apprehend timing, or stand behind the wave." },
+        { "text": "Ask for jungle help early — he is immobile and gankable." },
+        { "text": "Late game you out-duel him with items; don't feed him before that." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his physical damage in lane." },
+        { "item": 3157, "name": "Zhonya's Hourglass", "note": "Stasis can dodge Noxian Guillotine.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [
+        { "rune": "Bone Plating", "note": "Helps against his early burst combos.", "confidence": "low" }
+      ],
+      "threatTags": ["true-damage", "lane-bully"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Garen": {
+      "difficulty": 2,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "me", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Demacian Justice true-damage execute." },
+        { "kind": "other", "note": "Strong first back if he gets early sustain going." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Decisive Strike", "note": "Silence + speed — cancels your follow-up spells." },
+        { "key": "R", "name": "Demacian Justice", "note": "True-damage execute: don't stay low in his range." },
+        { "key": "E", "name": "Judgment", "note": "Spin damage; don't stand in it for long." }
+      ],
+      "tips": [
+        { "text": "He is a high-HP target for your passive: take longer trades once you have Nashor's Tooth." },
+        { "text": "Hit him to deny his passive regeneration; short trades keep it off." },
+        { "text": "Keep Hallowed Mist for his Decisive Strike engage." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his physical damage." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["true-damage", "point-click-cc"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Jax": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "even", "late": "them" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Grandmaster-at-Arms: much stronger duels." },
+        { "kind": "other", "note": "Trinity Force / attack-speed items make his extended fights dangerous." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Counter Strike", "note": "Dodges basic attacks and stuns at the end — back off or step out." },
+        { "key": "Q", "name": "Leap Strike", "note": "Gap close to you or a ward/minion." }
+      ],
+      "tips": [
+        { "text": "Don't auto into Counter Strike; walk out of its range and re-engage after it ends." },
+        { "text": "Trade with abilities while Counter Strike is on cooldown." },
+        { "text": "Side-lane duels later are risky — group or match him with jungle help." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his on-hit damage.", "confidence": "low" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["sustained-dps", "split-push"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low",
+      "reviewNotes": "Unsure how Counter Strike's damage reduction interacts with Gwen's Q; difficulty is a guess."
+    },
+    "Camille": {
+      "difficulty": 3,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Hextech Ultimatum locks you in a zone." },
+        { "kind": "other", "note": "Trinity Force spike makes her trades much stronger." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Hookshot", "note": "Wall dash that stuns — fight away from walls." },
+        { "key": "Q", "name": "Precision Protocol", "note": "Second Q deals true damage." },
+        { "key": "R", "name": "Hextech Ultimatum", "note": "Traps you; plan your Skip 'n Slash before she ults." }
+      ],
+      "tips": [
+        { "text": "Stay away from walls so Hookshot can't land." },
+        { "text": "Hallowed Mist blocks her from targeting you from outside." },
+        { "text": "Short trades before she has Trinity Force; you scale into teamfights." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against her physical damage." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["true-damage", "dive"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Aatrox": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "World Ender: more healing and damage, revive-like sustain in fights." },
+        { "kind": "other", "note": "Strong lane bully with early sustain." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "The Darkin Blade", "note": "Three casts; sweet spots knock up — dodge the edges." },
+        { "key": "W", "name": "Infernal Chains", "note": "Pulls you back if you stay in the zone." },
+        { "key": "R", "name": "World Ender", "note": "Huge healing; Grievous Wounds helps a lot." }
+      ],
+      "tips": [
+        { "text": "Dodge Q sweet spots with Skip 'n Slash, then trade while Q is on cooldown." },
+        { "text": "Walk out of Infernal Chains early instead of fighting inside it." },
+        { "text": "Build Grievous Wounds if he is fed — his healing decides fights." }
+      ],
+      "itemAdjustments": [
+        { "item": 3165, "name": "Morellonomicon", "note": "Cuts his World Ender healing.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["lane-bully", "healing"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Renekton": {
+      "difficulty": 4,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "them", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Full combo with empowered W stun." },
+        { "kind": "level", "level": 6, "note": "Dominus: more HP and fury generation." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Ruthless Predator", "note": "Point-and-click stun (longer when empowered by fury)." },
+        { "key": "E", "name": "Slice and Dice", "note": "Two dashes — he can engage and disengage." }
+      ],
+      "tips": [
+        { "text": "Track his fury bar: back off when it is high (empowered abilities)." },
+        { "text": "Concede CS early; he wants a fight at levels 3-6." },
+        { "text": "His power fades mid game — farm safely and out-scale." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his burst combo." }
+      ],
+      "runeAdjustments": [
+        { "rune": "Second Wind / Doran's Shield", "note": "Sustain through his early pressure.", "confidence": "medium" }
+      ],
+      "threatTags": ["lane-bully", "point-click-cc", "early-game"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Sett": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "The Show Stopper engage." },
+        { "kind": "other", "note": "Grit stored from damage you deal powers his Haymaker." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Haymaker", "note": "True damage in the center line — step off the center." },
+        { "key": "E", "name": "Facebreaker", "note": "Stuns if he grabs units on both sides." },
+        { "key": "R", "name": "The Show Stopper", "note": "Grabs you and slams you." }
+      ],
+      "tips": [
+        { "text": "Don't dump damage into him and then stay — his Grit converts it into a Haymaker shield." },
+        { "text": "Dodge the center of Haymaker; side positioning reduces the damage a lot." },
+        { "text": "Avoid standing between him and minions (Facebreaker stun)." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his auto-attack damage." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["true-damage", "lane-bully"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Mordekaiser": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Realm of Death: 1v1 duel where he steals your stats." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Obliterate", "note": "Big damage on isolated targets — don't stand alone at the tip." },
+        { "key": "E", "name": "Death's Grasp", "note": "Pull; dodge it sideways." },
+        { "key": "R", "name": "Realm of Death", "note": "Banishes you into a duel; Zhonya's can wait it out." }
+      ],
+      "tips": [
+        { "text": "Dodge Death's Grasp sideways; his combo depends on it." },
+        { "text": "Fight him when his passive is not active (he needs to hit three times)." },
+        { "text": "In Realm of Death, use Hallowed Mist and kite until it ends if you would lose the duel." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "MR + tenacity against his magic damage." },
+        { "item": 3157, "name": "Zhonya's Hourglass", "note": "Stasis inside Realm of Death.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["healing"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low",
+      "reviewNotes": "Phase advantages are a guess; please check against your own experience."
+    },
+    "Malphite": {
+      "difficulty": 2,
+      "threat": 2,
+      "phaseAdvantage": { "early": "even", "mid": "me", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Unstoppable Force: teamfight engage and gank setup." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Seismic Shard", "note": "Ranged slow poke; Hallowed Mist denies it from outside." },
+        { "key": "R", "name": "Unstoppable Force", "note": "AoE knockup engage — don't stand next to your carry in fights." }
+      ],
+      "tips": [
+        { "text": "Your magic damage ignores his armor stacking — fight him once you have Nashor's Tooth." },
+        { "text": "Sit in Hallowed Mist when he wants to Q you from range." },
+        { "text": "Spread out in teamfights so Unstoppable Force can't hit several of you." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "MR + tenacity against Seismic Shard and R.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["hard-engage", "ranged-poke"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Ornn": {
+      "difficulty": 2,
+      "threat": 2,
+      "phaseAdvantage": { "early": "even", "mid": "me", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Call of the Forge God: teamfight engage." },
+        { "kind": "other", "note": "Item upgrades for his team from level 13+." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Bellows Breath", "note": "Applies brittle: his next hard CC deals bonus damage." },
+        { "key": "E", "name": "Searing Charge", "note": "Knockup if it hits terrain/pillars near you." }
+      ],
+      "tips": [
+        { "text": "He is a tank: your passive is strong into him — take extended trades when his W is down." },
+        { "text": "Stay away from walls and his pillars to avoid the Searing Charge knockup." },
+        { "text": "Punish his early trades; tanks scale but you do too." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["tank", "hard-engage"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "KSante": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "All Out: kicks a target away and becomes a damage threat." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Ntofo Strikes", "note": "Third cast pulls/stuns." },
+        { "key": "W", "name": "Path Maker", "note": "Charge that knocks back; tough to all-in into." },
+        { "key": "R", "name": "All Out", "note": "Kicks you into/through walls and isolates you." }
+      ],
+      "tips": [
+        { "text": "Trade after his third Q is used; avoid fighting near walls." },
+        { "text": "Your % health damage is good into his tank build." },
+        { "text": "Respect All Out: he trades defense for damage, don't fight it alone." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["tank", "hard-engage"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Riven": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Blade of the Exile + Wind Slash execute." },
+        { "kind": "other", "note": "First lethality / bruiser item makes her combo burst." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Ki Burst", "note": "AoE stun around her — don't stand next to her when she's in range." },
+        { "key": "E", "name": "Valor", "note": "Shield + dash; trade after it's used." },
+        { "key": "R", "name": "Blade of the Exile", "note": "Wind Slash execute in the second cast." }
+      ],
+      "tips": [
+        { "text": "Trade when Valor is on cooldown — her shield blocks your snips." },
+        { "text": "Keep Skip 'n Slash to dodge after Ki Burst range is clear." },
+        { "text": "She is weaker in long fights than in burst trades." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against her physical damage." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["burst", "lane-bully"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Irelia": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Vanguard's Edge: marks for Bladesurge resets." },
+        { "kind": "other", "note": "Max passive stacks give big attack speed." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Flawless Duet", "note": "Stun line between the two blades." },
+        { "key": "Q", "name": "Bladesurge", "note": "Resets on marked targets and minion kills — she jumps through the wave." }
+      ],
+      "tips": [
+        { "text": "Keep the wave near your side so she can't chain Bladesurge on low minions." },
+        { "text": "Dodge Flawless Duet; trade after it's used." },
+        { "text": "Avoid fighting when she has full passive stacks." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against her on-hit damage." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["true-damage", "high-mobility"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Teemo": {
+      "difficulty": 4,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "them", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Noxious Traps zone the map." },
+        { "kind": "other", "note": "Nashor's Tooth makes his auto-attacks much stronger." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Blinding Dart", "note": "Blind makes your autos miss — use abilities instead." },
+        { "key": "R", "name": "Noxious Trap", "note": "Invisible mushrooms; bring sweeper." }
+      ],
+      "tips": [
+        { "text": "Start Doran's Shield and farm safely; don't chase him." },
+        { "text": "Hallowed Mist prevents his autos from outside the mist." },
+        { "text": "Buy Oracle Lens later to clear mushrooms around your lane." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "MR against his magic damage.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [
+        { "rune": "Second Wind", "note": "Sustain through his poke.", "confidence": "medium" }
+      ],
+      "threatTags": ["ranged-poke", "kite"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Jayce": {
+      "difficulty": 4,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "them", "late": "me" },
+      "powerSpikes": [
+        { "kind": "other", "note": "First lethality item: very strong ranged poke." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Shock Blast", "note": "Ranged poke, much stronger through Acceleration Gate." },
+        { "key": "E", "name": "Thundering Blow", "note": "Melee-form knockback that disengages you." }
+      ],
+      "tips": [
+        { "text": "Stand behind minions to block Shock Blast." },
+        { "text": "Use Hallowed Mist when he swaps to melee to dive you." },
+        { "text": "Farm safely; he falls off relative to you in long games." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [
+        { "rune": "Doran's Shield / Second Wind", "note": "Sustain against poke.", "confidence": "medium" }
+      ],
+      "threatTags": ["ranged-poke", "lane-bully"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Gnar": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "GNAR! teamfight stun into walls (in Mega form)." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Boomerang Throw", "note": "Ranged poke + slow in Mini form." },
+        { "key": "R", "name": "GNAR!", "note": "Stun if you are knocked into a wall." }
+      ],
+      "tips": [
+        { "text": "Track his rage bar: fight when he's mini and close to you, avoid fighting near Mega transformation." },
+        { "text": "Stay away from walls when he can turn Mega." },
+        { "text": "Mini Gnar kites — use Skip 'n Slash to close the final gap, not to start." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["ranged-poke", "kite"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Yone": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Fate Sealed: AoE knockup engage." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Mortal Steel", "note": "Third Q dashes and knocks up." },
+        { "key": "E", "name": "Soul Unbound", "note": "Damage dealt during it is repeated when he returns." }
+      ],
+      "tips": [
+        { "text": "Back off when he has the third Q (tornado) ready." },
+        { "text": "Don't chase his Soul Unbound body; he returns to his starting point." },
+        { "text": "Mixed damage: build one defensive stat according to his items." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["high-mobility", "burst"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Volibear": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Stormbringer: tower dive tool." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Thundering Smash", "note": "Charge that stuns — keep distance when he speeds toward you." },
+        { "key": "W", "name": "Frenzied Maul", "note": "Second bite heals him." },
+        { "key": "R", "name": "Stormbringer", "note": "Disables towers; dives get easier." }
+      ],
+      "tips": [
+        { "text": "Avoid early all-ins; he is strongest before your items." },
+        { "text": "Fight him once you have Nashor's Tooth — his HP scales your passive damage." },
+        { "text": "Ward your flank; he dives with the jungler after 6." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["early-game", "dive"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Shen": {
+      "difficulty": 2,
+      "threat": 2,
+      "phaseAdvantage": { "early": "even", "mid": "me", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Stand United: global shield/teleport to an ally." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Spirit's Refuge", "note": "Blocks basic attacks in the zone — use abilities or step out." },
+        { "key": "E", "name": "Shadow Dash", "note": "Taunt dash; dodge it sideways." }
+      ],
+      "tips": [
+        { "text": "Push when he ults away — he leaves the lane open." },
+        { "text": "Wait out Spirit's Refuge before auto-attacking." },
+        { "text": "Your % health damage is good into his tank items." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["global", "tank"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    }
+  }
+}

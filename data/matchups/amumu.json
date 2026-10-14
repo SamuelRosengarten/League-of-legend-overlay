@@ -1,0 +1,514 @@
+{
+  "$schema": "../schema/matchups.schema.json",
+  "champion": "Amumu",
+  "role": "jungle",
+  "threatWeights": {
+    "cleanse": 2,
+    "spell-shield": 2,
+    "anti-engage": 2,
+    "untargetable": 1.5,
+    "high-mobility": 1.5,
+    "percent-hp-damage": 1.5,
+    "early-invader": 1.5,
+    "true-damage": 1,
+    "kite": 1,
+    "early-game": 1,
+    "invisibility": 0.5
+  },
+  "genericAdvice": {
+    "cleanse": { "text": "They can cleanse CC: don't open with Curse of the Sad Mummy on them — catch someone else or wait for the cleanse to be used." },
+    "spell-shield": { "text": "Spell shield blocks Bandage Toss: bait it out (or Q a different target) before engaging." },
+    "anti-engage": { "text": "Anti-engage tools punish your dive: flank or wait until their peel is used before you R." },
+    "untargetable": { "text": "Untargetable/dodge tools can waste your R: hold it until they have used them." },
+    "high-mobility": { "text": "High mobility: hit them with R from fog or a flank — a straight Bandage Toss is easy to dodge." },
+    "percent-hp-damage": { "text": "Percent-HP damage shreds tanks: don't stand in front of them for long fights alone." },
+    "early-invader": { "text": "Early invader: ward your buff entrances and avoid 1v1s before level 6; ping your laners to cover." },
+    "true-damage": { "text": "True damage ignores your resistances: tank stacking helps less, peel for your carries instead." },
+    "kite": { "text": "Kiting carry: you need Bandage Toss or R to land first — flank instead of walking at them." },
+    "early-game": { "text": "Strong early: track their jungler, farm efficiently and arrive at fights after your level 6." }
+  },
+  "matchups": {
+    "LeeSin": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 2, "note": "Strong level 2-3 duels and invades." },
+        { "kind": "level", "level": 6, "note": "Dragon's Rage can kick you away from your engage target." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Dragon's Rage", "note": "Kicks you out of position or into your team." },
+        { "key": "Q", "name": "Sonic Wave", "note": "Follow-up dash for ganks and invades." },
+        { "key": "W", "name": "Safeguard", "note": "Shield/dash to allies and wards — escapes after you engage." }
+      ],
+      "tips": [
+        { "text": "Avoid 1v1s with him before level 6; he out-duels you early." },
+        { "text": "Ward the entrance to your raptors/buff side he is likely to invade." },
+        { "text": "Match his ganks by counter-ganking; your R + laner wins 2v2 fights." },
+        { "text": "Late game he falls off; play for teamfights." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his physical damage if he is ahead.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["early-invader", "early-game", "high-mobility"],
+      "jungle": { "invadeRisk": "high", "strongLevels": [2, 3], "note": "Enemy Lee Sin is strong level 2–3 — avoid his side early; ward his raptors/buff entrance." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Graves": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "them", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Fast clear + strong duel — common early invader." },
+        { "kind": "other", "note": "First lethality item makes his burst very high." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Smoke Screen", "note": "Nearsight hides him while he shoots you." },
+        { "key": "E", "name": "Quickdraw", "note": "Dash + armor; he kites your Bandage Toss." }
+      ],
+      "tips": [
+        { "text": "Never fight him alone in your jungle early; call your laners." },
+        { "text": "Ward entrances to your camps — he tends to take camps while farming." },
+        { "text": "In teamfights flank him; he kites well from the front." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his burst." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["early-invader", "kite", "burst"],
+      "jungle": { "invadeRisk": "high", "strongLevels": [3, 4], "note": "Graves farms fast and likes to steal camps — ward your second buff and avoid isolated 1v1s." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Viego": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Heartbreaker execute + possession resets in fights." }
+      ],
+      "dangerAbilities": [
+        { "key": "P", "name": "Sovereign's Domination", "note": "Possessing a dead champion resets him — clean up fights fast." },
+        { "key": "W", "name": "Spectral Maw", "note": "Dash stun." },
+        { "key": "E", "name": "Harrowed Path", "note": "Camouflage in terrain mist: hard to target with Bandage Toss." }
+      ],
+      "tips": [
+        { "text": "Chain CC on him after the first kill in a fight to stop resets." },
+        { "text": "Keep R for when he possesses someone — he can't escape in that window." },
+        { "text": "Contest scuttle with your laners; he's weak to coordinated fights." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["percent-hp-damage", "untargetable"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Viego can contest early but prefers farming; normal warding is enough." },
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Vi": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Strong level 3 ganks." },
+        { "kind": "level", "level": 6, "note": "Cease and Desist: unstoppable point-click knockup on your carry." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Cease and Desist", "note": "Can't be stopped by your CC while charging." },
+        { "key": "W", "name": "Denting Blows", "note": "% max HP damage and armor shred against you." }
+      ],
+      "tips": [
+        { "text": "Peel your carry from her R with your own Q/R after she lands." },
+        { "text": "Track her start: she likes level 3 ganks on the side she ends on." },
+        { "text": "You out-teamfight her later; avoid early 1v1s." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["point-click-cc", "percent-hp-damage"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Vi looks for level 3 ganks — warn the lane on her end side." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Kayn": {
+      "difficulty": 2,
+      "threat": 3,
+      "phaseAdvantage": { "early": "me", "mid": "even", "late": "them" },
+      "powerSpikes": [
+        { "kind": "other", "note": "Form transformation (Rhaast = anti-tank healing, Shadow Assassin = burst)." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Umbral Trespass", "note": "Untargetable inside a champion — dodges your R." },
+        { "key": "E", "name": "Shadow Step", "note": "Walks through walls; ganks from unexpected angles." }
+      ],
+      "tips": [
+        { "text": "He is weak before his form — gank early to keep his lanes from feeding him orbs." },
+        { "text": "Against Rhaast, avoid long fights (heals off % of your health)." },
+        { "text": "Wait for Umbral Trespass to be used before your R." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["percent-hp-damage", "untargetable"],
+      "jungle": { "invadeRisk": "low", "strongLevels": [], "note": "Kayn farms early; low invade risk." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Khazix": {
+      "difficulty": 2,
+      "threat": 2,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Evolution choices + Void Assault invisibility." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Taste Their Fear", "note": "Bonus damage on isolated targets — stay near allies." },
+        { "key": "R", "name": "Void Assault", "note": "Invisibility; your R can still hit him if he's nearby." }
+      ],
+      "tips": [
+        { "text": "Stay near walls/minions or allies to avoid being isolated." },
+        { "text": "You are tanky — he struggles to kill you; peel for your carries." },
+        { "text": "Use Despair/R area when he goes invisible nearby." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["burst", "invisibility"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Kha'Zix can invade an isolated jungler; avoid fighting alone." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Elise": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Very strong level 3 ganks and duels." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Cocoon", "note": "Stun skillshot that sets up her burst." },
+        { "key": "E", "name": "Rappel", "note": "Spider-form untargetable: dodges Bandage Toss and R." }
+      ],
+      "tips": [
+        { "text": "Expect early ganks on your lanes — warn them about her first gank timing." },
+        { "text": "Hold R until Rappel is on cooldown." },
+        { "text": "She falls off — survive early and win teamfights." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "MR + tenacity vs Cocoon burst." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["early-game", "untargetable", "early-invader"],
+      "jungle": { "invadeRisk": "high", "strongLevels": [2, 3], "note": "Elise is dangerous level 2–3 — don't contest her side early." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Nidalee": {
+      "difficulty": 4,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "them", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Fast clear and invade potential." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Javelin Toss", "note": "Long-range poke that hurts more the farther it travels." },
+        { "key": "W", "name": "Bushwhack", "note": "Traps reveal you." }
+      ],
+      "tips": [
+        { "text": "Ward your jungle; she invades and steals camps." },
+        { "text": "Don't walk into Javelin range at low HP." },
+        { "text": "Flank and catch her with R in teamfights — she is squishy." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["early-invader", "ranged-poke", "kite"],
+      "jungle": { "invadeRisk": "high", "strongLevels": [2, 3], "note": "Nidalee invades often — ward buffs and avoid low-HP clears in her range." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Shaco": {
+      "difficulty": 4,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 2, "note": "Box invades / level 2 ganks." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Jack In The Box", "note": "Fearing boxes; he pre-places them on your camps." },
+        { "key": "Q", "name": "Deceive", "note": "Invisibility blink." }
+      ],
+      "tips": [
+        { "text": "Buy Oracle Lens early to clear boxes in your jungle." },
+        { "text": "Keep your laners warned — he ganks early from invisibility." },
+        { "text": "Your R and Despair hit him even near his clone." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["early-invader", "invisibility"],
+      "jungle": { "invadeRisk": "high", "strongLevels": [2, 3], "note": "Shaco may invade with boxes — consider starting away from his likely side." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Kindred": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "even", "late": "them" },
+      "powerSpikes": [
+        { "kind": "other", "note": "Each mark collected increases her range and damage." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Lamb's Respite", "note": "Nobody dies inside it — don't waste your R into it." },
+        { "key": "Q", "name": "Dance of Arrows", "note": "Dash; she kites your engage." }
+      ],
+      "tips": [
+        { "text": "Protect the camps she marks; ward and contest with your laners." },
+        { "text": "Engage after Lamb's Respite is used." },
+        { "text": "Flank her; she kites frontal engages." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["anti-engage", "kite", "percent-hp-damage"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Kindred marks your camps — expect her to come for them." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Hecarim": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "them", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Onslaught of Shadows fear engage." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Devastating Charge", "note": "Knockback engage." },
+        { "key": "R", "name": "Onslaught of Shadows", "note": "AoE fear." }
+      ],
+      "tips": [
+        { "text": "He clears fast — match his tempo or counter-gank his first gank." },
+        { "text": "In teamfights hold your R for after his engage to counter-engage." },
+        { "text": "Mercury's Treads help against his fear chain." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Armor against his physical damage." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["hard-engage", "high-mobility"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Hecarim plays for fast clears and early ganks." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Diana": {
+      "difficulty": 2,
+      "threat": 3,
+      "phaseAdvantage": { "early": "me", "mid": "them", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Moonfall AoE pull — combo with your R." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Moonfall", "note": "Pulls everyone near her." }
+      ],
+      "tips": [
+        { "text": "She farms before 6: gank lanes early to build a lead." },
+        { "text": "Don't group tightly against her R." },
+        { "text": "Mercury's Treads + MR against her magic burst." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "MR and tenacity." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["burst", "hard-engage"],
+      "jungle": { "invadeRisk": "low", "strongLevels": [], "note": "Diana usually farms to 6." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "JarvanIV": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Early ganks with E-Q knockup." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Dragon Strike", "note": "E-Q knockup combo." },
+        { "key": "R", "name": "Cataclysm", "note": "Terrain arena that traps your team." }
+      ],
+      "tips": [
+        { "text": "Warn laners about his early ganks." },
+        { "text": "Your R inside his Cataclysm traps them too — use it." },
+        { "text": "Ward his likely start side." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["early-game", "hard-engage"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [2, 3], "note": "J4 is strong early in skirmishes." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "XinZhao": {
+      "difficulty": 4,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 2, "note": "Strong early duels." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Crescent Guard", "note": "Knocks back and blocks damage from outside the circle." },
+        { "key": "Q", "name": "Three Talon Strike", "note": "Third hit knockup." }
+      ],
+      "tips": [
+        { "text": "Avoid 1v1 duels early; he's one of the best early duelists." },
+        { "text": "Your engage must start inside his Crescent Guard circle." },
+        { "text": "He falls off later; farm safely and win teamfights." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["early-invader", "anti-engage"],
+      "jungle": { "invadeRisk": "high", "strongLevels": [2, 3], "note": "Xin Zhao is strong level 2–3 — don't contest scuttle alone." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Nocturne": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "them", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Paranoia: dives your carries from far away." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Shroud of Darkness", "note": "Spell shield blocks your Bandage Toss." },
+        { "key": "E", "name": "Unspeakable Horror", "note": "Fear after a tether." }
+      ],
+      "tips": [
+        { "text": "Bait Shroud of Darkness before using Bandage Toss on him." },
+        { "text": "Group with your carries after his level 6." },
+        { "text": "Your R is strong against his dive." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["spell-shield", "dive"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Nocturne mostly farms to 6 but can duel early." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Ekko": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "them", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Chronobreak heal + escape." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Parallel Convergence", "note": "Delayed stun zone." },
+        { "key": "R", "name": "Chronobreak", "note": "Rewinds him out of your engage." }
+      ],
+      "tips": [
+        { "text": "Wait for Chronobreak before committing R onto him." },
+        { "text": "Step out of his W zone before it detonates." },
+        { "text": "MR boots help against his burst." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "MR and tenacity." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["untargetable", "anti-engage"],
+      "jungle": { "invadeRisk": "low", "strongLevels": [], "note": "Ekko mostly farms early." },
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Evelynn": {
+      "difficulty": 2,
+      "threat": 3,
+      "phaseAdvantage": { "early": "me", "mid": "them", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Permanent camouflage and Last Caress." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Allure", "note": "Charm after a delay." },
+        { "key": "R", "name": "Last Caress", "note": "Untargetable dash back." }
+      ],
+      "tips": [
+        { "text": "Gank early: she is weak before level 6." },
+        { "text": "After 6, sweep/Control Wards your carries' paths." },
+        { "text": "Your R hits her even when camouflaged." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["invisibility", "burst"],
+      "jungle": { "invadeRisk": "low", "strongLevels": [], "note": "Evelynn farms to 6 — you can play aggressive early." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "MasterYi": {
+      "difficulty": 2,
+      "threat": 3,
+      "phaseAdvantage": { "early": "me", "mid": "even", "late": "them" },
+      "powerSpikes": [
+        { "kind": "other", "note": "Attack-speed items: very strong late." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Alpha Strike", "note": "Untargetable — can dodge your R; wait for it." },
+        { "key": "E", "name": "Wuju Style", "note": "True damage on attacks." }
+      ],
+      "tips": [
+        { "text": "Your R hard-counters his resets — hold it for when he enters the fight." },
+        { "text": "Gank early to deny his farm." },
+        { "text": "Don't R while he's in Alpha Strike." }
+      ],
+      "itemAdjustments": [
+        { "item": 3047, "name": "Plated Steelcaps", "note": "Reduces his auto-attack damage." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["untargetable", "true-damage"],
+      "jungle": { "invadeRisk": "low", "strongLevels": [], "note": "Master Yi farms and scales; you can play aggressive." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Lillia": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Lilting Lullaby: AoE sleep." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Lilting Lullaby", "note": "Sleeps everyone she marked." },
+        { "key": "E", "name": "Swirlseed", "note": "Long-range slow." }
+      ],
+      "tips": [
+        { "text": "She kites with speed; land Bandage Toss from fog." },
+        { "text": "MR against her magic damage." },
+        { "text": "Avoid long chases; she outruns you." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "MR and tenacity." }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["kite", "high-mobility", "percent-hp-damage"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Lillia clears fast and can contest scuttle." },
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Warwick": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Strong early duels with healing." },
+        { "kind": "level", "level": 6, "note": "Infinite Duress suppression." }
+      ],
+      "dangerAbilities": [
+        { "key": "R", "name": "Infinite Duress", "note": "Suppression lunge." },
+        { "key": "E", "name": "Primal Howl", "note": "Damage reduction + fear." }
+      ],
+      "tips": [
+        { "text": "Avoid low-HP fights against him; he heals and gets faster." },
+        { "text": "Grievous Wounds if he is ahead." },
+        { "text": "Your R can stop his R engage on your team." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["early-game", "point-click-cc", "healing"],
+      "jungle": { "invadeRisk": "medium", "strongLevels": [3], "note": "Warwick duels well early and tracks low-HP champions." },
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    }
+  }
+}
