@@ -51,7 +51,7 @@ npm run dev        # run against the real League client
 npm run build      # installer in src-tauri/target/release/bundle/
 ```
 
-Start Rift Advisor before or after the League client; it connects automatically. The tray icon menu has *Show / hide*, *Interactive mode* and *Quit*.
+Start Rift Advisor before or after the League client; it connects automatically. The tray icon menu has *Show / hide*, *Interactive mode* and *Quit*. Only one copy runs at a time: launching it again just brings the running overlay back on screen. A second copy would otherwise lose the global hotkeys to the first.
 
 The header shows the connection state:
 
@@ -83,16 +83,18 @@ The window is transparent, frameless, always on top and **click-through**, so th
 | `Ctrl+Shift+A` | Show / hide the overlay |
 | `Ctrl+Shift+Z` | Toggle interactive mode (click-through off / on) |
 
+**Passive vs interactive.** In passive mode (default) every click goes through the overlay to the game. In interactive mode the overlay receives clicks, scrolling and text selection: an *INTERACTIVE* tag appears on its top border, the frame lights up and the pointer button is highlighted. The overlay never takes keyboard focus in either mode (`WS_EX_NOACTIVATE`), so the game keeps your keyboard and the hotkeys work at any time. As a consequence, Tab navigation inside the overlay is not available; use the mouse in interactive mode. In interactive mode the transparent strip where the companions sit also catches clicks.
+
 ### Appearance: rank theme, companions, motion
 
 Click the gear in the header (in interactive mode) to open **Appearance**. Changes apply immediately and are saved to the settings file.
 
 - **Rank theme.** *My rank* (default) follows your current Solo/Duo tier as the League client reports it, or Flex if you have no Solo/Duo tier. An account without a tier this season gets the neutral hextech theme and shows "Unranked · N placements left". The app never guesses a rank. While the client is closed, the last reported rank is used and labelled "last known". You can also pin any of the ten tiers manually.
   Each tier sets the panel frame, background glow, buttons, selections, headings, score meters, LP bar, particles and the gems on the companions. Apex tiers (Master and up) get brighter frame corners, and Challenger adds a light sweep along the top edge. On a rank change the colors cross-fade over about 0.8 s.
-- **Companions.** Turn Gwen and Amumu on or off and choose a placement: *Opposite corners* (default), *Top border*, *Hanging below*, *Left corner*, *Right corner*, *Peeking* or *Minimal*. You can also set their size (70–140 %) and whether they stay on the in-game panel. They only ever sit above the top border or hang below the bottom border, so they never cover advice. The window grows by that much transparent space, and they never receive mouse clicks.
+- **Companions.** Gwen and Amumu (art in `src/assets/companions/`) live on the panel frame. Gwen stands and Amumu sits on the top border, both can peek over it, or they dangle below the bottom border (Gwen from a ribbon, Amumu from his bandage). Placements: *Opposite corners* (default), *Top border*, *Hanging below*, *Left corner*, *Right corner*, *Peeking* or *Minimal*. You can also set their size (70–140 %) and whether they stay on the in-game panel. They breathe, blink and sway. With motion set to *Full* they also pull an occasional expression: Gwen goes happy, sleepy, curious, excited or winks; Amumu goes sleepy, curious, happy, surprised or sheds a tear. They also react when you change screens. They never cover advice or controls and never receive mouse clicks.
 - **Motion.** *Full* (idle animations, sparkles, ambient particles), *Calm* (slow breathing and blinking) or *Off*. In game, motion is capped at Calm and particles are off. If Windows *Animation effects* is off (`prefers-reduced-motion`), everything stays still. While the overlay is hidden, all animations pause.
 
-Raster art for the companions can replace the built-in vector art without code changes. See `src/assets/companions/README.md`.
+How the companion art was prepared, and how to replace it, is described in `src/assets/companions/README.md`.
 
 ### Settings file
 
@@ -118,6 +120,18 @@ Raster art for the companions can replace the built-in vector art without code c
 - `lastRank`: written by the app, the last rank the client reported.
 
 Data Dragon files are cached in `%LOCALAPPDATA%\dev.rosengarten.riftadvisor\ddragon`. The app also works offline with the last cached version.
+
+### Testing in League of Legends (manual checklist)
+
+These need a real match and are not covered by the automated tests:
+
+1. Set League to **Borderless** (*Settings → Video → Window Mode*). Start Rift Advisor; the status dot on the crest turns green once the client is found.
+2. **Champ select:** the full panel appears on its own. Press `Ctrl+Shift+Z`, scroll the guide, open the gear menu, press `Ctrl+Shift+Z` again, then click the client behind the panel: the click must reach the client.
+3. **In game:** the compact panel docks to the screen edge. Right-click to move your champion *under* the panel: in passive mode the click must reach the game.
+4. Press `Ctrl+Shift+Z` in game: the panel stays visible, shows *INTERACTIVE*, and the collapse button works. Press it again and go back to playing. Your abilities (Q/W/E/R) must still work without clicking into the game first.
+5. Press `Ctrl+Shift+A` twice: the panel hides and comes back. Alt-Tab out and back: the panel stays on top.
+6. End the game: the panel hides on the end-of-game screen and returns in the lobby.
+7. Optional: try Windowed mode (works like Borderless). Exclusive Fullscreen is **not supported**: Windows does not draw other windows over an exclusive-fullscreen game.
 
 ## Mock mode (no League needed)
 
@@ -258,9 +272,9 @@ src/                frontend (vanilla TypeScript)
   domain/           pure logic: match normalization, roles, threat, warnings, jungle planner, in-game notes
   theme/            rank palettes (ranks.ts), theme resolution, appearance settings
   ui/               shell (app.ts), store, crest, particles, views (champ select, in game, idle, appearance, dev panel)
-  ui/companions/    Gwen/Amumu vector art, placement presets, persistent companion layer
+  ui/companions/    sprite metadata (eyes, seat, ribbon), placement presets, companion layer + expressions
   styles/           theme.css (tokens), panel.css, components.css, companions.css
-  assets/           ranked emblems, optional companion art
+  assets/           ranked emblems, companion sprites (gwen.png, amumu.png)
 src-tauri/src/      Rust backend
   lockfile.rs       LCU lockfile discovery and parsing
   tls.rs            127.0.0.1-only certificate verifier

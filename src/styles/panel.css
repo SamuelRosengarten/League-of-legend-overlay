@@ -39,6 +39,30 @@
     inset 0 0 0 1px color-mix(in srgb, var(--rank-primary) 30%, transparent);
 }
 
+/* Interactive mode: tag on the top border + selectable guide text. */
+.mode-tag {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 4;
+  transform: translate(-50%, -1px);
+  padding: 0 10px 1px;
+  border-radius: 0 0 7px 7px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--rank-on-primary);
+  background: var(--rank-metal);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--rank-glow) 80%, transparent);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.panel.interactive .mode-tag { opacity: 1; }
+.panel.interactive .content { user-select: text; cursor: auto; }
+.panel.interactive .frame { border-color: color-mix(in srgb, var(--rank-accent) 45%, transparent); }
+
 /* ---- ornamental frame (pointer-events: none) ---- */
 .frame {
   position: absolute;
@@ -253,6 +277,7 @@ html[data-prestige="2"] .frame .sheen {
   letter-spacing: 0.02em;
   color: var(--muted);
 }
+.btn-icon.on kbd { color: var(--rank-on-primary); opacity: 0.8; }
 
 /* ---- crest ---- */
 .crest {

@@ -1,34 +1,32 @@
 # Companion art
 
-Gwen and Amumu are drawn by default with the built-in vector art in
-`src/ui/companions/art.ts`. That art is original and fan-made, inspired by the champions.
-It is **not** official Riot artwork.
+`gwen.png` and `amumu.png` are cut from the reference sheet
+`Chibi Seamstress and Sad Mummy Duo.png` (project root, supplied by the project owner).
+The sheet already has a real alpha channel with a fully transparent gap between the two
+characters (columns ~870–990 of 1690), so the split is lossless:
 
-To use your own raster art instead, drop transparent PNG or WebP files here:
+1. Alpha-tight bounding box per character (alpha > 8), plus 6 px padding.
+2. High-quality bicubic resize in premultiplied alpha (no dark fringes): Gwen 759×879 → 414×480,
+   Amumu 615×722 → 358×420. That is about 2.5× their display size on a 200 % display at the
+   default companion size.
 
-```
-src/assets/companions/gwen/sit.webp     (or .png)
-src/assets/companions/gwen/stand.webp
-src/assets/companions/gwen/peek.webp
-src/assets/companions/gwen/hang.webp
-src/assets/companions/amumu/sit.webp
-src/assets/companions/amumu/peek.webp
-src/assets/companions/amumu/hang.webp
-```
+The art is fan art inspired by the champions. It is not official Riot artwork.
 
-Each file replaces one pose and is picked up automatically at build time. Poses without a
-file keep the vector art. The image is stretched to the pose's box, so match its aspect
-ratio. The **seat line** is the panel border the companion sits on or hangs from:
+## How the overlay uses it
 
-| Pose | Aspect (w × h) | Seat line, from the top | Notes |
-| --- | --- | --- | --- |
-| gwen/sit | 72 × 96 | 79 % | Sits on the top border; legs dangle below the line |
-| gwen/stand | 72 × 96 | 96 % | Feet on the top border |
-| gwen/peek | 72 × 52 | 88 % | Only head and hands above the line |
-| gwen/hang | 72 × 96 | 8 % | Hands on the bottom border, body hangs below |
-| amumu/sit | 78 × 68 | 88 % | Sits on the top border (Amumu has no stand pose) |
-| amumu/peek | 78 × 52 | 88 % | |
-| amumu/hang | 78 × 72 | 11 % | |
+`src/ui/companions/sprites.ts` describes each sprite in fractions (0–1) of its width and height:
 
-Export at 4× the box size (e.g. 288 × 384 for gwen/sit) for crisp results on 200 % displays.
-Raster art is shown static: the idle animations only animate the vector parts.
+| Field | Purpose |
+| --- | --- |
+| `eyes` | Center, size and tilt of each eye. Eyelid overlays sit here for blinking, winks, sleepy and happy (∩) eyes. |
+| `lid`, `lash` | Eyelid colors sampled from the art (Gwen's skin, Amumu's bandages). |
+| `seat` | Where the feet or bottom rest on the frame when perching. |
+| `peek` | How much of the sprite shows above the border when peeking (head and eyes). |
+| `hangAt` | Where Gwen's ribbon or Amumu's bandage ties on when hanging below the panel. |
+| `sparkles`, `bubble` | Anchors for sparkles (Gwen's scissor gem, blade tip) and the expression bubble. |
+
+## Replacing the art
+
+Replace the PNG with any transparent image, then update `width` and `height` to its pixel
+size and re-measure `eyes`, `seat`, `peek` and `hangAt`. A quick way to check the eye boxes
+is to draw them over the image. If the eyelids sit in the wrong place, blinking will look off.

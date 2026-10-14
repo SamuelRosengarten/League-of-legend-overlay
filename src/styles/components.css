@@ -539,8 +539,16 @@ h3 .count {
 .companion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .companion-tile { padding: 8px 4px 6px; }
 .companion-tile:not(.selected) .companion-face { filter: grayscale(0.85) brightness(0.7); }
-.companion-face { width: 64px; height: 38px; display: block; }
-.companion-face img { width: 100%; height: 100%; object-fit: contain; }
+.companion-face {
+  width: 64px;
+  height: 52px;
+  display: block;
+  border-radius: 8px;
+  background-repeat: no-repeat;
+  background-size: 125% auto;
+}
+.face-gwen { background-position: 46% 6%; }
+.face-amumu { background-position: 30% 62%; background-size: 150% auto; }
 
 .field { display: flex; flex-direction: column; gap: 5px; }
 .field label { font-size: 11px; font-weight: 600; color: var(--text-dim); }

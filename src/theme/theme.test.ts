@@ -69,7 +69,7 @@ describe("companion layout", () => {
 
   it("reserves space above/below the panel only where companions sit", () => {
     const corners = layoutCompanions(settings, 460, { compact: false });
-    expect(corners.placed.map((p) => [p.who, p.spot.edge])).toEqual([["gwen", "top"], ["amumu", "bottom"]]);
+    expect(corners.placed.map((p) => [p.who, p.spot.pose])).toEqual([["gwen", "perch"], ["amumu", "hang"]]);
     expect(corners.gutterTop).toBeGreaterThan(0);
     expect(corners.gutterBottom).toBeGreaterThan(0);
 

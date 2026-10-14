@@ -92,6 +92,12 @@ pub fn run() {
     let mock = is_mock();
 
     tauri::Builder::default()
+        // Must be the first plugin. A second copy would fail to register the global hotkeys
+        // (RegisterHotKey is per-system), so it hands over to the running overlay and exits.
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            log::info!("second launch: revealing the running overlay");
+            overlay::reveal(app);
+        }))
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, shortcut, event| {

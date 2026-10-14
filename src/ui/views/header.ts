@@ -67,7 +67,7 @@ export function headerContent(
     h(
       "button",
       {
-        class: `btn-icon${overlay.interactive ? " on" : " btn-kbd"}`,
+        class: `btn-icon btn-kbd${overlay.interactive ? " on" : ""}`,
         title: overlay.interactive
           ? `Interactive — clicks go to the overlay (${overlay.hotkeys.toggleInteractive} for click-through)`
           : `Click-through — ${overlay.hotkeys.toggleInteractive} to interact`,
@@ -76,7 +76,7 @@ export function headerContent(
       },
       icon(overlay.interactive ? "pointer" : "ghost", 15),
       // Tooltips can't be hovered in click-through mode, so the hotkey stays visible.
-      overlay.interactive ? null : h("kbd", null, shortHotkey(overlay.hotkeys.toggleInteractive)),
+      h("kbd", null, shortHotkey(overlay.hotkeys.toggleInteractive)),
     ),
     opts.collapsible && !settings
       ? h(

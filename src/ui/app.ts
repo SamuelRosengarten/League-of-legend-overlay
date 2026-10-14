@@ -50,7 +50,12 @@ function buildShell(root: HTMLElement): Shell {
   header.append(crest.el, headerSlot);
   const content = document.createElement("div");
   content.className = "content";
-  panel.append(particles.el, frame, header, content);
+  // Mode tag on the top border: only shown in interactive mode (CSS), so it is always clear
+  // whether clicks go to the overlay or to the game.
+  const modeTag = document.createElement("span");
+  modeTag.className = "mode-tag";
+  modeTag.textContent = "Interactive";
+  panel.append(particles.el, frame, modeTag, header, content);
   const companions = new CompanionLayer();
   stage.append(panel, companions.el);
   root.replaceChildren(stage);

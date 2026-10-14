@@ -46,6 +46,38 @@ if (args.has("--ddragon") && !issues.some((i) => i.severity === "error")) {
   for (const id of Object.keys(tags.champions).filter((id) => !ids.includes(id))) {
     issues.push({ file: files.tags.file, path: `/champions/${id}`, message: `not a Data Dragon champion id in ${versions[0]}`, severity: "error" });
   }
+
+  // Fact-check curated guides against Riot's own data: ability names per key, item ids/names.
+  const cdn = `https://ddragon.leagueoflegends.com/cdn/${versions[0]}/data/en_US`;
+  const items = ((await (await fetch(`${cdn}/item.json`)).json()) as { data: Record<string, { name: string }> }).data;
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const checkItem = (file: string, path: string, id: number | string | undefined, name?: string) => {
+    if (id === undefined) return;
+    const dd = items[String(id)];
+    if (!dd) issues.push({ file, path, message: `item ${id} does not exist in Data Dragon ${versions[0]}`, severity: "error" });
+    else if (name && norm(dd.name) !== norm(name)) issues.push({ file, path, message: `item ${id} is "${dd.name}" in Data Dragon, data says "${name}"`, severity: "warning" });
+  };
+  type Entry = { dangerAbilities: { key: string; name: string }[]; powerSpikes: { kind: string; item?: number }[]; itemAdjustments: { item?: number; name: string }[] };
+  for (const m of files.matchups) {
+    const entries = (m.data as { matchups: Record<string, Entry> }).matchups;
+    for (const [champ, e] of Object.entries(entries)) {
+      const detail = (await (await fetch(`${cdn}/champion/${champ}.json`)).json()) as { data: Record<string, { passive: { name: string }; spells: { name: string }[] }> };
+      const c = detail.data[champ]!;
+      const names: Record<string, string> = { P: c.passive.name, Q: c.spells[0]!.name, W: c.spells[1]!.name, E: c.spells[2]!.name, R: c.spells[3]!.name };
+      // "Sonic Wave / Resonating Strike": either form's name is fine; a leading "The" is optional.
+      const forms = (full: string) => [full, ...full.split(" / ")].map((n) => norm(n.replace(/^the /i, "")));
+      e.dangerAbilities.forEach((a, i) => {
+        if (!forms(names[a.key] ?? "").includes(norm(a.name.replace(/^the /i, "")))) {
+          issues.push({ file: m.file, path: `/matchups/${champ}/dangerAbilities/${i}`, message: `${a.key} is "${names[a.key]}" in Data Dragon, data says "${a.name}"`, severity: "error" });
+        }
+      });
+      e.powerSpikes.forEach((s, i) => s.kind === "item" && checkItem(m.file, `/matchups/${champ}/powerSpikes/${i}`, s.item));
+      e.itemAdjustments.forEach((it, i) => checkItem(m.file, `/matchups/${champ}/itemAdjustments/${i}`, it.item, it.name));
+    }
+  }
+  for (const [id, it] of Object.entries((files.items.data as { items: Record<string, { name: string }> }).items)) {
+    checkItem(files.items.file, `/items/${id}`, id, it.name);
+  }
 }
 
 for (const issue of issues) console.log(formatIssue(issue));

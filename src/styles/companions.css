@@ -1,8 +1,11 @@
 /* ==========================================================================
    Companions. Decorative only: the layer never receives pointer events.
-   All motion is transform/opacity on small SVG groups (cheap to composite).
-   Motion levels: full (everything) · calm (bob + blink) · off (static).
+   All motion is transform/opacity (plus one registered number for the eyelids).
+   Motion levels: full (idle loops + expressions) · calm (breathing + blinking)
+   · off (static). In game the app caps motion at calm.
    ========================================================================== */
+
+@property --lid { syntax: "<number>"; inherits: false; initial-value: 0; }
 
 .companions {
   position: absolute;
@@ -11,119 +14,188 @@
   pointer-events: none;
 }
 .companion { position: absolute; pointer-events: none; }
-.companion-inner { width: 100%; height: 100%; }
-.companion svg,
-.companion img { display: block; width: 100%; height: 100%; overflow: visible; }
-.companion.flip svg,
-.companion.flip img { transform: scaleX(-1); }
+.companion.pose-peek { overflow: hidden; }
+.companion-inner { position: absolute; inset: 0; }
 
-/* Soft contact shadow where they sit on the border. */
-.companion.edge-top:not(.pose-peek)::before {
+/* Own compositor layer: the drop-shadow is rasterized once, breathing only transforms it. */
+.sprite { position: absolute; left: 0; will-change: transform; }
+.flip .sprite { transform: scaleX(-1); }
+.sprite-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Soft contact shadow + a faint rim light in the rank color. */
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.55));
+}
+.ribbon { position: absolute; left: 0; top: 0; overflow: visible; }
+
+/* Contact shadow on the border for perching companions. */
+.companion.pose-perch::before {
   content: "";
   position: absolute;
-  left: 22%;
-  right: 22%;
-  top: calc(var(--seat) - 3px);
-  height: 6px;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.5), transparent);
+  left: 18%;
+  right: 18%;
+  bottom: -3px;
+  height: 8px;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), transparent);
 }
 
-/* Animated SVG parts pivot around their own box (static transform attributes keep the
-   default view-box origin, so they must not be listed here). */
-.companion :is(.body, .eyes, .head-tilt, .swing, .drill, .leg, .shears, .blade-a, .blade-b, .sparkle, .tear, .tail, .peek) {
-  transform-box: fill-box;
+/* ---- eyelids: --lid 0 = open, 1 = closed ---- */
+.lid {
+  position: absolute;
+  border-radius: 50%;
+  transform-origin: 50% 0;
+  transform: rotate(var(--rot)) scaleY(var(--lid));
+  background: linear-gradient(180deg, var(--lid-a), var(--lid-b));
+  /* Soft edge + lash line along the lid rim (invisible while the lid is open). */
+  box-shadow: 0 0 1.5px var(--lid-b), inset 0 -1.6px 0 var(--lash);
+  animation: c-blink 5.6s infinite;
+  animation-delay: var(--sync, 0s);
+}
+.companion-amumu .lid { animation-duration: 6.8s; }
+/* Closed-eye line (relaxed ∪); happy eyes swap it for ∩. */
+.lid::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 4%;
+  height: 45%;
+  border-bottom: 2px solid var(--lash);
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+@keyframes c-blink {
+  0%, 92%, 100% { --lid: 0; }
+  94% { --lid: 1; }
+  96% { --lid: 0.15; }
+  97% { --lid: 1; }
+  98.5% { --lid: 0; }
 }
 
-/* ---- shared idle loops ---- */
-.companion .body { transform-origin: 50% 100%; animation: c-bob 3.4s ease-in-out infinite; }
-.companion-amumu .body { animation-duration: 4.2s; }
-.companion .eyes { transform-origin: 50% 50%; animation: c-blink 5.2s infinite; }
-.companion-amumu .eyes { animation-duration: 6.4s; animation-delay: -2s; }
-.companion .head-tilt { transform-origin: 50% 90%; animation: c-tilt 6s ease-in-out infinite alternate; }
-.companion-amumu .head-tilt { animation: c-sad 5s ease-in-out infinite alternate; }
-.companion .swing { transform-origin: 50% 0%; animation: c-swing 3.2s ease-in-out infinite alternate; }
-.companion-amumu .swing { animation-duration: 3.9s; animation-delay: -1.3s; }
+/* ---- idle loops ---- */
+.sprite { transform-origin: 50% 100%; animation: c-breathe 3.8s ease-in-out infinite; animation-delay: var(--sync, 0s); }
+.flip .sprite { animation-name: c-breathe-flip; }
+.companion-amumu .sprite { animation-duration: 4.6s; }
+@keyframes c-breathe { 50% { transform: scale(1.012, 1.022); } }
+@keyframes c-breathe-flip { from, to { transform: scaleX(-1); } 50% { transform: scaleX(-1) scale(1.012, 1.022); } }
 
-/* Gwen */
-.companion .drill { transform-origin: 50% 0%; animation: c-drill 3.6s ease-in-out infinite alternate; }
-.companion .drill-r { animation-delay: -1.8s; }
-.companion .leg { transform-origin: 50% 0%; animation: c-leg 1.9s ease-in-out infinite alternate; }
-.companion .leg-r { animation-delay: -0.95s; }
-.companion .shears { transform-origin: 50% 74%; animation: c-flourish 24s ease-in-out infinite; animation-delay: var(--sync, 0s); }
-.companion .blade-a { transform-origin: 50% 97%; animation: c-snip-a 24s ease-in-out infinite; animation-delay: var(--sync, 0s); }
-.companion .blade-b { transform-origin: 50% 97%; animation: c-snip-b 24s ease-in-out infinite; animation-delay: var(--sync, 0s); }
-.companion .holy { animation: c-glow 3s ease-in-out infinite alternate; }
-.companion .sparkle { transform-origin: 50% 50%; animation: c-sparkle 7s ease-in-out infinite; }
+.pose-perch .companion-inner { transform-origin: 50% 97%; animation: c-sway 7s ease-in-out infinite alternate; }
+.companion-amumu.pose-perch .companion-inner { animation-duration: 9s; animation-delay: -3s; }
+@keyframes c-sway { from { transform: rotate(-1.2deg); } to { transform: rotate(1.2deg); } }
 
-/* Amumu */
-.companion .tear { transform-origin: 50% 0%; animation: c-tear 7s ease-in infinite; }
-.companion .tail { transform-origin: 0% 50%; animation: c-tail 2.8s ease-in-out infinite alternate; }
-.companion .aura { animation: c-glow 4s ease-in-out infinite alternate; }
-.companion-amumu.pose-hang .leg { transform-origin: 50% 0%; animation: c-dangle 2.2s ease-in-out infinite alternate; }
-/* Coordinated beat: Amumu hops while Gwen flourishes her shears (same 24 s clock). */
-.companion-amumu .companion-inner { animation: c-cheer 24s ease-in-out infinite; animation-delay: var(--sync, 0s); }
+.pose-hang .companion-inner { transform-origin: var(--hang-x) 0; animation: c-swing 3.4s ease-in-out infinite alternate; }
+.companion-amumu.pose-hang .companion-inner { animation-duration: 4.1s; animation-delay: -1.5s; }
+@keyframes c-swing { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
 
-/* Peek: duck below the border now and then. The clip keeps the hidden part hidden. */
-.companion.pose-peek .head-tilt { animation: c-peek 13s ease-in-out infinite; }
-.companion-amumu.pose-peek .head-tilt { animation-duration: 15s; animation-delay: -6s; }
-
-@keyframes c-bob { 50% { transform: translateY(-2px); } }
-@keyframes c-blink { 0%, 93%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.12); } }
-@keyframes c-tilt { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
-@keyframes c-sad { from { transform: rotate(-5deg); } to { transform: rotate(1.5deg); } }
-@keyframes c-swing { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
-@keyframes c-drill { from { transform: rotate(-4deg); } to { transform: rotate(4deg); } }
-@keyframes c-leg { from { transform: rotate(-12deg); } to { transform: rotate(14deg); } }
-@keyframes c-dangle { from { transform: rotate(-8deg); } to { transform: rotate(8deg); } }
-@keyframes c-tail { from { transform: rotate(-10deg); } to { transform: rotate(8deg); } }
-@keyframes c-glow { from { opacity: 0.55; } to { opacity: 1; } }
-@keyframes c-flourish {
-  0%, 85%, 100% { transform: rotate(0); }
-  87% { transform: rotate(-16deg); }
-  89.5% { transform: rotate(12deg); }
-  92% { transform: rotate(-5deg); }
-  94% { transform: rotate(0); }
+.pose-peek .sprite { animation: c-peek 14s ease-in-out infinite; animation-delay: var(--sync, 0s); }
+.companion-amumu.pose-peek .sprite { animation-duration: 17s; animation-delay: -6s; }
+.flip.pose-peek .sprite { animation: none; }
+@keyframes c-peek {
+  0%, 84%, 100% { transform: translateY(0); }
+  88%, 93% { transform: translateY(30%); }
+  97% { transform: translateY(-2%); }
 }
-@keyframes c-snip-a { 0%, 87%, 91%, 100% { transform: rotate(0); } 88%, 90% { transform: rotate(6deg); } 89% { transform: rotate(-2deg); } }
-@keyframes c-snip-b { 0%, 87%, 91%, 100% { transform: rotate(0); } 88%, 90% { transform: rotate(-6deg); } 89% { transform: rotate(2deg); } }
-@keyframes c-sparkle {
-  0%, 70%, 100% { transform: scale(0) rotate(0); opacity: 0; }
-  78% { transform: scale(1.15) rotate(45deg); opacity: 1; }
-  88% { transform: scale(0.3) rotate(90deg); opacity: 0; }
+
+/* Amumu's tear: wells up and rolls down now and then. */
+.tear {
+  position: absolute;
+  width: 4.5%;
+  height: 5.5%;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #9fdcff 45%, #4e9ad6);
+  opacity: 0;
+  animation: c-tear 11s ease-in infinite;
+  animation-delay: -4s;
 }
 @keyframes c-tear {
-  0%, 55% { transform: translateY(0) scale(0.4); opacity: 0; }
-  62% { transform: translateY(0) scale(1); opacity: 1; }
-  80% { transform: translateY(8px) scale(0.9); opacity: 0.9; }
-  88%, 100% { transform: translateY(13px) scale(0.6); opacity: 0; }
-}
-@keyframes c-cheer {
-  0%, 88%, 96%, 100% { transform: translateY(0) rotate(0); }
-  90% { transform: translateY(-4px) rotate(-4deg); }
-  92% { transform: translateY(0) rotate(3deg); }
-  94% { transform: translateY(-2px) rotate(0); }
-}
-@keyframes c-peek {
-  0%, 82%, 100% { transform: translateY(0) rotate(0); }
-  86% { transform: translateY(12px) rotate(-3deg); }
-  92% { transform: translateY(12px) rotate(3deg); }
-  96% { transform: translateY(-1px) rotate(0); }
+  0%, 70% { transform: translateY(0) scale(0.3); opacity: 0; }
+  76% { transform: translateY(0) scale(1); opacity: 0.95; }
+  92% { transform: translateY(160%) scale(0.85); opacity: 0.85; }
+  100% { transform: translateY(260%) scale(0.5); opacity: 0; }
 }
 
-/* ---- calm: slow bob + blink only ---- */
-html[data-motion="calm"] .companion .body { animation-duration: 5.5s; }
-html[data-motion="calm"] .companion .swing { animation-duration: 5s; }
-html[data-motion="calm"] .companion .leg,
-html[data-motion="calm"] .companion .drill,
-html[data-motion="calm"] .companion .shears,
-html[data-motion="calm"] .companion .blade-a,
-html[data-motion="calm"] .companion .blade-b,
-html[data-motion="calm"] .companion .sparkle,
-html[data-motion="calm"] .companion .tear,
-html[data-motion="calm"] .companion .tail,
-html[data-motion="calm"] .companion .aura,
-html[data-motion="calm"] .companion .head-tilt,
-html[data-motion="calm"] .companion-amumu .companion-inner { animation: none; }
-/* Static sparkle/tear states for calm/off. */
-html:not([data-motion="full"]) .companion .sparkle,
-html:not([data-motion="full"]) .companion .tear { opacity: 0; }
+/* Sparkles (Gwen's shears gem, blade tip …) in the rank accent color. */
+.spark {
+  position: absolute;
+  width: 9%;
+  aspect-ratio: 1;
+  margin: -4.5% 0 0 -4.5%;
+  background: var(--rank-accent, #bff6ff);
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  opacity: 0;
+  animation: c-spark 8s ease-in-out infinite;
+}
+.spark:nth-of-type(2) { animation-delay: -2.7s; }
+.spark:nth-of-type(3) { animation-delay: -5.3s; }
+.companion-amumu .spark { animation-duration: 13s; }
+@keyframes c-spark {
+  0%, 80%, 100% { transform: scale(0) rotate(0); opacity: 0; }
+  86% { transform: scale(1) rotate(45deg); opacity: 1; }
+  93% { transform: scale(0.2) rotate(90deg); opacity: 0; }
+}
+
+/* Speech bubble for expressions. */
+.bubble {
+  position: absolute;
+  transform: translate(-50%, -100%) scale(0.4);
+  opacity: 0;
+  min-width: 16px;
+  padding: 1px 6px;
+  border-radius: 9px;
+  font: 700 11px/16px var(--font-body);
+  text-align: center;
+  color: var(--rank-on-primary);
+  background: var(--rank-metal);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  transition: opacity 200ms ease, transform 260ms cubic-bezier(0.3, 1.6, 0.5, 1);
+  white-space: nowrap;
+}
+.bubble:empty { display: none; }
+[data-expr] .bubble { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+
+/* ---- expressions (data-expr set by layer.ts) ---- */
+[data-expr] .lid { animation: none; transition: --lid 160ms ease; }
+[data-expr="happy"] .lid,
+[data-expr="excited"] .lid { --lid: 1; }
+[data-expr="happy"] .lid::after,
+[data-expr="excited"] .lid::after,
+[data-expr="wink"] .lid-r::after {
+  /* ∩ happy eyes */
+  bottom: auto;
+  top: 30%;
+  border-bottom: 0;
+  border-top: 2.2px solid var(--lash);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+[data-expr="wink"] .lid-r { --lid: 1; }
+[data-expr="sleepy"] .lid { --lid: 0.6; }
+[data-expr="sleepy"] .lid::after { display: none; }
+[data-expr="surprised"] .lid { --lid: 0; }
+
+[data-expr="excited"] .companion-inner,
+[data-expr="surprised"] .companion-inner { animation: c-hop 0.7s cubic-bezier(0.3, 0.7, 0.4, 1) 2; }
+[data-expr="happy"] .companion-inner { animation: c-hop 0.9s ease-in-out 1; }
+[data-expr="curious"] .sprite { animation: c-curious 2.2s ease-in-out 1 forwards; }
+.flip[data-expr="curious"] .sprite { animation-name: c-curious-flip; }
+@keyframes c-curious { 25%, 80% { transform: rotate(-6deg); } }
+@keyframes c-curious-flip { from, to { transform: scaleX(-1); } 25%, 80% { transform: scaleX(-1) rotate(-6deg); } }
+[data-expr="excited"] .spark,
+[data-expr="happy"] .spark { animation: c-spark-burst 0.9s ease-out 2; }
+[data-expr="cry"] .tear { animation: c-tear 1.6s ease-in 1; }
+@keyframes c-hop {
+  0%, 100% { transform: translateY(0); }
+  35% { transform: translateY(-9%) rotate(-2deg); }
+  60% { transform: translateY(0) rotate(1deg); }
+}
+@keyframes c-spark-burst {
+  0% { transform: scale(0); opacity: 0; }
+  40% { transform: scale(1.3) rotate(45deg); opacity: 1; }
+  100% { transform: scale(0) rotate(120deg); opacity: 0; }
+}
+
+/* ---- calm: breathing + blinking only ---- */
+html[data-motion="calm"] .companion-inner,
+html[data-motion="calm"] .pose-peek .sprite,
+html[data-motion="calm"] .spark,
+html[data-motion="calm"] .tear { animation: none; }
+html[data-motion="calm"] .sprite { animation-duration: 6s; }

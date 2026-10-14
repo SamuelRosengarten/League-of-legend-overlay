@@ -153,6 +153,12 @@ pub fn toggle_visibility(app: &AppHandle) {
     apply(app);
 }
 
+/// Show the overlay (e.g. the app was launched again while already running).
+pub fn reveal(app: &AppHandle) {
+    with_overlay(app, |o| o.visible_override = Some(true));
+    apply(app);
+}
+
 pub fn set_interactive(app: &AppHandle, interactive: bool) {
     with_overlay(app, |o| o.interactive = interactive);
     if let Some(win) = window(app) {
@@ -318,10 +324,15 @@ fn on_user_moved(app: &AppHandle) {
     emit_state(app);
 }
 
+/// Click-through is set natively, never through tao's `set_ignore_cursor_events`.
+///
+/// Root cause of "interactive mode makes the overlay disappear": tao re-applies all of its
+/// window flags on any flag change, and `apply_diff` calls `ShowWindow(SW_HIDE)` whenever its
+/// own VISIBLE flag is unset. We show the window natively (`show_without_activating`, so it
+/// never steals focus), which tao never learns about — so every click-through toggle through
+/// tao hid the window. Owning the styles here keeps tao's flags untouched.
 fn set_click_through(win: &WebviewWindow, ignore: bool) {
-    let _ = win.set_ignore_cursor_events(ignore);
-    // tao rewrites the extended style when toggling click-through.
-    win_native::make_non_activating(win);
+    win_native::set_click_through(win, ignore);
 }
 
 #[cfg(windows)]
@@ -330,7 +341,8 @@ mod win_native {
     use windows_sys::Win32::Foundation::HWND;
     use windows_sys::Win32::UI::WindowsAndMessaging::{
         GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
-        SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
+        SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_LAYERED,
+        WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT,
     };
 
     fn hwnd(win: &WebviewWindow) -> Option<HWND> {
@@ -346,6 +358,32 @@ mod win_native {
             if wanted != ex {
                 SetWindowLongPtrW(h, GWL_EXSTYLE, wanted);
             }
+        }
+    }
+
+    /// WS_EX_TRANSPARENT + WS_EX_LAYERED = mouse input falls through to the game. Same bits
+    /// tao uses, minus its visibility side effects. Also re-asserts no-activate + topmost so
+    /// the overlay can never drop behind the game when the mode changes.
+    pub fn set_click_through(win: &WebviewWindow, ignore: bool) {
+        let Some(h) = hwnd(win) else { return };
+        unsafe {
+            let ex = GetWindowLongPtrW(h, GWL_EXSTYLE);
+            let wanted = click_through_style(ex, ignore);
+            if wanted != ex {
+                SetWindowLongPtrW(h, GWL_EXSTYLE, wanted);
+            }
+            SetWindowPos(h, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        }
+    }
+
+    /// Extended style for a mode: click-through bits on/off, never-activate + tool window always.
+    pub fn click_through_style(ex: isize, ignore: bool) -> isize {
+        let through = (WS_EX_TRANSPARENT | WS_EX_LAYERED) as isize;
+        let base = ex | (WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW) as isize;
+        if ignore {
+            base | through
+        } else {
+            base & !through
         }
     }
 
@@ -371,6 +409,9 @@ mod win_native {
 mod win_native {
     use tauri::WebviewWindow;
     pub fn make_non_activating(_win: &WebviewWindow) {}
+    pub fn set_click_through(win: &WebviewWindow, ignore: bool) {
+        let _ = win.set_ignore_cursor_events(ignore);
+    }
     pub fn show_without_activating(win: &WebviewWindow) {
         let _ = win.show();
     }
@@ -393,5 +434,23 @@ mod tests {
         assert_eq!(mode_for_phase("None"), Mode::Idle);
         assert_eq!(mode_for("None", true), Mode::InGame);
         assert_eq!(mode_for("EndOfGame", true), Mode::Hidden);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn click_through_toggles_only_input_bits() {
+        use windows_sys::Win32::UI::WindowsAndMessaging::{
+            WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST, WS_EX_TRANSPARENT,
+        };
+        let through = (WS_EX_TRANSPARENT | WS_EX_LAYERED) as isize;
+        let keep = (WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST) as isize;
+        let passive = win_native::click_through_style(WS_EX_TOPMOST as isize, true);
+        assert_eq!(passive & through, through);
+        assert_eq!(passive & keep, keep);
+        let interactive = win_native::click_through_style(passive, false);
+        assert_eq!(interactive & through, 0);
+        // Interactive mode must keep the window topmost and non-activating (never steals focus).
+        assert_eq!(interactive & keep, keep);
+        assert_eq!(win_native::click_through_style(interactive, true), passive);
     }
 }

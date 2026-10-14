@@ -1,10 +1,10 @@
 // Placement presets: where each companion sits relative to the panel, and how much
 // transparent space ("gutter") the window needs above/below the panel for them.
 //
-// Companions only ever live ABOVE the top border (sitting, standing, peeking) or BELOW the
-// bottom border (hanging), so they never cover the panel's content.
+// Companions only ever live ABOVE the top border (perching, peeking) or BELOW the bottom
+// border (hanging), so they never cover the panel's content or controls.
 import type { CompanionSettings } from "../../types";
-import { ART, type CompanionId, type Pose } from "./art";
+import { type CompanionId, type Pose, SPRITES } from "./sprites";
 
 export interface PlacementPreset {
   id: string;
@@ -15,11 +15,9 @@ export interface PlacementPreset {
 
 export interface Spot {
   pose: Pose;
-  /** "top" = on the top border, "bottom" = hanging from the bottom border. */
-  edge: "top" | "bottom";
-  /** Horizontal anchor as a fraction of the panel width (art center). */
+  /** Horizontal anchor as a fraction of the panel width (sprite center). */
   x: number;
-  /** Mirror the art. */
+  /** Mirror the sprite. */
   flip?: boolean;
   /** Extra scale relative to the user size (minimal mode). */
   scale?: number;
@@ -29,62 +27,68 @@ export const PRESETS: PlacementPreset[] = [
   {
     id: "corners",
     label: "Opposite corners",
-    description: "Gwen sits on the top border, Amumu hangs from the bottom corner.",
-    spots: { gwen: { pose: "sit", edge: "top", x: 0.24 }, amumu: { pose: "hang", edge: "bottom", x: 0.84 } },
+    description: "Gwen stands on the top-left of the frame, Amumu dangles from the bottom-right corner.",
+    spots: { gwen: { pose: "perch", x: 0.2 }, amumu: { pose: "hang", x: 0.84 } },
   },
   {
     id: "top",
     label: "Top border",
-    description: "Both sit on the top border.",
-    spots: { gwen: { pose: "sit", edge: "top", x: 0.26 }, amumu: { pose: "sit", edge: "top", x: 0.78 } },
+    description: "Gwen stands and Amumu sits on the top border.",
+    spots: { gwen: { pose: "perch", x: 0.22 }, amumu: { pose: "perch", x: 0.8 } },
   },
   {
     id: "bottom",
     label: "Hanging below",
-    description: "Both hang from the bottom border.",
-    spots: { gwen: { pose: "hang", edge: "bottom", x: 0.2 }, amumu: { pose: "hang", edge: "bottom", x: 0.8 } },
+    description: "Both dangle from the bottom border — Gwen on a ribbon, Amumu on his bandage.",
+    spots: { gwen: { pose: "hang", x: 0.22 }, amumu: { pose: "hang", x: 0.78 } },
   },
   {
     id: "left",
     label: "Left corner",
-    description: "Gwen stands at the top-left corner, Amumu peeks beside her.",
-    spots: { gwen: { pose: "stand", edge: "top", x: 0.13 }, amumu: { pose: "peek", edge: "top", x: 0.32 } },
+    description: "Side by side on the top-left of the frame.",
+    spots: { gwen: { pose: "perch", x: 0.15 }, amumu: { pose: "perch", x: 0.36 } },
   },
   {
     id: "right",
     label: "Right corner",
-    description: "Amumu peeks, Gwen stands at the top-right corner.",
-    spots: { amumu: { pose: "peek", edge: "top", x: 0.68 }, gwen: { pose: "stand", edge: "top", x: 0.87, flip: true } },
+    description: "Side by side on the top-right of the frame.",
+    spots: { amumu: { pose: "perch", x: 0.64, flip: true }, gwen: { pose: "perch", x: 0.85, flip: true } },
   },
   {
     id: "peek",
     label: "Peeking",
     description: "Both peek over the top border.",
-    spots: { gwen: { pose: "peek", edge: "top", x: 0.3 }, amumu: { pose: "peek", edge: "top", x: 0.7 } },
+    spots: { gwen: { pose: "peek", x: 0.28 }, amumu: { pose: "peek", x: 0.72 } },
   },
   {
     id: "minimal",
     label: "Minimal",
     description: "Two small heads peeking over the top-right corner.",
-    spots: { gwen: { pose: "peek", edge: "top", x: 0.74, scale: 0.7 }, amumu: { pose: "peek", edge: "top", x: 0.88, scale: 0.7 } },
+    spots: { gwen: { pose: "peek", x: 0.72, scale: 0.72 }, amumu: { pose: "peek", x: 0.88, scale: 0.72 } },
   },
 ];
 
 export const DEFAULT_PRESET = "corners";
-/** Art units → CSS px at size 1. */
-export const BASE_SCALE = 0.84;
 export const SIZE_MIN = 0.7;
 export const SIZE_MAX = 1.4;
+/** In-game (compact) panels are narrower: companions shrink a little. */
+const COMPACT_SCALE = 0.8;
+/** Ribbon / bandage length for hanging companions, CSS px at size 1. */
+const RIBBON = 16;
 
 export interface Placed {
   who: CompanionId;
   spot: Spot;
-  /** CSS px. */
+  /** CSS px box of the companion element. */
   width: number;
   height: number;
-  /** Distance from the art's top to the seat line, CSS px. */
-  seat: number;
   left: number;
+  /** Rendered sprite height (CSS px). */
+  spriteHeight: number;
+  /** Distance from the element's top to the border line (top-edge poses). */
+  seat: number;
+  /** Hanging: ribbon length above the sprite. */
+  ribbon: number;
 }
 
 export interface Layout {
@@ -102,24 +106,37 @@ export function clampSize(size: number): number {
 }
 
 /**
- * Lays the enabled companions out over a panel of `panelWidth` CSS px. Art is clamped to
- * stay inside the window horizontally. `compact` (in-game) shrinks them a little.
+ * Lays the enabled companions out over a panel of `panelWidth` CSS px, clamped to stay inside
+ * the window horizontally. `compact` (in-game) shrinks them a little.
  */
 export function layoutCompanions(settings: CompanionSettings, panelWidth: number, opts: { compact: boolean }): Layout {
   const preset = presetById(settings.placement);
-  const size = clampSize(settings.size) * BASE_SCALE * (opts.compact ? 0.85 : 1);
+  const size = clampSize(settings.size) * (opts.compact ? COMPACT_SCALE : 1);
   const placed: Placed[] = [];
   for (const who of ["gwen", "amumu"] as const) {
     if (!settings[who]) continue;
     const spot = preset.spots[who];
     if (!spot) continue;
-    const [, y, w, h] = ART[who][spot.pose].box;
-    const s = size * (spot.scale ?? 1);
-    const width = w * s;
-    const left = Math.min(Math.max(spot.x * panelWidth - width / 2, 0), Math.max(0, panelWidth - width));
-    placed.push({ who, spot, width, height: h * s, seat: -y * s, left });
+    const sprite = SPRITES[who];
+    const spriteHeight = Math.round(sprite.baseHeight * size * (spot.scale ?? 1));
+    const width = Math.round((spriteHeight * sprite.width) / sprite.height);
+    const left = Math.round(Math.min(Math.max(spot.x * panelWidth - width / 2, 0), Math.max(0, panelWidth - width)));
+    let height = spriteHeight;
+    let seat = 0;
+    let ribbon = 0;
+    if (spot.pose === "perch") {
+      seat = Math.round(spriteHeight * sprite.seat);
+    } else if (spot.pose === "peek") {
+      // Only the head shows; the element clips the rest just below the border.
+      seat = Math.round(spriteHeight * sprite.peek);
+      height = seat + 2;
+    } else {
+      ribbon = Math.round(RIBBON * size);
+      height = ribbon + spriteHeight;
+    }
+    placed.push({ who, spot, width, height, left, spriteHeight, seat, ribbon });
   }
-  const gutterTop = Math.ceil(Math.max(0, ...placed.filter((p) => p.spot.edge === "top").map((p) => p.seat)));
-  const gutterBottom = Math.ceil(Math.max(0, ...placed.filter((p) => p.spot.edge === "bottom").map((p) => p.height - p.seat)));
+  const gutterTop = Math.max(0, ...placed.filter((p) => p.spot.pose !== "hang").map((p) => p.seat));
+  const gutterBottom = Math.max(0, ...placed.filter((p) => p.spot.pose === "hang").map((p) => p.height));
   return { placed, gutterTop, gutterBottom };
 }

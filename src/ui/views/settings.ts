@@ -3,8 +3,7 @@ import { MOTIONS } from "../../theme/appearance";
 import { THEMES, TIER_IDS, type ThemeId } from "../../theme/ranks";
 import type { ResolvedTheme } from "../../theme/theme";
 import type { Appearance, CompanionSettings, RankInfo } from "../../types";
-import { ART, type CompanionId } from "../companions/art";
-import { rasterArt } from "../companions/layer";
+import { type CompanionId, SPRITES } from "../companions/sprites";
 import { PRESETS, SIZE_MAX, SIZE_MIN } from "../companions/layout";
 import { crestArt } from "../crest";
 import { h } from "../h";
@@ -48,12 +47,8 @@ function toggle(label: string, on: boolean, onChange: (v: boolean) => void, hint
 function companionTile(who: CompanionId, c: CompanionSettings, a: Appearance): HTMLElement {
   const on = c[who];
   const name = who === "gwen" ? "Gwen" : "Amumu";
-  const raster = rasterArt(who, "peek");
-  const [x, y, w, hh] = ART[who].peek.box;
-  const face = h("span", { class: "companion-face" });
-  if (raster) face.append(h("img", { src: raster, alt: "" }));
-  // Static, self-authored SVG markup.
-  else face.innerHTML = `<svg viewBox="${x} ${y} ${w} ${hh}" width="100%" height="100%">${ART[who].peek.svg(`t-${who}-`)}</svg>`;
+  // Head-and-shoulders crop of the companion sprite.
+  const face = h("span", { class: `companion-face face-${who}`, style: `background-image:url("${SPRITES[who].url}")` });
   return h(
     "button",
     {
