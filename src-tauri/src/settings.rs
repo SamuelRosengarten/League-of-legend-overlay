@@ -75,3 +75,26 @@ pub fn save(app: &AppHandle, settings: &Settings) {
         log::warn!("could not save {}: {e}", path.display());
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hand_edited_partial_file_keeps_defaults_for_missing_fields() {
+        let s: Settings = serde_json::from_str(r#"{ "hotkeys": { "toggleVisibility": "Alt+F9" }, "leagueInstallDir": "D:/Games/League" }"#).unwrap();
+        assert_eq!(s.hotkeys.toggle_visibility, "Alt+F9");
+        assert_eq!(s.hotkeys.toggle_interactive, "Ctrl+Shift+Z");
+        assert_eq!(s.league_install_dir.as_deref(), Some("D:/Games/League"));
+        assert_eq!(s.dock, Edge::Right);
+    }
+
+    #[test]
+    fn round_trips_through_json() {
+        let mut s = Settings::default();
+        s.positions.insert("in-game".into(), SavedPosition { x: -1920, y: 40 });
+        s.dock = Edge::Left;
+        let back: Settings = serde_json::from_str(&serde_json::to_string(&s).unwrap()).unwrap();
+        assert_eq!(back, s);
+    }
+}

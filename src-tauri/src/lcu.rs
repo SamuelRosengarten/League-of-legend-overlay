@@ -203,4 +203,17 @@ mod tests {
         assert!(parse_event(json!([5, SESSION_EVENT]).as_array().unwrap()).is_none());
         assert!(parse_event(json!([0, "welcome", 1]).as_array().unwrap()).is_none());
     }
+
+    #[test]
+    fn basic_auth_uses_riot_user_and_lockfile_password() {
+        let lock = Lockfile { process: "LeagueClient".into(), pid: 1, port: 50000, password: "abc".into(), protocol: "https".into() };
+        // base64("riot:abc")
+        assert_eq!(Lcu::new(lock).auth_header(), "Basic cmlvdDphYmM=");
+    }
+
+    #[test]
+    fn champ_select_payload_tolerates_unknown_shapes() {
+        assert!(parse_session(json!({"localPlayerCellId": 0, "extra": true})).is_some());
+        assert!(parse_session(json!("not a session")).is_none());
+    }
 }
