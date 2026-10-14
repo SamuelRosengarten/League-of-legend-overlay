@@ -87,7 +87,7 @@ export type Camp =
   | "scuttle-blue-buff-side" | "scuttle-red-buff-side";
 export type BuffSide = "blue-buff-side" | "red-buff-side";
 export type PathCondition =
-  | "end-lane-priority" | "end-lane-losing" | "end-lane-gank-setup" | "end-lane-enemy-immobile"
+  | "end-lane-priority" | "end-lane-losing" | "end-lane-not-priority" | "end-lane-gank-setup" | "end-lane-enemy-immobile"
   | "start-lane-priority" | "mid-priority" | "enemy-jungler-invader" | "enemy-jungler-passive"
   | "enemy-jungler-strong-early";
 
@@ -104,6 +104,7 @@ export interface JunglePath {
   endsOn: BuffSide;
   approxFinish: string;
   firstGank: "end-side-lane" | "mid" | "none";
+  baseScore: number;
   favors: PathRule[];
   avoid: PathRule[];
   notes: Text[];

@@ -193,7 +193,7 @@ fn apply(app: &AppHandle) {
             win_native::make_non_activating(&win);
             set_click_through(&win, !interactive);
         } else {
-            let _ = win.hide();
+            win_native::hide(&win);
         }
     }
     emit_state(app);
@@ -330,7 +330,7 @@ mod win_native {
     use windows_sys::Win32::Foundation::HWND;
     use windows_sys::Win32::UI::WindowsAndMessaging::{
         GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
-        SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SW_SHOWNOACTIVATE, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
+        SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW,
     };
 
     fn hwnd(win: &WebviewWindow) -> Option<HWND> {
@@ -356,6 +356,15 @@ mod win_native {
             SetWindowPos(h, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
         }
     }
+
+    /// Must mirror `show_without_activating`: tao never learned the window was shown, so its
+    /// own `hide()` would be a no-op.
+    pub fn hide(win: &WebviewWindow) {
+        let Some(h) = hwnd(win) else { return };
+        unsafe {
+            ShowWindow(h, SW_HIDE);
+        }
+    }
 }
 
 #[cfg(not(windows))]
@@ -364,6 +373,9 @@ mod win_native {
     pub fn make_non_activating(_win: &WebviewWindow) {}
     pub fn show_without_activating(win: &WebviewWindow) {
         let _ = win.show();
+    }
+    pub fn hide(win: &WebviewWindow) {
+        let _ = win.hide();
     }
 }
 

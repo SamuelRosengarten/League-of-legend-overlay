@@ -18,10 +18,11 @@ export function render(root: HTMLElement, state: UiState) {
   let body: HTMLElement | null = null;
   if (!collapsed) {
     if (mode === "champ-select" && snap.champSelect) {
-      body = champSelectView(fromChampSelect(snap.champSelect, state.champions), state.champions, snap.champSelect.timer.phase);
+      body = champSelectView(fromChampSelect(snap.champSelect, state.champions), state.champions, state.data, snap.champSelect.timer.phase);
     } else if (mode === "in-game") {
       const game = snap.live.game;
-      body = inGameView(game ? fromLive(game, state.champions) : null, snap.live.status, state.champions);
+      const preGame = state.lastChampSelect ? fromChampSelect(state.lastChampSelect, state.champions) : null;
+      body = inGameView(game ? fromLive(game, state.champions) : null, snap.live.status, state.champions, state.data, state.notes, preGame);
     } else {
       body = idleView(snap);
     }

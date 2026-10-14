@@ -140,7 +140,7 @@
       }
     },
     {
-      "label": "4 of 5 known (Darius, Lee Sin, Lux, Caitlyn) — top laner still hidden",
+      "label": "4 of 5 known (Darius, Lee Sin, Lux, Caitlyn) — one pick still hidden",
       "delayMs": 5000,
       "champSelect": {
         "localPlayerCellId": 0,

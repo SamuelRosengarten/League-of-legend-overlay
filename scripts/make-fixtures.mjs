@@ -249,7 +249,7 @@ const write = (id, scenario) => {
     steps: [
       { label: "2 of 5 enemies known", delayMs: 4000, phase: "ChampSelect",
         champSelect: session(0, blue, red([null, "Darius", null, "LeeSin", null]), "BAN_PICK") },
-      { label: "4 of 5 known (Darius, Lee Sin, Lux, Caitlyn) — top laner still hidden", delayMs: 5000,
+      { label: "4 of 5 known (Darius, Lee Sin, Lux, Caitlyn) — one pick still hidden", delayMs: 5000,
         champSelect: session(0, blue, red([null, "Darius", "Lux", "LeeSin", "Caitlyn"]), "BAN_PICK") },
     ],
   });

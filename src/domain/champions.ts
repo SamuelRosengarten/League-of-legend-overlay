@@ -31,6 +31,11 @@ export class ChampionIndex {
     return this.byName.get(normalize(championName))?.id ?? (championName.replace(/[^A-Za-z]/g, "") || null);
   }
 
+  /** Data Dragon class tags ("Fighter", "Mage", ...), used for the generic fallback profile. */
+  classTags(id: string): string[] {
+    return this.byId.get(id)?.tags ?? [];
+  }
+
   name(id: string | null): string {
     if (!id) return "Unknown";
     return this.byId.get(id)?.name ?? id;

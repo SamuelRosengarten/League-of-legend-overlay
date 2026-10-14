@@ -1,12 +1,16 @@
+import type { CuratedData } from "../../data";
+import { buildAdvice } from "../../domain/advisor";
 import type { ChampionIndex } from "../../domain/champions";
-import { type MatchView, supportedRole } from "../../domain/match";
+import type { MatchView } from "../../domain/match";
 import { h } from "../h";
-import { ROLE_LABEL, champIcon, notice, slotRow } from "./common";
+import { adviceStatus, laneCard, threatList, warningsList } from "./advisor";
+import { ROLE_LABEL, champIcon, notice } from "./common";
+import { pathCard } from "./jungle";
 
-export function champSelectView(match: MatchView, champs: ChampionIndex, timerPhase: string): HTMLElement {
-  const role = supportedRole(match.me);
-  const hiddenEnemies = match.enemies.filter((e) => !e.championId).length;
+export function champSelectView(match: MatchView, champs: ChampionIndex, data: CuratedData, timerPhase: string): HTMLElement {
   const me = match.me;
+  const advice = buildAdvice(match, champs, data);
+  const ok = advice.status === "ok" ? advice : null;
 
   const hero = h(
     "div",
@@ -19,7 +23,7 @@ export function champSelectView(match: MatchView, champs: ChampionIndex, timerPh
       h(
         "div",
         { class: "hero-meta" },
-        [match.side ? `${match.side === "blue" ? "Blue" : "Red"} side` : null, me?.position ? ROLE_LABEL[me.position] : null, timerPhase.replace("_", " ").toLowerCase()]
+        [match.side ? `${match.side === "blue" ? "Blue" : "Red"} side` : null, ok ? ROLE_LABEL[ok.role] : null, timerPhase.replace("_", " ").toLowerCase()]
           .filter(Boolean)
           .join(" · "),
       ),
@@ -27,23 +31,40 @@ export function champSelectView(match: MatchView, champs: ChampionIndex, timerPh
     match.side ? h("span", { class: `side side-${match.side}` }, match.side) : null,
   );
 
-  let advisor: HTMLElement;
-  if (!me?.championId || me.hovering) {
-    advisor = notice("muted", "Lock in Gwen or Amumu", "The matchup advisor starts once your champion is locked.");
-  } else if (!role) {
-    advisor = notice("muted", `Unsupported champion: ${champs.name(me.championId)}`, "Rift Advisor only covers Gwen (top) and Amumu (jungle).");
+  const dataErrors = data.issues.filter((i) => i.severity === "error");
+  const body: (HTMLElement | null)[] = [
+    hero,
+    dataErrors.length ? notice("warn", "Some curated data failed validation", `${dataErrors.length} problem(s) — affected files are ignored. Run npm run validate:data.`) : null,
+    adviceStatus(advice, champs),
+  ];
+
+  if (ok) {
+    // Ranking + warnings first: in click-through mode the panel can't be scrolled, so the
+    // long matchup card goes last (scroll it in interactive mode).
+    body.push(
+      warningsList(ok.warnings),
+      ok.plan ? pathCard(ok.plan, champs) : null,
+      h("h3", null, "Threat ranking", h("span", { class: "count" }, `vs ${champs.name(ok.me)}`)),
+      threatList(ok.threats.ranked, ok.threats.hidden, champs),
+      laneCard(ok, champs),
+    );
   } else {
-    advisor = notice("info", `${champs.name(me.championId)} advisor`, "Matchup cards, threat ranking and the jungle path planner arrive in the next steps.");
+    body.push(
+      h("h3", null, "Enemy team"),
+      h("div", { class: "team-row" }, match.enemies.map((s) => champIcon(s.championId, champs, 34))),
+    );
   }
 
-  return h(
-    "section",
-    { class: "body scroll" },
-    hero,
-    advisor,
-    h("h3", null, "Enemy team", hiddenEnemies ? h("span", { class: "count" }, `${hiddenEnemies} hidden`) : null),
-    h("div", { class: "slots" }, match.enemies.map((s) => slotRow(s, champs))),
+  body.push(
     h("h3", null, "Your team"),
-    h("div", { class: "slots" }, match.allies.map((s) => slotRow(s, champs))),
+    h(
+      "div",
+      { class: "team-row" },
+      match.allies.map((s, i) => {
+        const role = ok?.allyRoles[i]?.role ?? s.position;
+        return h("div", { class: `ally${s.isMe ? " ally-me" : ""}`, title: s.championId ? champs.name(s.championId) : "Not picked" }, champIcon(s.championId, champs, 34), h("small", null, role ? ROLE_LABEL[role] : "?"));
+      }),
+    ),
   );
+  return h("section", { class: "body scroll" }, body);
 }

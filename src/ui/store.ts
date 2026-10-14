@@ -1,12 +1,21 @@
-import type { DdragonData, MockStatus, Snapshot } from "../types";
+import type { ChampSelectSession, DdragonData, MockStatus, Snapshot } from "../types";
 import { ChampionIndex } from "../domain/champions";
+import type { EnemySnapshot, GameNote } from "../domain/gameNotes";
+import { type CuratedData, curated } from "../data";
 
 export interface UiState {
   snapshot: Snapshot | null;
   champions: ChampionIndex;
+  data: CuratedData;
   mock: MockStatus | null;
   /** Compact in-game panel collapsed to its header (persisted per machine). */
   collapsed: boolean;
+  /** In-game notes for the current game, oldest first. */
+  notes: GameNote[];
+  /** Enemy items/levels from the previous live snapshot (for diffing). */
+  lastEnemies: EnemySnapshot[] | null;
+  /** Last non-empty champ-select session (the plan stays visible on the loading screen). */
+  lastChampSelect: ChampSelectSession | null;
 }
 
 type Listener = (s: UiState) => void;
@@ -20,7 +29,16 @@ function readCollapsed(): boolean {
 }
 
 class Store {
-  state: UiState = { snapshot: null, champions: new ChampionIndex(null), mock: null, collapsed: readCollapsed() };
+  state: UiState = {
+    snapshot: null,
+    champions: new ChampionIndex(null),
+    data: curated(),
+    mock: null,
+    collapsed: readCollapsed(),
+    notes: [],
+    lastEnemies: null,
+    lastChampSelect: null,
+  };
   private listeners: Listener[] = [];
   private queued = false;
 

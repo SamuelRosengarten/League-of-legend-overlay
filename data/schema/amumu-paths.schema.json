@@ -21,6 +21,7 @@
       "enum": [
         "end-lane-priority",
         "end-lane-losing",
+        "end-lane-not-priority",
         "end-lane-gank-setup",
         "end-lane-enemy-immobile",
         "start-lane-priority",
@@ -42,7 +43,7 @@
     },
     "path": {
       "type": "object",
-      "required": ["id", "name", "clear", "endsOn", "approxFinish", "firstGank", "favors", "avoid", "notes", "confidence"],
+      "required": ["id", "name", "clear", "endsOn", "approxFinish", "firstGank", "baseScore", "favors", "avoid", "notes", "confidence"],
       "additionalProperties": false,
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
@@ -63,6 +64,12 @@
         "firstGank": {
           "description": "Where the first gank goes: the lane on the side the path ends on, or mid.",
           "enum": ["end-side-lane", "mid", "none"]
+        },
+        "baseScore": {
+          "description": "Default preference before any condition applies (full clears are the safe default for Amumu).",
+          "type": "number",
+          "minimum": -2,
+          "maximum": 2
         },
         "favors": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
         "avoid": { "type": "array", "items": { "$ref": "#/$defs/rule" } },

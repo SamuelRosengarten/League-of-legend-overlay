@@ -245,6 +245,10 @@ pub fn start(app: &AppHandle) {
     }
     if let Some(id) = first {
         let _ = load(app, &id);
+        // RIFT_MOCK_STEP=<n> (1-based) starts paused on that step — handy for UI work.
+        if let Some(n) = std::env::var("RIFT_MOCK_STEP").ok().and_then(|v| v.parse::<i64>().ok()) {
+            step(app, n - 1);
+        }
     } else {
         let _ = app.emit(events::MOCK, status(app));
     }

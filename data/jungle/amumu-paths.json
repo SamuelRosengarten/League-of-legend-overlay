@@ -8,11 +8,13 @@
       "endsOn": "blue-buff-side",
       "approxFinish": "3:15",
       "firstGank": "end-side-lane",
+      "baseScore": 1,
       "favors": [
         { "condition": "end-lane-priority", "weight": 2, "reason": "your laner on the blue-buff side has priority, so a gank there after the clear is likely to work" },
         { "condition": "end-lane-gank-setup", "weight": 1, "reason": "your laner on the blue-buff side has CC to follow up Bandage Toss" },
         { "condition": "end-lane-enemy-immobile", "weight": 1, "reason": "the enemy laner on the blue-buff side has little mobility to escape" },
-        { "condition": "enemy-jungler-passive", "weight": 0.5, "reason": "a full clear is safe against a farming enemy jungler" }
+        { "condition": "enemy-jungler-passive", "weight": 0.5, "reason": "a full clear is safe against a farming enemy jungler" },
+        { "condition": "start-lane-priority", "weight": 0.5, "reason": "your laner on the start side has priority and can cover your start/leash against an invade" }
       ],
       "avoid": [
         { "condition": "enemy-jungler-invader", "weight": 1.5, "reason": "a full clear leaves your start buff side exposed to an early invader" },
@@ -31,11 +33,13 @@
       "endsOn": "red-buff-side",
       "approxFinish": "3:15",
       "firstGank": "end-side-lane",
+      "baseScore": 1,
       "favors": [
         { "condition": "end-lane-priority", "weight": 2, "reason": "your laner on the red-buff side has priority, so a gank there after the clear is likely to work" },
         { "condition": "end-lane-gank-setup", "weight": 1, "reason": "your laner on the red-buff side has CC to follow up Bandage Toss" },
         { "condition": "end-lane-enemy-immobile", "weight": 1, "reason": "the enemy laner on the red-buff side has little mobility to escape" },
-        { "condition": "enemy-jungler-passive", "weight": 0.5, "reason": "a full clear is safe against a farming enemy jungler" }
+        { "condition": "enemy-jungler-passive", "weight": 0.5, "reason": "a full clear is safe against a farming enemy jungler" },
+        { "condition": "start-lane-priority", "weight": 0.5, "reason": "your laner on the start side has priority and can cover your start/leash against an invade" }
       ],
       "avoid": [
         { "condition": "enemy-jungler-invader", "weight": 1.5, "reason": "a full clear leaves your start buff side exposed to an early invader" },
@@ -54,6 +58,7 @@
       "endsOn": "red-buff-side",
       "approxFinish": "2:30",
       "firstGank": "end-side-lane",
+      "baseScore": 0,
       "favors": [
         { "condition": "end-lane-priority", "weight": 2.5, "reason": "your laner on the red-buff side has priority — an early level 3 gank there is the highest-value play" },
         { "condition": "end-lane-gank-setup", "weight": 1.5, "reason": "your laner on the red-buff side has CC to chain with Bandage Toss" },
@@ -62,6 +67,7 @@
       ],
       "avoid": [
         { "condition": "end-lane-losing", "weight": 2, "reason": "a losing lane can't follow up an early gank" },
+        { "condition": "end-lane-not-priority", "weight": 1.5, "reason": "a level 3 gank needs the lane to have priority — without it the enemy laner sits under tower" },
         { "condition": "enemy-jungler-strong-early", "weight": 1, "reason": "a strong early enemy jungler can counter-gank your level 3 Amumu" }
       ],
       "notes": [
@@ -77,6 +83,7 @@
       "endsOn": "blue-buff-side",
       "approxFinish": "3:30",
       "firstGank": "mid",
+      "baseScore": 0,
       "favors": [
         { "condition": "mid-priority", "weight": 2, "reason": "your mid laner has priority to help you contest scuttle" },
         { "condition": "end-lane-priority", "weight": 1, "reason": "your laner on the blue-buff side can rotate to the river" },
