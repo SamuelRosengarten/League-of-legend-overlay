@@ -29,6 +29,9 @@ interface Shell {
 
 let shell: Shell | null = null;
 let screenKey = "";
+/** Mirrors `snapshot.overlay.interactive` for the click guard on the content. */
+let interactive = false;
+let inGame = false;
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function buildShell(root: HTMLElement): Shell {
@@ -50,6 +53,17 @@ function buildShell(root: HTMLElement): Shell {
   header.append(crest.el, headerSlot);
   const content = document.createElement("div");
   content.className = "content";
+  // Outside the game the whole panel takes the mouse in click-through mode too, so the wheel
+  // scrolls it (see reportHotZone). Clicks on the content still do nothing until interactive.
+  content.addEventListener(
+    "click",
+    (e) => {
+      if (interactive) return;
+      e.preventDefault();
+      e.stopPropagation();
+    },
+    true,
+  );
   // Mode tag on the top border: only shown in interactive mode (CSS), so it is always clear
   // whether clicks go to the overlay or to the game.
   const modeTag = document.createElement("span");
@@ -59,7 +73,10 @@ function buildShell(root: HTMLElement): Shell {
   const companions = new CompanionLayer();
   stage.append(panel, companions.el);
   root.replaceChildren(stage);
-  return { stage, panel, headerSlot, content, crest, particles, companions };
+  const s = { stage, panel, headerSlot, content, crest, particles, companions };
+  // The docked panel resizes with the client window between renders: keep the zone current.
+  new ResizeObserver(() => reportHotZone(s, inGame)).observe(panel);
+  return s;
 }
 
 export function render(root: HTMLElement, state: UiState) {
@@ -68,6 +85,8 @@ export function render(root: HTMLElement, state: UiState) {
   shell ??= buildShell(root);
   const s = shell;
   const { mode } = snap.overlay;
+  interactive = snap.overlay.interactive;
+  inGame = mode === "in-game";
   const compact = mode !== "champ-select";
   const collapsed = mode === "in-game" && state.collapsed && state.view === "main";
   const appearance = normalizeAppearance(snap.appearance);
@@ -126,19 +145,23 @@ export function render(root: HTMLElement, state: UiState) {
   screenKey = key;
 
   if (compact && !docked) reportHeight(s, layout.gutterTop + layout.gutterBottom);
-  reportHotZone(s);
+  reportHotZone(s, inGame);
 }
 
 let lastHotZone = "";
 /**
- * League keeps hotkeys from reaching the overlay while the game has focus, so the header
- * buttons must work by mouse in click-through mode: Rust makes this area clickable while the
- * cursor is over it.
+ * The area Rust makes clickable in click-through mode while the cursor is over it.
+ * - In game: only the header buttons (League keeps hotkeys from reaching the overlay while
+ *   the game has focus, so they must work by mouse), never the rest of the panel.
+ * - Elsewhere: the whole panel, so the wheel scrolls it without interactive mode.
  */
-function reportHotZone(s: Shell) {
+function reportHotZone(s: Shell, inGame: boolean) {
   const buttons = [...s.panel.querySelectorAll<HTMLElement>(".header .btn-icon")].map((b) => b.getBoundingClientRect());
   const pad = 4;
-  const zone = buttons.length
+  const panel = s.panel.getBoundingClientRect();
+  const zone = !inGame
+    ? { x: panel.left, y: panel.top, w: panel.width, h: panel.height }
+    : buttons.length
     ? {
         x: Math.min(...buttons.map((r) => r.left)) - pad,
         y: Math.min(...buttons.map((r) => r.top)) - pad,

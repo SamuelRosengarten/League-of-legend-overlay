@@ -57,16 +57,20 @@ export function headerContent(
     h("div", { class: "title", "data-tauri-drag-region": true }, h("div", { class: "brand", "data-tauri-drag-region": true }, "Rift Advisor"), rankLine(snap, resolved)),
     h("span", { class: `status status-${tone}`, title: label }, h("i", { class: "status-dot" }), h("span", { class: "status-text" }, label)),
     h("span", { class: "spacer", "data-tauri-drag-region": true }),
-    h(
-      "button",
-      {
-        class: `btn-icon${settings ? " on" : ""}`,
-        title: settings ? "Back" : "Appearance — rank theme & companions",
-        "aria-label": settings ? "Back" : "Appearance",
-        onclick: () => store.update({ view: settings ? "main" : "settings" }),
-      },
-      icon(settings ? "back" : "gear", 15),
-    ),
+    // Settings can only be used in interactive mode, so the gear only shows there. Its Back
+    // button stays while the settings screen is open, so leaving interactive never strands it.
+    !overlay.interactive && !settings
+      ? null
+      : h(
+          "button",
+          {
+            class: `btn-icon${settings ? " on" : ""}`,
+            title: settings ? "Back" : "Appearance — rank theme & companions",
+            "aria-label": settings ? "Back" : "Appearance",
+            onclick: () => store.update({ view: settings ? "main" : "settings" }),
+          },
+          icon(settings ? "back" : "gear", 15),
+        ),
     h(
       "button",
       {

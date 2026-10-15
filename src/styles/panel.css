@@ -159,8 +159,9 @@ html[data-prestige="2"] .frame .sheen {
   flex-direction: column;
   overflow-y: auto;
 }
-.content::-webkit-scrollbar { width: 6px; }
-.content::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--rank-primary) 40%, transparent); border-radius: 3px; }
+/* No visible scrollbar (see theme.css); the wheel scrolls. */
+.content { scrollbar-width: none; }
+.content::-webkit-scrollbar { display: none; }
 
 /* ---- header ---- */
 .header {

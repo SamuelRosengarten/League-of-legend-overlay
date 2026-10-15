@@ -142,9 +142,10 @@ impl OverlayState {
     fn effective_visible(&self) -> bool {
         let default = match self.mode {
             Mode::Hidden => false,
-            // Docked: only while the client is the active window, so the panel never floats
-            // over a browser or Discord.
-            Mode::Idle if self.docked => self.client_foreground,
+            // Docked: shown while the client window is (not minimized). It is not topmost but
+            // stacked right above the client (`win_native::stack_above_client`), so other apps
+            // cover it exactly like they cover the client.
+            Mode::Idle if self.docked => self.client.is_some(),
             _ => true,
         };
         self.visible_override.unwrap_or(default)
@@ -152,6 +153,12 @@ impl OverlayState {
 
     fn should_dock(&self) -> bool {
         self.dock_to_client && self.mode == Mode::Idle && (self.client.is_some() || self.client_minimized)
+    }
+
+    /// Floating panels stay above everything (the game included); a docked one lives in the
+    /// client's z-order instead.
+    fn topmost(&self) -> bool {
+        !self.docked
     }
 }
 
@@ -174,8 +181,8 @@ fn emit_state(app: &AppHandle) {
 pub fn init(app: &AppHandle) {
     let Some(win) = window(app) else { return };
     win_native::make_non_activating(&win);
-    let (interactive, zoom) = with_overlay(app, |o| (o.interactive, o.zoom));
-    set_click_through(&win, !interactive);
+    let (interactive, zoom, topmost) = with_overlay(app, |o| (o.interactive, o.zoom, o.topmost()));
+    set_click_through(&win, !interactive, topmost);
     let _ = win.set_zoom(zoom);
 
     let handle = app.clone();
@@ -194,6 +201,8 @@ pub fn set_hot_zone(app: &AppHandle, zone: Option<HotZone>) {
 }
 
 const CURSOR_POLL: Duration = Duration::from_millis(50);
+/// Docked: poll faster so the panel keeps up with the client window while it is dragged.
+const CURSOR_POLL_DOCKED: Duration = Duration::from_millis(16);
 /// In game, interactive mode ends once the cursor has been off the panel this long.
 const INTERACTIVE_IDLE_IN_GAME: Duration = Duration::from_millis(1500);
 
@@ -210,11 +219,16 @@ fn spawn_cursor_watch(app: &AppHandle) {
         let mut last_interactive = false;
         let mut outside_since: Option<std::time::Instant> = None;
         loop {
-            tokio::time::sleep(CURSOR_POLL).await;
+            let docked = with_overlay(&app, |o| o.docked);
+            tokio::time::sleep(if docked { CURSOR_POLL_DOCKED } else { CURSOR_POLL }).await;
             track_client(&app);
             let Some(win) = window(&app) else { continue };
-            let (mode, visible, interactive, zone, zoom) =
-                with_overlay(&app, |o| (o.mode, o.visible, o.interactive, o.hot_zone, o.zoom));
+            let (mode, visible, interactive, zone, zoom, topmost) =
+                with_overlay(&app, |o| (o.mode, o.visible, o.interactive, o.hot_zone, o.zoom, o.topmost()));
+            if visible && !topmost {
+                // The client came to the front (or was sent back): slot back in right above it.
+                win_native::stack_above_client(&win);
+            }
             let (Some((cx, cy)), Ok(pos), Ok(size)) = (win_native::cursor_pos(), win.outer_position(), win.outer_size())
             else {
                 continue;
@@ -252,7 +266,7 @@ fn spawn_cursor_watch(app: &AppHandle) {
                 });
             if over != hot || force {
                 hot = over;
-                set_click_through(&win, !over);
+                set_click_through(&win, !over, topmost);
             }
         }
     });
@@ -287,9 +301,12 @@ pub fn reveal(app: &AppHandle) {
 }
 
 pub fn set_interactive(app: &AppHandle, interactive: bool) {
-    with_overlay(app, |o| o.interactive = interactive);
+    let topmost = with_overlay(app, |o| {
+        o.interactive = interactive;
+        o.topmost()
+    });
     if let Some(win) = window(app) {
-        set_click_through(&win, !interactive);
+        set_click_through(&win, !interactive, topmost);
     }
     emit_state(app);
 }
@@ -392,18 +409,21 @@ pub fn reset_position(app: &AppHandle) {
 
 /// Applies visibility + placement for the current mode and emits the overlay state.
 fn apply(app: &AppHandle) {
-    let (visible, interactive) = with_overlay(app, |o| {
+    let (visible, interactive, topmost) = with_overlay(app, |o| {
         o.docked = o.should_dock();
         o.visible = o.effective_visible();
-        (o.visible, o.interactive)
+        (o.visible, o.interactive, o.topmost())
     });
     if let Some(win) = window(app) {
         if visible {
             apply_geometry(app, Placement::Restore);
-            win_native::show_without_activating(&win);
+            win_native::show_without_activating(&win, topmost);
             // Showing can reset tao's style bits; re-assert ours.
             win_native::make_non_activating(&win);
-            set_click_through(&win, !interactive);
+            set_click_through(&win, !interactive, topmost);
+            if !topmost {
+                win_native::stack_above_client(&win);
+            }
         } else {
             win_native::hide(&win);
         }
@@ -609,8 +629,8 @@ fn on_user_moved(app: &AppHandle) {
 /// own VISIBLE flag is unset. We show the window natively (`show_without_activating`, so it
 /// never steals focus), which tao never learns about — so every click-through toggle through
 /// tao hid the window. Owning the styles here keeps tao's flags untouched.
-fn set_click_through(win: &WebviewWindow, ignore: bool) {
-    win_native::set_click_through(win, ignore);
+fn set_click_through(win: &WebviewWindow, ignore: bool, topmost: bool) {
+    win_native::set_click_through(win, ignore, topmost);
 }
 
 #[cfg(windows)]
@@ -620,9 +640,9 @@ mod win_native {
     use crate::geometry::Rect;
     use windows_sys::Win32::Foundation::{HWND, POINT, RECT};
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        FindWindowExW, GetCursorPos, GetForegroundWindow, GetWindowLongPtrW, GetWindowRect, IsIconic, IsWindowVisible, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
-        SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_LAYERED,
-        WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT,
+        FindWindowExW, GetCursorPos, GetForegroundWindow, GetWindow, GetWindowLongPtrW, GetWindowRect, IsIconic, IsWindowVisible, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, GW_HWNDPREV, HWND_NOTOPMOST, HWND_TOP,
+        HWND_TOPMOST, SWP_NOACTIVATE, SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE,
+        WS_EX_LAYERED, WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST, WS_EX_TRANSPARENT,
     };
 
     fn hwnd(win: &WebviewWindow) -> Option<HWND> {
@@ -643,8 +663,9 @@ mod win_native {
 
     /// WS_EX_TRANSPARENT + WS_EX_LAYERED = mouse input falls through to the game. Same bits
     /// tao uses, minus its visibility side effects. Also re-asserts no-activate + topmost so
-    /// the overlay can never drop behind the game when the mode changes.
-    pub fn set_click_through(win: &WebviewWindow, ignore: bool) {
+    /// the overlay can never drop behind the game when the mode changes. Docked panels
+    /// (`topmost` false) leave the topmost band instead; `stack_above_client` places them.
+    pub fn set_click_through(win: &WebviewWindow, ignore: bool, topmost: bool) {
         let Some(h) = hwnd(win) else { return };
         unsafe {
             let ex = GetWindowLongPtrW(h, GWL_EXSTYLE);
@@ -652,7 +673,32 @@ mod win_native {
             if wanted != ex {
                 SetWindowLongPtrW(h, GWL_EXSTYLE, wanted);
             }
-            SetWindowPos(h, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+            let after = if topmost { HWND_TOPMOST } else { HWND_NOTOPMOST };
+            SetWindowPos(h, after, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_FRAMECHANGED);
+        }
+    }
+
+    /// Docked panel: keep it directly above the League client in z-order (not topmost), so
+    /// it comes forward with the client and goes behind any app that covers the client.
+    /// Cheap when already in place (two `GetWindow` calls), so it runs on every poll.
+    pub fn stack_above_client(win: &WebviewWindow) {
+        let (Some(own), Some(client)) = (hwnd(win), find_client()) else { return };
+        unsafe {
+            let above = GetWindow(client, GW_HWNDPREV);
+            if above == own {
+                return;
+            }
+            // Directly above the client = just below the window that is above it, unless that
+            // window is topmost (the client leads the normal band): then the top of the band.
+            let after = if above.is_null() || GetWindowLongPtrW(above, GWL_EXSTYLE) & WS_EX_TOPMOST as isize != 0 {
+                HWND_TOP
+            } else {
+                above
+            };
+            if GetWindowLongPtrW(own, GWL_EXSTYLE) & WS_EX_TOPMOST as isize != 0 {
+                SetWindowPos(own, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+            }
+            SetWindowPos(own, after, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
         }
     }
 
@@ -667,11 +713,12 @@ mod win_native {
         }
     }
 
-    pub fn show_without_activating(win: &WebviewWindow) {
+    pub fn show_without_activating(win: &WebviewWindow, topmost: bool) {
         let Some(h) = hwnd(win) else { return };
         unsafe {
             ShowWindow(h, SW_SHOWNOACTIVATE);
-            SetWindowPos(h, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
+            let after = if topmost { HWND_TOPMOST } else { HWND_NOTOPMOST };
+            SetWindowPos(h, after, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
         }
     }
 
@@ -686,18 +733,8 @@ mod win_native {
     /// The client also owns several hidden `RCLIENT` helper windows. A minimized main window
     /// drops below them in z-order, so the first match is not enough: take the visible one.
     pub fn client_window(own: Option<&WebviewWindow>) -> ClientWindow {
-        let class: Vec<u16> = "RCLIENT\0".encode_utf16().collect();
+        let Some(h) = find_client() else { return ClientWindow::Missing };
         unsafe {
-            let mut h = std::ptr::null_mut();
-            loop {
-                h = FindWindowExW(std::ptr::null_mut(), h, class.as_ptr(), std::ptr::null());
-                if h.is_null() {
-                    return ClientWindow::Missing;
-                }
-                if IsWindowVisible(h) != 0 {
-                    break;
-                }
-            }
             if IsIconic(h) != 0 {
                 return ClientWindow::Minimized;
             }
@@ -708,6 +745,21 @@ mod win_native {
             let fg = GetForegroundWindow();
             let foreground = fg == h || own.and_then(hwnd).is_some_and(|o| o == fg);
             ClientWindow::Shown(Rect { x: r.left, y: r.top, w: r.right - r.left, h: r.bottom - r.top }, foreground)
+        }
+    }
+
+    /// The visible `RCLIENT` window (the client's main window; its helper windows are hidden).
+    fn find_client() -> Option<HWND> {
+        let class: Vec<u16> = "RCLIENT\0".encode_utf16().collect();
+        let mut h = std::ptr::null_mut();
+        loop {
+            h = unsafe { FindWindowExW(std::ptr::null_mut(), h, class.as_ptr(), std::ptr::null()) };
+            if h.is_null() {
+                return None;
+            }
+            if unsafe { IsWindowVisible(h) } != 0 {
+                return Some(h);
+            }
         }
     }
 
@@ -733,12 +785,13 @@ mod win_native {
 mod win_native {
     use tauri::WebviewWindow;
     pub fn make_non_activating(_win: &WebviewWindow) {}
-    pub fn set_click_through(win: &WebviewWindow, ignore: bool) {
+    pub fn set_click_through(win: &WebviewWindow, ignore: bool, _topmost: bool) {
         let _ = win.set_ignore_cursor_events(ignore);
     }
-    pub fn show_without_activating(win: &WebviewWindow) {
+    pub fn show_without_activating(win: &WebviewWindow, _topmost: bool) {
         let _ = win.show();
     }
+    pub fn stack_above_client(_win: &WebviewWindow) {}
     pub fn hide(win: &WebviewWindow) {
         let _ = win.hide();
     }

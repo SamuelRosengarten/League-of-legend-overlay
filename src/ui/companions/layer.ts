@@ -79,24 +79,18 @@ function ribbonEl(s: Sprite, p: Placed): SVGSVGElement {
   return svg;
 }
 
-/** Side pose: strap height as a fraction of the sprite height (Gwen's waist, Amumu's arm, clear of his eyes). */
+/** Side pose: sway pivot height as a fraction of the sprite height (Gwen's waist, Amumu's arm). */
 const STRAP_Y: Record<CompanionId, number> = { gwen: 0.46, amumu: 0.62 };
 
 /**
  * Docked to the client: the sprite leans over the panel's frame (the layer is drawn above the
- * panel) and a ribbon / bandage strap ties it to the border.
+ * panel) and sways from the point where it holds the border. No strap: it read as a stray
+ * scrollbar handle on the frame.
  */
 function sideEl(s: Sprite, p: Placed, root: HTMLElement): HTMLElement {
   const inner = el("div", "companion-inner");
-  // The border runs `overlap` px into the box, from the panel's side.
-  const strap = el("i", "strap", {
-    top: `${Math.round(p.spriteHeight * STRAP_Y[p.who])}px`,
-    [p.spot.flip ? "right" : "left"]: `${p.overlap - 8}px`,
-    "--strap": s.ribbon.color,
-    "--strap-edge": s.ribbon.edge,
-  });
   const bx = p.spot.flip ? 1 - s.bubble.x : s.bubble.x;
-  inner.append(spriteEl(s, p.spriteHeight, 0), strap, el("span", "bubble", { left: pct(bx), top: `${s.bubble.y * p.spriteHeight}px` }));
+  inner.append(spriteEl(s, p.spriteHeight, 0), el("span", "bubble", { left: pct(bx), top: `${s.bubble.y * p.spriteHeight}px` }));
   root.style.setProperty("--grip", `${p.overlap}px`);
   root.style.setProperty("--strap-y", pct(STRAP_Y[p.who]));
   root.style.top = `calc(${((p.spot.y ?? 0.5) * 100).toFixed(1)}% - ${p.height}px)`;

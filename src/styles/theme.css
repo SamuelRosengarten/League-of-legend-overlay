@@ -95,13 +95,9 @@ html[data-motion="off"] *::after {
   transition-duration: 0ms !important;
 }
 
-/* Scrollbars */
-.scroll::-webkit-scrollbar { width: 6px; }
-.scroll::-webkit-scrollbar-track { background: transparent; }
-.scroll::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--rank-primary) 40%, transparent);
-  border-radius: 3px;
-}
-.scroll::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--rank-primary) 65%, transparent); }
+/* Scrollbars: hidden. Lists scroll with the wheel (also in click-through mode); a visible bar
+   read as a handle stuck to the frame. */
+.scroll { scrollbar-width: none; }
+.scroll::-webkit-scrollbar { display: none; }
 
 .ico { flex: none; display: block; }

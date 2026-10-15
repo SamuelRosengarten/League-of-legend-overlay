@@ -30,32 +30,7 @@
 .ribbon { position: absolute; left: 0; top: 0; overflow: visible; }
 
 /* Side pose (docked to the League client): clinging to the panel's outer border, leaning
-   over its frame. A ribbon (Gwen) / bandage (Amumu) strap ties them to the border. */
-.strap {
-  position: absolute;
-  width: 26px;
-  height: 7px;
-  margin-top: -3px;
-  border-radius: 4px;
-  background: var(--strap);
-  border: 1px solid var(--strap-edge);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-}
-/* The knot sits on the border itself. */
-.strap::before {
-  content: "";
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  width: 7px;
-  height: 7px;
-  transform: translate(-50%, -50%) rotate(45deg);
-  border-radius: 2px;
-  background: var(--strap-edge);
-  box-shadow: 0 0 0 1.5px var(--rank-accent, #8ff0ff), 0 0 6px var(--rank-glow, transparent);
-}
-.flip .strap::before { left: auto; right: 8px; transform: translate(50%, -50%) rotate(45deg); }
-/* They sway from the strap, like something tied to the frame. */
+   over its frame. They sway from where they hold the border. */
 .pose-side .companion-inner { transform-origin: var(--grip) var(--strap-y); animation: c-sway 7s ease-in-out infinite alternate; }
 .pose-side.flip .companion-inner { transform-origin: calc(100% - var(--grip)) var(--strap-y); }
 .companion-amumu.pose-side .companion-inner { animation-duration: 9s; animation-delay: -3s; }
