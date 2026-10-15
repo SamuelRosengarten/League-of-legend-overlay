@@ -9,8 +9,9 @@ import gwenUrl from "../../assets/companions/gwen.png";
 
 export type CompanionId = "gwen" | "amumu";
 /** perch = natural pose on the top border (Gwen stands, Amumu sits); peek = head only above
- * the top border; hang = dangling below the bottom border from a ribbon / bandage. */
-export type Pose = "perch" | "peek" | "hang";
+ * the top border; hang = dangling below the bottom border from a ribbon / bandage;
+ * side = standing on a ledge off the right border (docked to the League client). */
+export type Pose = "perch" | "peek" | "hang" | "side";
 export type Expression = "happy" | "sleepy" | "curious" | "excited" | "wink" | "surprised" | "cry";
 
 export interface Eye {

@@ -54,7 +54,9 @@ pub fn mode_for_phase(phase: &str) -> Mode {
     match phase {
         "ChampSelect" => Mode::ChampSelect,
         "GameStart" | "InProgress" | "Reconnect" => Mode::InGame,
-        "WaitingForStats" | "PreEndOfGame" | "EndOfGame" | "TerminatedInError" => Mode::Hidden,
+        // The game window is closing. Once the client's post-game screen is up (EndOfGame),
+        // the panel comes back docked to the client with the last-game recap.
+        "WaitingForStats" | "PreEndOfGame" => Mode::Hidden,
         _ => Mode::Idle,
     }
 }
@@ -67,6 +69,11 @@ pub struct OverlayState {
     /// false = click-through.
     pub interactive: bool,
     pub dock: Edge,
+    /// Stuck to the side of the League client window (idle mode, client open).
+    pub docked: bool,
+    /// Docked on the client's left side (not enough room on its right): companions then
+    /// stand on the panel's outer, left border.
+    pub docked_left: bool,
     pub hotkeys: settings::Hotkeys,
     /// Hotkey override of the mode's default visibility; reset on every mode change.
     #[serde(skip)]
@@ -85,6 +92,14 @@ pub struct OverlayState {
     /// Header buttons that stay clickable in click-through mode (see `spawn_cursor_watch`).
     #[serde(skip)]
     hot_zone: Option<HotZone>,
+    #[serde(skip)]
+    dock_to_client: bool,
+    /// League client window (physical px) while it is open and not minimized.
+    #[serde(skip)]
+    client: Option<Rect>,
+    /// The client (or this overlay) is the active window.
+    #[serde(skip)]
+    client_foreground: bool,
 }
 
 /// A rectangle in CSS px, relative to the window's top-left corner.
@@ -111,11 +126,27 @@ impl OverlayState {
             zoom: settings.appearance.zoom(),
             snap_to_edge: settings.appearance.snap_to_edge,
             hot_zone: None,
+            dock_to_client: settings.appearance.dock_to_client,
+            client: None,
+            client_foreground: false,
+            docked: false,
+            docked_left: false,
         }
     }
 
     fn effective_visible(&self) -> bool {
-        self.visible_override.unwrap_or(self.mode != Mode::Hidden)
+        let default = match self.mode {
+            Mode::Hidden => false,
+            // Docked: only while the client is the active window, so the panel never floats
+            // over a browser or Discord.
+            Mode::Idle if self.docked => self.client_foreground,
+            _ => true,
+        };
+        self.visible_override.unwrap_or(default)
+    }
+
+    fn should_dock(&self) -> bool {
+        self.dock_to_client && self.mode == Mode::Idle && self.client.is_some()
     }
 }
 
@@ -175,6 +206,7 @@ fn spawn_cursor_watch(app: &AppHandle) {
         let mut outside_since: Option<std::time::Instant> = None;
         loop {
             tokio::time::sleep(CURSOR_POLL).await;
+            track_client(&app);
             let Some(win) = window(&app) else { continue };
             let (mode, visible, interactive, zone, zoom) =
                 with_overlay(&app, |o| (o.mode, o.visible, o.interactive, o.hot_zone, o.zoom));
@@ -268,7 +300,8 @@ pub fn fit_content(app: &AppHandle, height: f64) {
         let h = height.max(MIN_HEIGHT).round();
         let changed = (o.content_height - h).abs() >= 1.0;
         o.content_height = h;
-        changed && o.mode != Mode::ChampSelect
+        // Docked panels are exactly as tall as the client; their content scrolls.
+        changed && o.mode != Mode::ChampSelect && !o.docked
     });
     if changed {
         // Content grew or shrank because of new game data: resize where the panel is now.
@@ -278,20 +311,43 @@ pub fn fit_content(app: &AppHandle, height: f64) {
 }
 
 /// Appearance changed: apply the zoom and edge snapping.
-pub fn set_layout(app: &AppHandle, zoom: f64, snap_to_edge: bool) {
-    let zoom_changed = with_overlay(app, |o| {
+pub fn set_layout(app: &AppHandle, zoom: f64, snap_to_edge: bool, dock_to_client: bool) {
+    let (zoom_changed, dock_changed) = with_overlay(app, |o| {
         o.snap_to_edge = snap_to_edge;
-        let changed = (o.zoom - zoom).abs() > f64::EPSILON;
+        let zoom_changed = (o.zoom - zoom).abs() > f64::EPSILON;
+        let dock_changed = o.dock_to_client != dock_to_client;
         o.zoom = zoom;
-        changed
+        o.dock_to_client = dock_to_client;
+        (zoom_changed, dock_changed)
     });
-    if !zoom_changed {
-        return;
+    if zoom_changed {
+        if let Some(win) = window(app) {
+            let _ = win.set_zoom(zoom);
+        }
     }
-    if let Some(win) = window(app) {
-        let _ = win.set_zoom(zoom);
+    if dock_changed {
+        apply(app);
+    } else if zoom_changed {
+        apply_geometry(app, Placement::KeepInPlace);
     }
-    apply_geometry(app, Placement::KeepInPlace);
+}
+
+/// Tracks the League client window for docking; re-applies when it moves, resizes, is
+/// minimized/restored or gains/loses focus.
+fn track_client(app: &AppHandle) {
+    let (dock, prev, prev_fg) = with_overlay(app, |o| (o.dock_to_client, o.client, o.client_foreground));
+    let found = if dock { win_native::client_window(window(app).as_ref()) } else { None };
+    let (client, fg) = match found {
+        Some((r, fg)) => (Some(r), fg),
+        None => (None, false),
+    };
+    if client != prev || fg != prev_fg {
+        with_overlay(app, |o| {
+            o.client = client;
+            o.client_foreground = fg;
+        });
+        apply(app);
+    }
 }
 
 /// Forgets the saved position of the current mode and puts the panel back at its default spot.
@@ -314,6 +370,7 @@ pub fn reset_position(app: &AppHandle) {
 /// Applies visibility + placement for the current mode and emits the overlay state.
 fn apply(app: &AppHandle) {
     let (visible, interactive) = with_overlay(app, |o| {
+        o.docked = o.should_dock();
         o.visible = o.effective_visible();
         (o.visible, o.interactive)
     });
@@ -377,8 +434,12 @@ enum Placement {
 /// Size + position for the current mode, clamped to the target monitor, DPI-aware.
 fn apply_geometry(app: &AppHandle, placement: Placement) {
     let Some(win) = window(app) else { return };
-    let (mode, content_height, dock, zoom, snap) =
-        with_overlay(app, |o| (o.mode, o.content_height, o.dock, o.zoom, o.snap_to_edge));
+    let (mode, content_height, dock, zoom, snap, docked_to) =
+        with_overlay(app, |o| (o.mode, o.content_height, o.dock, o.zoom, o.snap_to_edge, o.client.filter(|_| o.docked)));
+    if let Some(client) = docked_to {
+        dock_to_client(app, &win, client, zoom);
+        return;
+    }
     let saved = app.state::<AppState>().settings.lock().unwrap().positions.get(mode.key()).copied();
     let current = match (win.outer_position(), win.outer_size()) {
         (Ok(p), Ok(s)) => Some(Rect { x: p.x, y: p.y, w: s.width as i32, h: s.height as i32 }),
@@ -430,6 +491,33 @@ fn apply_geometry(app: &AppHandle, placement: Placement) {
     win_native::set_bounds(&win, x, y, w, h);
 }
 
+/// Docked panel width in CSS px (panel + companion gutter), and the narrowest it may shrink
+/// to before it has to overlap the client instead.
+const DOCKED_WIDTH: f64 = 410.0;
+const DOCKED_MIN_WIDTH: f64 = 300.0;
+
+fn dock_to_client(app: &AppHandle, win: &WebviewWindow, client: Rect, zoom: f64) {
+    let mons = monitors(win);
+    let works: Vec<Rect> = mons.iter().map(|m| m.work).collect();
+    let Some(idx) = geometry::pick_monitor(&works, client.x + client.w / 2, client.y + client.h / 2) else { return };
+    let MonitorInfo { work, scale } = mons[idx];
+    let px = |css: f64| (css * zoom * scale).round() as i32;
+    let target = geometry::dock_beside(client, px(DOCKED_WIDTH), px(DOCKED_MIN_WIDTH), work);
+    let left = target.right() <= client.x;
+    if with_overlay(app, |o| std::mem::replace(&mut o.docked_left, left) != left) {
+        emit_state(app);
+    }
+    let current = match (win.outer_position(), win.outer_size()) {
+        (Ok(p), Ok(s)) => Some(Rect { x: p.x, y: p.y, w: s.width as i32, h: s.height as i32 }),
+        _ => None,
+    };
+    if current == Some(target) {
+        return;
+    }
+    with_overlay(app, |o| o.last_applied = Some((target.x, target.y)));
+    win_native::set_bounds(win, target.x, target.y, target.w, target.h);
+}
+
 static MOVE_GENERATION: AtomicU64 = AtomicU64::new(0);
 /// A `Moved` stream is in progress (the user is probably dragging).
 static MOVE_PENDING: AtomicBool = AtomicBool::new(false);
@@ -451,8 +539,13 @@ fn schedule_move_settled(app: &AppHandle) {
 fn on_user_moved(app: &AppHandle) {
     let Some(win) = window(app) else { return };
     let (Ok(pos), Ok(size)) = (win.outer_position(), win.outer_size()) else { return };
-    let (mode, last) = with_overlay(app, |o| (o.mode, o.last_applied));
+    let (mode, last, docked) = with_overlay(app, |o| (o.mode, o.last_applied, o.docked));
     if last == Some((pos.x, pos.y)) || mode == Mode::Hidden {
+        return;
+    }
+    if docked {
+        // Docked panels follow the client; a drag just snaps back.
+        apply_geometry(app, Placement::Restore);
         return;
     }
     let (w, h) = (size.width as i32, size.height as i32);
@@ -499,9 +592,10 @@ fn set_click_through(win: &WebviewWindow, ignore: bool) {
 #[cfg(windows)]
 mod win_native {
     use tauri::WebviewWindow;
-    use windows_sys::Win32::Foundation::{HWND, POINT};
+    use crate::geometry::Rect;
+    use windows_sys::Win32::Foundation::{HWND, POINT, RECT};
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        GetCursorPos, GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
+        FindWindowW, GetCursorPos, GetForegroundWindow, GetWindowLongPtrW, GetWindowRect, IsIconic, IsWindowVisible, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
         SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_LAYERED,
         WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT,
     };
@@ -561,6 +655,25 @@ mod win_native {
         (unsafe { GetCursorPos(&mut p) } != 0).then_some((p.x, p.y))
     }
 
+    /// The League client's main window (`RCLIENT`, owned by LeagueClientUx.exe) when it is
+    /// shown and not minimized, and whether it (or `own`, the overlay) is the active window.
+    pub fn client_window(own: Option<&WebviewWindow>) -> Option<(Rect, bool)> {
+        let class: Vec<u16> = "RCLIENT\0".encode_utf16().collect();
+        unsafe {
+            let h = FindWindowW(class.as_ptr(), std::ptr::null());
+            if h.is_null() || IsWindowVisible(h) == 0 || IsIconic(h) != 0 {
+                return None;
+            }
+            let mut r = RECT { left: 0, top: 0, right: 0, bottom: 0 };
+            if GetWindowRect(h, &mut r) == 0 {
+                return None;
+            }
+            let fg = GetForegroundWindow();
+            let foreground = fg == h || own.and_then(hwnd).is_some_and(|o| o == fg);
+            Some((Rect { x: r.left, y: r.top, w: r.right - r.left, h: r.bottom - r.top }, foreground))
+        }
+    }
+
     /// Move + resize in one call, so growing upwards does not flash the panel one frame lower.
     pub fn set_bounds(win: &WebviewWindow, x: i32, y: i32, w: i32, h: i32) {
         let Some(h_wnd) = hwnd(win) else { return };
@@ -595,6 +708,9 @@ mod win_native {
     pub fn cursor_pos() -> Option<(i32, i32)> {
         None
     }
+    pub fn client_window(_own: Option<&WebviewWindow>) -> Option<(crate::geometry::Rect, bool)> {
+        None
+    }
     pub fn set_bounds(win: &WebviewWindow, x: i32, y: i32, w: i32, h: i32) {
         let _ = win.set_size(tauri::PhysicalSize::new(w as u32, h as u32));
         let _ = win.set_position(tauri::PhysicalPosition::new(x, y));
@@ -610,11 +726,12 @@ mod tests {
         assert_eq!(mode_for_phase("ChampSelect"), Mode::ChampSelect);
         assert_eq!(mode_for_phase("InProgress"), Mode::InGame);
         assert_eq!(mode_for_phase("Reconnect"), Mode::InGame);
-        assert_eq!(mode_for_phase("EndOfGame"), Mode::Hidden);
+        assert_eq!(mode_for_phase("WaitingForStats"), Mode::Hidden);
+        assert_eq!(mode_for_phase("EndOfGame"), Mode::Idle);
         assert_eq!(mode_for_phase("Lobby"), Mode::Idle);
         assert_eq!(mode_for_phase("None"), Mode::Idle);
         assert_eq!(mode_for("None", true), Mode::InGame);
-        assert_eq!(mode_for("EndOfGame", true), Mode::Hidden);
+        assert_eq!(mode_for("PreEndOfGame", true), Mode::Hidden);
     }
 
     #[cfg(windows)]

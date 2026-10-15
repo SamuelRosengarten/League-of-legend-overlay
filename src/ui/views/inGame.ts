@@ -21,6 +21,8 @@ export function inGameView(
   notes: GameNote[],
   /** Last champ-select view, to keep showing the plan during the loading screen. */
   preGame: MatchView | null,
+  /** Off: one glanceable line per threat and two short tips (the in-game default). */
+  opts: { details: boolean } = { details: false },
 ): HTMLElement {
   if (!match) {
     const msg =
@@ -51,8 +53,8 @@ export function inGameView(
     clock,
     plan,
     heading("Top threats"),
-    threatList(advice.threats.ranked, advice.threats.hidden, champs, { limit: 3, compact: true }),
-    laneCard(advice, champs, { compact: true }),
-    notesFeed(notes.slice(-3).reverse(), champs),
+    threatList(advice.threats.ranked, advice.threats.hidden, champs, { limit: 3, compact: true, oneLine: !opts.details }),
+    laneCard(advice, champs, { compact: true, brief: !opts.details }),
+    notesFeed(notes.slice(opts.details ? -3 : -2).reverse(), champs),
   );
 }

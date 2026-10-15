@@ -42,6 +42,9 @@ pub struct Appearance {
     /// In game, snap the panel to the nearest left/right screen edge after a drag.
     /// Off: the panel stays exactly where it is dropped.
     pub snap_to_edge: bool,
+    /// Outside of champ select and games, stick the panel to the side of the League client
+    /// window (same height) and show it only while the client is the active window.
+    pub dock_to_client: bool,
 }
 
 pub const SCALE_MIN: f64 = 0.8;
@@ -79,6 +82,7 @@ impl Default for Appearance {
             companions: Companions::default(),
             scale: 1.0,
             snap_to_edge: false,
+            dock_to_client: true,
         }
     }
 }

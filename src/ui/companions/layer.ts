@@ -89,9 +89,15 @@ function companionEl(p: Placed): HTMLElement {
     "--sync": `-${Math.round(performance.now() % 24000)}ms`,
     "--hang-x": pct(p.spot.flip ? 1 - s.hangAt.x : s.hangAt.x),
   });
-  // Border line: top border = --gutter-top; bottom border = bottom of the panel.
+  // Border line: top border = --gutter-top; bottom border = bottom of the panel; side = a
+  // ledge at a fraction of the window height, reaching back to the panel's right border.
   if (p.spot.pose === "hang") root.style.bottom = `calc(var(--gutter-bottom) - ${p.height}px)`;
-  else root.style.top = `calc(var(--gutter-top) - ${p.seat}px)`;
+  else if (p.spot.pose === "side") {
+    root.style.top = `calc(${((p.spot.y ?? 0.5) * 100).toFixed(1)}% - ${p.height}px)`;
+    // Gap between the panel's right border and this companion's box.
+    const gutter = p.spot.flip ? "var(--gutter-left)" : "var(--gutter-right)";
+    root.style.setProperty("--ledge", `calc((${gutter} - ${p.width}px) / 2)`);
+  } else root.style.top = `calc(var(--gutter-top) - ${p.seat}px)`;
 
   const inner = el("div", "companion-inner");
   if (p.spot.pose === "hang") inner.append(ribbonEl(s, p));

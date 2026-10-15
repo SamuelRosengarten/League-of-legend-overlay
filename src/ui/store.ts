@@ -10,6 +10,8 @@ export interface UiState {
   mock: MockStatus | null;
   /** Compact in-game panel collapsed to its header (persisted per machine). */
   collapsed: boolean;
+  /** In-game panel shows the full cards instead of the glanceable summary (persisted). */
+  details: boolean;
   /** In-game notes for the current game, oldest first. */
   notes: GameNote[];
   /** Enemy items/levels from the previous live snapshot (for diffing). */
@@ -22,11 +24,19 @@ export interface UiState {
 
 type Listener = (s: UiState) => void;
 
-function readCollapsed(): boolean {
+function readFlag(key: string): boolean {
   try {
-    return localStorage.getItem("rift.collapsed") === "1";
+    return localStorage.getItem(key) === "1";
   } catch {
     return false;
+  }
+}
+
+function writeFlag(key: string, on: boolean) {
+  try {
+    localStorage.setItem(key, on ? "1" : "0");
+  } catch {
+    /* storage unavailable — keep in memory only */
   }
 }
 
@@ -36,7 +46,8 @@ class Store {
     champions: new ChampionIndex(null),
     data: curated(),
     mock: null,
-    collapsed: readCollapsed(),
+    collapsed: readFlag("rift.collapsed"),
+    details: readFlag("rift.details"),
     notes: [],
     lastEnemies: null,
     lastChampSelect: null,
@@ -69,12 +80,13 @@ class Store {
   }
 
   setCollapsed(collapsed: boolean) {
-    try {
-      localStorage.setItem("rift.collapsed", collapsed ? "1" : "0");
-    } catch {
-      /* storage unavailable — keep in memory only */
-    }
+    writeFlag("rift.collapsed", collapsed);
     this.update({ collapsed });
+  }
+
+  setDetails(details: boolean) {
+    writeFlag("rift.details", details);
+    this.update({ details });
   }
 }
 

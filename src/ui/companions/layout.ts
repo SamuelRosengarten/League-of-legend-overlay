@@ -17,6 +17,8 @@ export interface Spot {
   pose: Pose;
   /** Horizontal anchor as a fraction of the panel width (sprite center). */
   x: number;
+  /** Side pose: height of the ledge as a fraction of the window height. */
+  y?: number;
   /** Mirror the sprite. */
   flip?: boolean;
   /** Extra scale relative to the user size (minimal mode). */
@@ -68,6 +70,22 @@ export const PRESETS: PlacementPreset[] = [
   },
 ];
 
+/**
+ * Docked to the League client: both stand on ledges off the panel's outer border (right, or
+ * left when the panel sits on the client's left). Mirrored on the left so they face the panel.
+ */
+const DOCKED_SPOTS: Record<CompanionId, Spot> = {
+  gwen: { pose: "side", x: 0, y: 0.34 },
+  amumu: { pose: "side", x: 0, y: 0.78 },
+};
+const DOCKED_SPOTS_LEFT: Record<CompanionId, Spot> = {
+  gwen: { ...DOCKED_SPOTS.gwen, flip: true },
+  amumu: { ...DOCKED_SPOTS.amumu, flip: true },
+};
+const DOCKED_SCALE = 0.72;
+/** The docked window shrinks to the space beside the client; the gutter never takes more. */
+const DOCKED_MAX_GUTTER = 0.2;
+
 export const DEFAULT_PRESET = "corners";
 export const SIZE_MIN = 0.7;
 export const SIZE_MAX = 1.4;
@@ -95,6 +113,9 @@ export interface Layout {
   placed: Placed[];
   gutterTop: number;
   gutterBottom: number;
+  /** Side pose: transparent strip right (or left) of the panel. */
+  gutterRight: number;
+  gutterLeft: number;
 }
 
 export function presetById(id: string): PlacementPreset {
@@ -107,9 +128,16 @@ export function clampSize(size: number): number {
 
 /**
  * Lays the enabled companions out over a panel of `panelWidth` CSS px, clamped to stay inside
- * the window horizontally. `compact` (in-game) shrinks them a little.
+ * the window horizontally. `compact` (in-game) shrinks them a little. `docked` ignores the
+ * preset: they stand beside the outer border (`dockedLeft`: the left one) and `panelWidth`
+ * is the whole window.
  */
-export function layoutCompanions(settings: CompanionSettings, panelWidth: number, opts: { compact: boolean }): Layout {
+export function layoutCompanions(
+  settings: CompanionSettings,
+  panelWidth: number,
+  opts: { compact: boolean; docked?: boolean; dockedLeft?: boolean },
+): Layout {
+  if (opts.docked) return layoutDocked(settings, panelWidth, !!opts.dockedLeft);
   const preset = presetById(settings.placement);
   const size = clampSize(settings.size) * (opts.compact ? COMPACT_SCALE : 1);
   const placed: Placed[] = [];
@@ -138,5 +166,33 @@ export function layoutCompanions(settings: CompanionSettings, panelWidth: number
   }
   const gutterTop = Math.max(0, ...placed.filter((p) => p.spot.pose !== "hang").map((p) => p.seat));
   const gutterBottom = Math.max(0, ...placed.filter((p) => p.spot.pose === "hang").map((p) => p.height));
-  return { placed, gutterTop, gutterBottom };
+  return { placed, gutterTop, gutterBottom, gutterRight: 0, gutterLeft: 0 };
+}
+
+function layoutDocked(settings: CompanionSettings, windowWidth: number, onLeft: boolean): Layout {
+  const enabled = (["gwen", "amumu"] as const).filter((who) => settings[who]);
+  const size = clampSize(settings.size) * DOCKED_SCALE;
+  // Widest sprite at this size, then shrink everyone if that would eat too much of the panel.
+  const widthAt = (who: CompanionId, s: number) => (SPRITES[who].baseHeight * s * SPRITES[who].width) / SPRITES[who].height;
+  const widest = Math.max(0, ...enabled.map((who) => widthAt(who, size)));
+  const fit = widest ? Math.min(1, (windowWidth * DOCKED_MAX_GUTTER - 10) / widest) : 1;
+  const sized = enabled.map((who) => {
+    const sprite = SPRITES[who];
+    const spriteHeight = Math.round(sprite.baseHeight * size * fit);
+    return { who, spriteHeight, width: Math.round((spriteHeight * sprite.width) / sprite.height) };
+  });
+  if (!sized.length) return { placed: [], gutterTop: 0, gutterBottom: 0, gutterRight: 0, gutterLeft: 0 };
+  const gutter = Math.max(...sized.map((s) => s.width)) + 10;
+  const placed = sized.map(({ who, spriteHeight, width }) => ({
+    who,
+    spot: (onLeft ? DOCKED_SPOTS_LEFT : DOCKED_SPOTS)[who],
+    width,
+    height: spriteHeight,
+    // Centered in the gutter beside the panel's outer border.
+    left: (onLeft ? 0 : windowWidth - gutter) + Math.round((gutter - width) / 2),
+    spriteHeight,
+    seat: spriteHeight,
+    ribbon: 0,
+  }));
+  return { placed, gutterTop: 0, gutterBottom: 0, gutterRight: onLeft ? 0 : gutter, gutterLeft: onLeft ? gutter : 0 };
 }

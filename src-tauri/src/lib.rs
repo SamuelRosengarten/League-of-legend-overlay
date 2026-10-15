@@ -4,6 +4,7 @@
 mod commands;
 mod ddragon;
 mod geometry;
+mod history;
 mod lcu;
 mod live;
 mod lockfile;

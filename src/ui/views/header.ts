@@ -45,7 +45,7 @@ function rankLine(snap: Snapshot, resolved: ResolvedTheme): HTMLElement {
 export function headerContent(
   snap: Snapshot,
   resolved: ResolvedTheme,
-  opts: { collapsible: boolean; collapsed: boolean; view: "main" | "settings" },
+  opts: { collapsible: boolean; collapsed: boolean; details: boolean; view: "main" | "settings" },
 ): HTMLElement[] {
   const [tone, label] = connectionLabel(snap.connection);
   const { overlay } = snap;
@@ -84,6 +84,19 @@ export function headerContent(
       icon(overlay.interactive ? "pointer" : "ghost", 15),
       inGame ? null : h("kbd", null, shortHotkey(key)),
     ),
+    opts.collapsible && !settings && !opts.collapsed
+      ? h(
+          "button",
+          {
+            class: `btn-icon${opts.details ? " on" : ""}`,
+            title: opts.details ? "Less detail" : "More detail: every threat reason and tip",
+            "aria-label": opts.details ? "Less detail" : "More detail",
+            "aria-pressed": String(opts.details),
+            onclick: () => store.setDetails(!opts.details),
+          },
+          icon(opts.details ? "minus" : "plus", 15),
+        )
+      : null,
     opts.collapsible && !settings
       ? h(
           "button",

@@ -4,7 +4,7 @@ import { loadCurated } from "../data";
 import type { ChampionProfile, ItemCountersFile, MatchupFile } from "../data/types";
 import { ChampionIndex } from "./champions";
 import { profileLookup } from "./profiles";
-import { LANE_OPPONENT_BONUS, UNCURATED_BASE, rankThreats } from "./threat";
+import { LANE_OPPONENT_BONUS, type Threat, UNCURATED_BASE, headlineReason, rankThreats } from "./threat";
 import { teamWarnings } from "./warnings";
 
 const data = loadCurated();
@@ -133,5 +133,22 @@ describe("teamWarnings", () => {
 
   it("stays quiet with fewer than 3 known enemies", () => {
     expect(teamWarnings("Gwen", [{ championId: "Ahri", items: [] }, { championId: null, items: [] }], { profileOf, items: data.items, name })).toEqual([]);
+  });
+});
+
+describe("headlineReason", () => {
+  const base = { kind: "base" as const, label: "Uncurated matchup (generic score)", points: UNCURATED_BASE };
+  const lane = { kind: "lane" as const, label: "Lane opponent", points: LANE_OPPONENT_BONUS };
+  const kite = { kind: "tag" as const, label: "kite", tag: "kite" as const, points: 1.5, via: [{ source: "champion" as const }] };
+  const cc = { kind: "tag" as const, label: "point-click-cc", tag: "point-click-cc" as const, points: 1, via: [{ source: "champion" as const }] };
+  const threat = (reasons: Threat["reasons"], curated: Threat["curated"] = null): Threat =>
+    ({ index: 0, championId: "Poppy", role: "top", score: 0, curated, reasons });
+
+  it("prefers item-driven, then the strongest trait, never the generic base", () => {
+    const anti = { ...cc, label: "grievous-wounds", via: [{ source: "item" as const, detail: "Executioner's Calling" }] };
+    expect(headlineReason(threat([base, lane, cc, anti]))).toBe(anti);
+    expect(headlineReason(threat([base, lane, cc, kite]))).toBe(kite);
+    expect(headlineReason(threat([base, lane]))).toBe(lane);
+    expect(headlineReason(threat([base]))).toBeNull();
   });
 });

@@ -81,21 +81,24 @@ export function render(root: HTMLElement, state: UiState) {
 
   s.crest.update(resolved.theme, compact);
   s.panel.className = `panel mode-${mode}${snap.overlay.interactive ? " interactive" : ""}${collapsed ? " collapsed" : ""}`;
-  s.stage.className = `stage stage-${mode}`;
-  s.headerSlot.replaceChildren(...headerContent(snap, resolved, { collapsible: mode === "in-game", collapsed, view: state.view }));
+  const docked = mode === "idle" && snap.overlay.docked;
+  s.stage.className = `stage stage-${mode}${docked ? " docked" : ""}`;
+  s.headerSlot.replaceChildren(...headerContent(snap, resolved, { collapsible: mode === "in-game", collapsed, details: state.details, view: state.view }));
 
   let body: HTMLElement | null = null;
   if (state.view === "settings") {
-    body = settingsView(appearance, snap.rank, resolved, { compact });
+    body = settingsView(appearance, snap.rank, resolved, { compact: compact && !docked });
   } else if (!collapsed) {
     if (mode === "champ-select" && snap.champSelect) {
       body = champSelectView(fromChampSelect(snap.champSelect, state.champions), state.champions, state.data, snap.champSelect.timer.phase);
     } else if (mode === "in-game") {
       const game = snap.live.game;
       const preGame = state.lastChampSelect ? fromChampSelect(state.lastChampSelect, state.champions) : null;
-      body = inGameView(game ? fromLive(game, state.champions) : null, snap.live.status, state.champions, state.data, state.notes, preGame);
+      body = inGameView(game ? fromLive(game, state.champions) : null, snap.live.status, state.champions, state.data, state.notes, preGame, {
+        details: state.details,
+      });
     } else {
-      body = idleView(snap, resolved);
+      body = idleView(snap, resolved, state.champions);
     }
   }
   s.content.replaceChildren(...[body, devPanel(state.mock)].filter((x): x is HTMLElement => !!x));
@@ -105,22 +108,24 @@ export function render(root: HTMLElement, state: UiState) {
   const layout = layoutCompanions(
     showCompanions ? appearance.companions : { ...appearance.companions, gwen: false, amumu: false },
     window.innerWidth,
-    { compact: mode === "in-game" },
+    { compact: mode === "in-game", docked, dockedLeft: snap.overlay.dockedLeft },
   );
   s.stage.style.setProperty("--gutter-top", `${layout.gutterTop}px`);
   s.stage.style.setProperty("--gutter-bottom", `${layout.gutterBottom}px`);
+  s.stage.style.setProperty("--gutter-right", `${layout.gutterRight}px`);
+  s.stage.style.setProperty("--gutter-left", `${layout.gutterLeft}px`);
   s.companions.update(layout);
   s.particles.update(html.dataset.motion === "full" && mode !== "in-game", resolved.theme.prestige);
 
   // Screen changes (mode, settings, collapse) get a short fade and a companion hop.
-  const key = `${mode}|${state.view}|${collapsed}`;
+  const key = `${mode}|${state.view}|${collapsed}|${state.details}|${docked}`;
   if (screenKey && key !== screenKey) {
     s.content.animate([{ opacity: 0, transform: "translateY(4px)" }, { opacity: 1, transform: "none" }], { duration: 220, easing: "ease-out" });
     s.companions.react();
   }
   screenKey = key;
 
-  if (compact) reportHeight(s, layout.gutterTop + layout.gutterBottom);
+  if (compact && !docked) reportHeight(s, layout.gutterTop + layout.gutterBottom);
   reportHotZone(s);
 }
 

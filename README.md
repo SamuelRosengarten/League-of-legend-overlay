@@ -69,10 +69,20 @@ The overlay switches mode automatically from the gameflow phase:
 
 | Phase | Mode |
 | --- | --- |
-| No client, lobby, matchmaking | idle (small status card) |
+| Client open (lobby, post-game, …) | docked to the client: your stats (see below) |
+| No client | idle (small status card) |
 | ChampSelect | full panel (460 px wide) |
 | GameStart / InProgress | compact panel (starts on the right edge) |
-| EndOfGame | hidden |
+| WaitingForStats / PreEndOfGame | hidden (the game window is closing) |
+
+### Docked to the client: your stats
+
+Between games the panel sticks to the side of the League client window: right next to it, exactly as tall, following it when you move or resize it. It uses the right side, or the left if there is no room on the right (shrinking to fit before it would ever cover the client), and it only shows while the client is the active window, so it never floats over other apps. Gwen and Amumu stand on ledges off the panel's outer border.
+
+- **Last game:** result, queue, length, K/D/A, KDA, CS/min and damage/min, with arrows comparing each number to your other games on that champion.
+- **Gwen and Amumu:** wins/losses, win rate, a win/loss strip, average K/D/A, KDA, CS/min, damage/min and mastery level.
+
+The numbers come from the client's match history (`/lol-match-history/…/current-summoner/matches`) and mastery (`/lol-champion-mastery/v1/local-player/champion-mastery`). The client only shares your **last 20 games**. Champion stats count Summoner's Rift only (Classic and Swiftplay); Practice Tool, custom games and remakes under 5 minutes are left out. History reloads 5 and 30 seconds after each game, since the client adds the game a little after the post-game screen opens. Turn docking off under Appearance → Layout → *Dock to the League client*.
 
 The window is transparent, frameless, always on top and **click-through**, so the game receives every click. Turn on *interactive mode* to scroll, collapse sections or drag the panel by its header. The panel stays where you drop it (turn on *Snap to screen edge in game* under Appearance → Layout for the old docking behaviour). Positions are remembered per mode, kept inside the monitor's work area, and are DPI-aware.
 
@@ -87,7 +97,9 @@ When new game data makes the panel taller or shorter, it resizes where it is and
 
 **Passive vs interactive.** In passive mode (default) every click goes through the overlay to the game. In interactive mode the overlay receives clicks, scrolling and text selection: an *INTERACTIVE* tag appears on its top border, the frame lights up and the pointer button is highlighted. The overlay never takes keyboard focus in either mode (`WS_EX_NOACTIVATE`), so the game keeps your keyboard. As a consequence, Tab navigation inside the overlay is not available; use the mouse in interactive mode. In interactive mode the transparent strip where the companions sit also catches clicks.
 
-**In game, use the mouse.** While the game has focus, League keeps registered hotkeys from reaching other apps (tested in Practice Tool: no press arrived). So the header buttons always work by mouse, even in click-through mode: point at them and click. Click the pointer button to make the whole panel interactive (drag, scroll, collapse). In game, interactive mode switches itself off 1.5 s after the cursor leaves the panel, so the game never loses clicks for long. The hotkeys still work in the client and in champ select. Every registered hotkey and every press that reaches the app is logged in the `npm run dev` console.
+**In game, use the mouse.** While the game has focus, League keeps registered hotkeys from reaching other apps (tested in Practice Tool: no press arrived). So the header buttons always work by mouse, even in click-through mode: point at them and click. Click the pointer button to make the whole panel interactive (drag, scroll, collapse). In game, interactive mode switches itself off 1.5 s after the cursor leaves the panel, so the game never loses clicks for long. The hotkeys still work in the client and in champ select.
+
+**Glance view.** In game the panel shows one line per threat (its most telling reason, such as an anti-heal item they bought) and the two most important tips, each clamped to two lines. The **+** button in the header switches to the detailed view with every reason and tip; the choice is remembered. Every registered hotkey and every press that reaches the app is logged in the `npm run dev` console.
 
 ### Appearance: rank theme, companions, motion
 
@@ -116,7 +128,8 @@ How the companion art was prepared, and how to replace it, is described in `src/
     "motion": "full",
     "companions": { "gwen": true, "amumu": true, "placement": "corners", "size": 1, "inGame": true },
     "scale": 1,
-    "snapToEdge": false
+    "snapToEdge": false,
+    "dockToClient": true
   }
 }
 ```

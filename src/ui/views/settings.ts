@@ -140,6 +140,12 @@ export function settingsView(a: Appearance, rank: RankInfo | null, resolved: Res
       }),
     ),
     h("p", { class: "hint" }, "Text, icons and the panel itself grow together. Try 115–130% on 1440p or 4K screens."),
+    toggle(
+      "Dock to the League client",
+      a.dockToClient,
+      (v) => save({ ...a, dockToClient: v }),
+      "Between games the panel sticks to the side of the client window, as tall as the client, with your stats",
+    ),
     toggle("Snap to screen edge in game", a.snapToEdge, (v) => save({ ...a, snapToEdge: v }), "Off: the in-game panel stays exactly where you drop it"),
     h(
       "button",

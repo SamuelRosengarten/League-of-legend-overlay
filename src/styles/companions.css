@@ -29,6 +29,28 @@
 }
 .ribbon { position: absolute; left: 0; top: 0; overflow: visible; }
 
+/* Side pose (docked to the League client): a small hextech ledge sticks out of the panel's
+   right border; the companion stands on it. */
+.companion.pose-side::after {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--ledge) - 3px);
+  right: 8%;
+  bottom: -5px;
+  height: 5px;
+  border-radius: 0 4px 4px 0;
+  background: var(--rank-metal);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55), 0 0 8px color-mix(in srgb, var(--rank-glow) 60%, transparent);
+}
+/* Docked on the client's left: the ledge reaches right, to the panel's left border. */
+.companion.pose-side.flip::after {
+  left: 8%;
+  right: calc(-1 * var(--ledge) - 3px);
+  border-radius: 4px 0 0 4px;
+}
+.pose-side .companion-inner { transform-origin: 50% 97%; animation: c-sway 7s ease-in-out infinite alternate; }
+.companion-amumu.pose-side .companion-inner { animation-duration: 9s; animation-delay: -3s; }
+
 /* Contact shadow on the border for perching companions. */
 .companion.pose-perch::before {
   content: "";

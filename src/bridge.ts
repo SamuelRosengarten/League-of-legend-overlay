@@ -6,6 +6,7 @@ import type {
   ChampSelectSession,
   ConnectionStatus,
   DdragonData,
+  History,
   LivePayload,
   MockStatus,
   OverlayState,
@@ -31,6 +32,7 @@ export interface BackendEvents {
   "rift:ddragon": DdragonData | null;
   "rift:rank": RankInfo | null;
   "rift:appearance": Appearance;
+  "rift:history": History | null;
 }
 
 export function on<K extends keyof BackendEvents>(event: K, handler: (payload: BackendEvents[K]) => void) {

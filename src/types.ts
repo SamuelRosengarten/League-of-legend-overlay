@@ -86,7 +86,37 @@ export interface OverlayState {
   visible: boolean;
   interactive: boolean;
   dock: "left" | "right";
+  /** Stuck to the side of the League client window (idle mode, client open). */
+  docked: boolean;
+  /** Docked on the client's left side: companions go on the panel's left border. */
+  dockedLeft: boolean;
   hotkeys: { toggleVisibility: string; toggleInteractive: string };
+}
+
+/** One of the player's own games (src-tauri/src/history.rs). */
+export interface RecentGame {
+  gameId: number;
+  /** LCU numeric champion key. */
+  championId: number;
+  queueId: number;
+  gameMode: string;
+  gameType: string;
+  /** Unix ms. */
+  created: number;
+  durationSecs: number;
+  win: boolean;
+  kills: number;
+  deaths: number;
+  assists: number;
+  cs: number;
+  damageToChampions: number;
+  gold: number;
+}
+
+export interface History {
+  /** Newest first. */
+  games: RecentGame[];
+  mastery: { championId: number; level: number; points: number }[];
 }
 
 export interface RankInfo {
@@ -120,6 +150,8 @@ export interface Appearance {
   scale: number;
   /** In game, snap the panel to the nearest left/right edge after a drag. */
   snapToEdge: boolean;
+  /** Outside champ select and games, stick to the side of the League client window. */
+  dockToClient: boolean;
 }
 
 export interface Snapshot {
@@ -131,6 +163,7 @@ export interface Snapshot {
   overlay: OverlayState;
   rank: RankInfo | null;
   appearance: Appearance;
+  history: History | null;
 }
 
 export interface MockStatus {

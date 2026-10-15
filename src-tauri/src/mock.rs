@@ -227,6 +227,10 @@ pub fn set_playing(app: &AppHandle, playing: bool) {
     let _ = app.emit(events::MOCK, status(app));
 }
 
+fn now_ms() -> i64 {
+    std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_millis() as i64).unwrap_or(0)
+}
+
 pub fn start(app: &AppHandle) {
     app.manage(Mutex::new(MockRunner::default()));
     let (scenarios, error) = load_scenarios();
@@ -235,6 +239,7 @@ pub fn start(app: &AppHandle) {
     }
     // RIFT_MOCK_RANK="gold II 47" picks the mock rank (theme); default emerald II.
     state::set_rank(app, crate::ranked::mock_rank(std::env::var("RIFT_MOCK_RANK").ok().as_deref()));
+    state::set_history(app, crate::history::sample(now_ms()));
     let wanted = std::env::var("RIFT_MOCK_SCENARIO").ok();
     let first = wanted
         .filter(|w| scenarios.iter().any(|(m, _)| &m.id == w))

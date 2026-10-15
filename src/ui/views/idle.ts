@@ -1,10 +1,13 @@
+import type { ChampionIndex } from "../../domain/champions";
 import type { ResolvedTheme } from "../../theme/theme";
 import type { Snapshot } from "../../types";
 import { h } from "../h";
+import { clientView } from "./client";
 import { notice } from "./common";
 import { rankShowcase } from "./rank";
 
-export function idleView(snap: Snapshot, resolved: ResolvedTheme): HTMLElement {
+export function idleView(snap: Snapshot, resolved: ResolvedTheme, champs: ChampionIndex): HTMLElement {
+  if (snap.overlay.docked) return clientView(snap.history, champs);
   const c = snap.connection;
   let status: HTMLElement;
   switch (c.state) {

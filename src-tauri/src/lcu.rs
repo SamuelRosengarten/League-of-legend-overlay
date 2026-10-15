@@ -14,6 +14,7 @@ use tokio_tungstenite::tungstenite::http::HeaderValue;
 use tokio_tungstenite::tungstenite::Message;
 use tokio_tungstenite::Connector;
 
+use crate::history::{self, History};
 use crate::lockfile::{self, Lockfile};
 use crate::ranked::{self, RANKED_EVENT, RANKED_PATH};
 use crate::state::{self, AppState};
@@ -30,6 +31,7 @@ const POLL: Duration = Duration::from_millis(1000);
 /// Rank changes rarely; when polling, re-read it every this many polls.
 const RANK_POLL_EVERY: u32 = 30;
 
+#[derive(Clone)]
 struct Lcu {
     lock: Lockfile,
     http: reqwest::Client,
@@ -81,6 +83,48 @@ impl Lcu {
     }
 }
 
+impl Lcu {
+    /// Last 20 games + mastery. Optional like the rank: failures only log.
+    async fn refresh_history(&self, app: &AppHandle) {
+        let games = match self.get(history::MATCHES_PATH).await {
+            Ok(Some(v)) => history::parse_matches(&v),
+            Ok(None) => Vec::new(),
+            Err(e) => {
+                log::debug!("match history unavailable: {e}");
+                return;
+            }
+        };
+        let mastery = match self.get(history::MASTERY_PATH).await {
+            Ok(Some(v)) => history::parse_mastery(&v),
+            _ => Vec::new(),
+        };
+        log::debug!("match history: {} games, {} mastery entries", games.len(), mastery.len());
+        state::set_history(app, History { games, mastery });
+    }
+}
+
+/// Loads history once per connection, then again after every game. The LCU writes the new
+/// game into match history a little after EndOfGame, so it re-reads twice.
+async fn history_worker(app: AppHandle, lcu: Lcu) {
+    lcu.refresh_history(&app).await;
+    loop {
+        state::HISTORY_REFRESH.notified().await;
+        for delay in [Duration::from_secs(5), Duration::from_secs(25)] {
+            tokio::time::sleep(delay).await;
+            lcu.refresh_history(&app).await;
+        }
+    }
+}
+
+/// Stops the history worker when a connection ends, whichever way `run_once` returns.
+struct AbortOnDrop(tauri::async_runtime::JoinHandle<()>);
+
+impl Drop for AbortOnDrop {
+    fn drop(&mut self) {
+        self.0.abort();
+    }
+}
+
 fn parse_session(v: Value) -> Option<ChampSelectSession> {
     serde_json::from_value(v).map_err(|e| log::warn!("unexpected champ-select payload: {e}")).ok()
 }
@@ -110,6 +154,7 @@ async fn run_once(app: &AppHandle) {
         return;
     }
     lcu.refresh_rank(app).await;
+    let _history = AbortOnDrop(tauri::async_runtime::spawn(history_worker(app.clone(), lcu.clone())));
 
     match websocket(app, &lcu).await {
         Ok(()) => log::info!("LCU websocket closed"),

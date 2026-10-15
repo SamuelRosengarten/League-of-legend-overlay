@@ -57,6 +57,7 @@ describe("appearance settings", () => {
       companions: { gwen: true, amumu: false, placement: "??", size: 9, inGame: false },
       scale: 3,
       snapToEdge: true,
+      dockToClient: false,
     });
     expect(a).toEqual({
       theme: "auto",
@@ -64,6 +65,7 @@ describe("appearance settings", () => {
       companions: { gwen: true, amumu: false, placement: "corners", size: 1.4, inGame: false },
       scale: 1.5,
       snapToEdge: true,
+      dockToClient: false,
     });
     expect(normalizeAppearance({ scale: Number.NaN }).scale).toBe(1);
     expect(normalizeAppearance(null)).toEqual(DEFAULT_APPEARANCE);
@@ -89,7 +91,27 @@ describe("companion layout", () => {
     const top = layoutCompanions({ ...settings, placement: "top" }, 460, { compact: false });
     expect(top.gutterBottom).toBe(0);
     const none = layoutCompanions({ ...settings, gwen: false, amumu: false }, 460, { compact: false });
-    expect(none).toEqual({ placed: [], gutterTop: 0, gutterBottom: 0 });
+    expect(none).toEqual({ placed: [], gutterTop: 0, gutterBottom: 0, gutterRight: 0, gutterLeft: 0 });
+  });
+
+  it("docked: both stand in a right gutter, inside the window, nothing above or below", () => {
+    const d = layoutCompanions(settings, 410, { compact: false, docked: true });
+    expect(d.placed.map((p) => [p.who, p.spot.pose])).toEqual([["gwen", "side"], ["amumu", "side"]]);
+    expect([d.gutterTop, d.gutterBottom]).toEqual([0, 0]);
+    expect(d.gutterRight).toBeGreaterThan(0);
+    for (const p of d.placed) {
+      expect(p.left).toBeGreaterThanOrEqual(410 - d.gutterRight);
+      expect(p.left + p.width).toBeLessThanOrEqual(410);
+    }
+    expect(layoutCompanions({ ...settings, gwen: false, amumu: false }, 410, { compact: false, docked: true }).gutterRight).toBe(0);
+
+    // Docked on the client's left: mirrored onto the panel's outer (left) border.
+    const l = layoutCompanions(settings, 410, { compact: false, docked: true, dockedLeft: true });
+    expect([l.gutterLeft, l.gutterRight]).toEqual([d.gutterRight, 0]);
+    for (const p of l.placed) {
+      expect(p.spot.flip).toBe(true);
+      expect(p.left + p.width).toBeLessThanOrEqual(l.gutterLeft);
+    }
   });
 
   it("keeps companions inside the window and scales with size", () => {
@@ -102,5 +124,14 @@ describe("companion layout", () => {
     const small = layoutCompanions({ ...settings, size: 0.7 }, 460, { compact: false });
     const big = layoutCompanions({ ...settings, size: 1.4 }, 460, { compact: false });
     expect(big.gutterTop).toBeGreaterThan(small.gutterTop);
+  });
+});
+
+describe("docked companions on a narrow window", () => {
+  it("shrink so the gutter stays at most a fifth of the window", () => {
+    const narrow = layoutCompanions(DEFAULT_APPEARANCE.companions, 300, { compact: false, docked: true });
+    expect(narrow.gutterRight).toBeLessThanOrEqual(60);
+    const wide = layoutCompanions(DEFAULT_APPEARANCE.companions, 410, { compact: false, docked: true });
+    expect(wide.placed[0]!.spriteHeight).toBeGreaterThanOrEqual(narrow.placed[0]!.spriteHeight);
   });
 });

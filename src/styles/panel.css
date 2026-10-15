@@ -10,6 +10,9 @@
   padding: var(--gutter-top) 0 var(--gutter-bottom);
 }
 .stage-champ-select { height: 100vh; }
+/* Docked to the League client: exactly the client's height; companions in a right gutter. */
+.stage.docked { --gutter-right: 0px; --gutter-left: 0px; height: 100vh; padding-right: var(--gutter-right); padding-left: var(--gutter-left); }
+.stage.docked .panel { height: 100%; }
 
 .panel {
   position: relative;

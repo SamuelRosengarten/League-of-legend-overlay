@@ -23,6 +23,7 @@ export const DEFAULT_APPEARANCE: Appearance = {
   companions: { gwen: true, amumu: true, placement: DEFAULT_PRESET, size: 1, inGame: true },
   scale: 1,
   snapToEdge: false,
+  dockToClient: true,
 };
 
 /** Settings come from a hand-editable file: repair anything unknown instead of failing. */
@@ -40,6 +41,7 @@ export function normalizeAppearance(a: Partial<Appearance> | null | undefined): 
     },
     scale: a?.scale === undefined ? 1 : clampScale(Number(a.scale)),
     snapToEdge: !!a?.snapToEdge,
+    dockToClient: a?.dockToClient === undefined ? true : !!a.dockToClient,
   };
 }
 

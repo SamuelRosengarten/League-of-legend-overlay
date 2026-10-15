@@ -86,9 +86,43 @@ pub fn resize_in_place(old: Rect, w: i32, h: i32, work: Rect) -> (i32, i32) {
     clamp(x, y, w, h, work)
 }
 
+/// Window rect for a panel docked to the League client, `w` wide if there is room, never
+/// narrower than `min_w`: outside its right edge, else outside its left edge (shrinking to
+/// the free space), else (no room on either side) overlapping its right edge at width `w`.
+/// Always exactly as tall as the client and top-aligned with it.
+pub fn dock_beside(client: Rect, w: i32, min_w: i32, work: Rect) -> Rect {
+    let room_right = work.right() - client.right();
+    let room_left = client.x - work.x;
+    let (x, w) = if room_right >= min_w {
+        (client.right(), w.min(room_right))
+    } else if room_left >= min_w {
+        let w = w.min(room_left);
+        (client.x - w, w)
+    } else {
+        (client.right() - w, w)
+    };
+    Rect { x, y: client.y, w, h: client.h }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn docks_beside_the_client() {
+        const UHD: Rect = Rect { x: 0, y: 0, w: 3840, h: 2100 };
+        // The user's setup: 2560×1440 client with 673 px free on its right; an 820 px panel
+        // shrinks to fit instead of covering the client.
+        let client = Rect { x: 607, y: 272, w: 2560, h: 1440 };
+        assert_eq!(dock_beside(client, 820, 600, UHD), Rect { x: 3167, y: 272, w: 673, h: 1440 });
+        assert_eq!(dock_beside(client, 640, 600, UHD), Rect { x: 3167, y: 272, w: 640, h: 1440 });
+        // Client pushed against the right edge: dock on its left.
+        let right = Rect { x: 1280, y: 100, w: 2560, h: 1440 };
+        assert_eq!(dock_beside(right, 640, 600, UHD), Rect { x: 640, y: 100, w: 640, h: 1440 });
+        // Maximized: no room outside, so overlap the client's right edge.
+        let max = Rect { x: 0, y: 0, w: 3840, h: 2100 };
+        assert_eq!(dock_beside(max, 640, 600, UHD), Rect { x: 3200, y: 0, w: 640, h: 2100 });
+    }
 
     #[test]
     fn resizes_away_from_the_nearest_corner() {

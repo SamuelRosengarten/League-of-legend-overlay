@@ -96,3 +96,13 @@ function collectTags(
 export function counterItemsOwned(items: number[], me: string, counters: ItemCountersFile | null): number[] {
   return items.filter((id) => counters?.items[String(id)]?.relevantTo.includes(me));
 }
+
+/**
+ * The one reason worth a glance in game: what they bought, then their strongest trait. The
+ * generic uncurated base score says nothing about this enemy, so it is never the headline.
+ */
+export function headlineReason(t: Threat): ThreatReason | null {
+  const informative = t.reasons.filter((r) => !(r.kind === "base" && !t.curated));
+  const rank = (r: ThreatReason) => (r.via?.some((v) => v.source === "item") ? 0 : r.kind === "tag" ? 1 : r.kind === "lane" ? 2 : 3);
+  return [...informative].sort((a, b) => rank(a) - rank(b) || b.points - a.points)[0] ?? null;
+}

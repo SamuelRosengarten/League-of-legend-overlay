@@ -2,7 +2,7 @@ import type { Advice, LaneOpponent } from "../../domain/advisor";
 import type { ChampionIndex } from "../../domain/champions";
 import type { GameNote } from "../../domain/gameNotes";
 import { formatGameTime } from "../../domain/match";
-import type { Threat, ThreatReason } from "../../domain/threat";
+import { type Threat, type ThreatReason, headlineReason } from "../../domain/threat";
 import type { TeamWarning } from "../../domain/warnings";
 import type { Confidence, Phase } from "../../data/types";
 import { h } from "../h";
@@ -56,28 +56,39 @@ function guideRow(art: HTMLElement | null, title: string | null, note: string, c
   return h("li", { class: "guide-row" }, art, h("div", { class: "guide-text" }, title ? h("b", null, title) : null, title ? " " : null, note, lowMark(confidence)));
 }
 
-export function laneCard(advice: OkAdvice, champs: ChampionIndex, opts: { compact?: boolean } = {}): HTMLElement {
+/** In-game glance mode: two tips, each clamped to two lines (full text on hover). */
+const BRIEF_TIPS = 2;
+
+function briefTip(text: string, extra: HTMLElement | null = null): HTMLElement {
+  return h("li", { title: text }, h("span", { class: "clamp-2" }, text), extra);
+}
+
+export function laneCard(advice: OkAdvice, champs: ChampionIndex, opts: { compact?: boolean; brief?: boolean } = {}): HTMLElement {
   const opp = advice.laneOpponent;
   const what = advice.role === "jungle" ? "Enemy jungler" : `Lane opponent (${ROLE_LABEL[advice.role]})`;
   if (!opp || !opp.championId) {
     return h("div", { class: "card" }, h("div", { class: "card-head" }, champIcon(null, champs, 40), h("div", null, h("div", { class: "card-title" }, what), h("div", { class: "muted" }, "Not revealed yet — the card fills in when they lock."))));
   }
+  // Brief: one subtitle line, no source/confidence badge (both stay in the detailed view).
   const head = h(
     "div",
     { class: "card-head" },
-    champIcon(opp.championId, champs, 40),
+    champIcon(opp.championId, champs, opts.brief ? 32 : 40),
     h(
       "div",
       { class: "grow" },
       h("div", { class: "card-title" }, `vs ${champs.name(opp.championId)}`, opp.entry ? difficultyDots(opp.entry.difficulty) : null),
-      h("div", { class: "muted" }, `${what} · ${roleSourceLabel(opp)}`),
+      h("div", { class: "muted" }, opts.brief ? what : `${what} · ${roleSourceLabel(opp)}`),
     ),
-    confidenceBadge(opp),
+    opts.brief ? null : confidenceBadge(opp),
   );
   if (!opp.entry) return uncuratedCard(head, opp, opts);
 
   const e = opp.entry;
   const champ = opp.championId;
+  if (opts.brief) {
+    return h("div", { class: "card compact-card" }, head, section("Key tips", e.tips.slice(0, BRIEF_TIPS).map((t) => briefTip(t.text, lowMark(t.confidence))), "tips"));
+  }
   if (opts.compact) {
     return h("div", { class: "card compact-card" }, head, section("Key tips", e.tips.slice(0, 3).map((t) => h("li", null, t.text, lowMark(t.confidence))), "tips"));
   }
@@ -97,9 +108,18 @@ export function laneCard(advice: OkAdvice, champs: ChampionIndex, opts: { compac
   );
 }
 
-function uncuratedCard(head: HTMLElement, opp: LaneOpponent, opts: { compact?: boolean }): HTMLElement {
+function uncuratedCard(head: HTMLElement, opp: LaneOpponent, opts: { compact?: boolean; brief?: boolean }): HTMLElement {
   const p = opp.profile?.profile;
   const summary = p ? `${p.range} · ${p.damage} damage · ${["", "weak", "average", "strong"][p.earlyGame]} early` : "No profile for this champion.";
+  if (opts.brief) {
+    return h(
+      "div",
+      { class: "card compact-card" },
+      head,
+      h("div", { class: "muted small" }, summary),
+      section("Key tips", opp.genericTips.slice(0, BRIEF_TIPS).map((t) => briefTip(t.text)), "tips"),
+    );
+  }
   return h(
     "div",
     { class: "card" },
@@ -130,14 +150,44 @@ function reasonChip(r: ThreatReason): HTMLElement {
   return h("span", { class: `chip chip-${r.kind}${fromItem ? " chip-item" : ""}`, title }, r.kind === "tag" ? r.label : r.label, h("small", null, ` +${r.points}`));
 }
 
-export function threatList(threats: Threat[], hidden: number, champs: ChampionIndex, opts: { limit?: number; compact?: boolean } = {}): HTMLElement {
+/** "point-click-cc" → "point-click cc"; item-driven reasons name the item. */
+function reasonText(r: ThreatReason): string {
+  const label = r.kind === "tag" ? r.label.replace(/-/g, " ") : r.label;
+  const item = r.via?.find((v) => v.source === "item")?.detail;
+  return item ? `${label} (${item})` : label;
+}
+
+function oneLineThreat(t: Threat, rank: number, max: number, champs: ChampionIndex): HTMLElement {
+  const why = headlineReason(t);
+  const all = t.reasons.map((r) => `${reasonText(r)} +${r.points}`).join("\n");
+  return h(
+    "div",
+    { class: `threat threat-line${rank === 0 ? " threat-top" : ""}`, style: `--meter:${Math.round((t.score / max) * 100)}%`, title: all },
+    h("span", { class: "rank" }, h("span", null, String(rank + 1))),
+    champIcon(t.championId, champs, 26),
+    h(
+      "div",
+      { class: "grow" },
+      h("div", { class: "threat-name" }, champs.name(t.championId), t.role ? h("span", { class: "muted" }, ROLE_LABEL[t.role]) : null),
+      why ? h("div", { class: "threat-why" }, reasonText(why)) : null,
+    ),
+    h("span", { class: "score", title: "Threat score" }, t.score.toFixed(1)),
+  );
+}
+
+export function threatList(
+  threats: Threat[],
+  hidden: number,
+  champs: ChampionIndex,
+  opts: { limit?: number; compact?: boolean; oneLine?: boolean } = {},
+): HTMLElement {
   const shown = threats.slice(0, opts.limit ?? threats.length);
   const max = Math.max(1, ...threats.map((t) => t.score));
   return h(
     "div",
     { class: "threats" },
     shown.map((t, rank) =>
-      h(
+      opts.oneLine ? oneLineThreat(t, rank, max, champs) : h(
         "div",
         { class: `threat${opts.compact ? " threat-compact" : ""}${rank === 0 ? " threat-top" : ""}`, style: `--meter:${Math.round((t.score / max) * 100)}%` },
         h("span", { class: "rank" }, h("span", null, String(rank + 1))),

@@ -6,6 +6,7 @@ use std::sync::Mutex;
 use serde::Serialize;
 use tauri::{AppHandle, Emitter, Manager};
 
+use crate::history::History;
 use crate::overlay::{self, OverlayState};
 use crate::ranked::RankInfo;
 use crate::settings::{self, Appearance, Settings};
@@ -21,7 +22,11 @@ pub mod events {
     pub const DDRAGON: &str = "rift:ddragon";
     pub const RANK: &str = "rift:rank";
     pub const APPEARANCE: &str = "rift:appearance";
+    pub const HISTORY: &str = "rift:history";
 }
+
+/// Wakes the LCU history worker (a game just ended, so match history is about to change).
+pub static HISTORY_REFRESH: tokio::sync::Notify = tokio::sync::Notify::const_new();
 
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -36,6 +41,8 @@ pub struct Snapshot {
     /// Current ranked tier (client, mock, or the cached last client value); None = never known.
     pub rank: Option<RankInfo>,
     pub appearance: Appearance,
+    /// Recent games + mastery for the client-docked stats panel; None until first loaded.
+    pub history: Option<History>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -66,6 +73,7 @@ impl AppState {
                     settings.last_rank.clone().map(|r| RankInfo { source: "cached".into(), ..r })
                 },
                 appearance: settings.appearance.clone(),
+                history: None,
             }),
             settings: Mutex::new(settings),
         }
@@ -107,8 +115,15 @@ pub fn set_connection(app: &AppHandle, status: ConnectionStatus) {
 pub fn set_phase(app: &AppHandle, phase: &str) {
     if update(app, events::PHASE, |s| &mut s.phase, phase.to_string()) {
         log::info!("gameflow phase → {phase}");
+        if phase == "EndOfGame" {
+            HISTORY_REFRESH.notify_one();
+        }
         overlay::sync_mode(app);
     }
+}
+
+pub fn set_history(app: &AppHandle, history: History) {
+    update(app, events::HISTORY, |s| &mut s.history, Some(history));
 }
 
 pub fn set_champ_select(app: &AppHandle, session: Option<ChampSelectSession>) {
@@ -157,7 +172,7 @@ pub fn mark_rank_cached(app: &AppHandle) {
 }
 
 pub fn set_appearance(app: &AppHandle, appearance: Appearance) {
-    crate::overlay::set_layout(app, appearance.zoom(), appearance.snap_to_edge);
+    crate::overlay::set_layout(app, appearance.zoom(), appearance.snap_to_edge, appearance.dock_to_client);
     if update(app, events::APPEARANCE, |s| &mut s.appearance, appearance.clone()) {
         let state = app.state::<AppState>();
         let saved = {

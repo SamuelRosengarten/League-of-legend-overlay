@@ -35,6 +35,7 @@ async function start() {
     on("rift:ddragon", (data) => store.setDdragon(data)),
     on("rift:rank", (rank) => store.patchSnapshot({ rank })),
     on("rift:appearance", (appearance) => store.patchSnapshot({ appearance })),
+    on("rift:history", (history) => store.patchSnapshot({ history })),
   ]);
 
   // Re-render when Windows animation settings or page visibility change (pauses animations).
