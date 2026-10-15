@@ -75,7 +75,8 @@ pub struct OverlayState {
     /// stand on the panel's outer, left border.
     pub docked_left: bool,
     pub hotkeys: settings::Hotkeys,
-    /// Hotkey override of the mode's default visibility; reset on every mode change.
+    /// Hotkey override of the mode's default visibility; reset on every mode change and
+    /// whenever the client gains/loses focus or is minimized/opened/closed.
     #[serde(skip)]
     visible_override: Option<bool>,
     /// Frontend-reported content height (logical px) for compact modes.
@@ -348,7 +349,17 @@ fn track_client(app: &AppHandle) {
     };
     if now != prev {
         log::debug!("league client window: {found:?}");
-        with_overlay(app, |o| (o.client, o.client_foreground, o.client_minimized) = now);
+        // Focus moved, or the client was minimized/opened/closed: drop any show/hide
+        // override (second launch, Reset position, hotkey) so the docked panel follows the
+        // client again instead of staying over Discord or the desktop. A plain move/resize
+        // keeps it.
+        let focus_changed = (now.0.is_some(), now.1, now.2) != (prev.0.is_some(), prev.1, prev.2);
+        with_overlay(app, |o| {
+            (o.client, o.client_foreground, o.client_minimized) = now;
+            if focus_changed && o.mode == Mode::Idle {
+                o.visible_override = None;
+            }
+        });
         apply(app);
     }
 }
@@ -609,7 +620,7 @@ mod win_native {
     use crate::geometry::Rect;
     use windows_sys::Win32::Foundation::{HWND, POINT, RECT};
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        FindWindowW, GetCursorPos, GetForegroundWindow, GetWindowLongPtrW, GetWindowRect, IsIconic, IsWindowVisible, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
+        FindWindowExW, GetCursorPos, GetForegroundWindow, GetWindowLongPtrW, GetWindowRect, IsIconic, IsWindowVisible, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
         SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_LAYERED,
         WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT,
     };
@@ -671,12 +682,21 @@ mod win_native {
 
     /// The League client's main window (`RCLIENT`, owned by LeagueClientUx.exe), and whether
     /// it (or `own`, the overlay) is the active window.
+    ///
+    /// The client also owns several hidden `RCLIENT` helper windows. A minimized main window
+    /// drops below them in z-order, so the first match is not enough: take the visible one.
     pub fn client_window(own: Option<&WebviewWindow>) -> ClientWindow {
         let class: Vec<u16> = "RCLIENT\0".encode_utf16().collect();
         unsafe {
-            let h = FindWindowW(class.as_ptr(), std::ptr::null());
-            if h.is_null() || IsWindowVisible(h) == 0 {
-                return ClientWindow::Missing;
+            let mut h = std::ptr::null_mut();
+            loop {
+                h = FindWindowExW(std::ptr::null_mut(), h, class.as_ptr(), std::ptr::null());
+                if h.is_null() {
+                    return ClientWindow::Missing;
+                }
+                if IsWindowVisible(h) != 0 {
+                    break;
+                }
             }
             if IsIconic(h) != 0 {
                 return ClientWindow::Minimized;
