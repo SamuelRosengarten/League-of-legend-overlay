@@ -121,6 +121,31 @@ export function render(root: HTMLElement, state: UiState) {
   screenKey = key;
 
   if (compact) reportHeight(s, layout.gutterTop + layout.gutterBottom);
+  reportHotZone(s);
+}
+
+let lastHotZone = "";
+/**
+ * League keeps hotkeys from reaching the overlay while the game has focus, so the header
+ * buttons must work by mouse in click-through mode: Rust makes this area clickable while the
+ * cursor is over it.
+ */
+function reportHotZone(s: Shell) {
+  const buttons = [...s.panel.querySelectorAll<HTMLElement>(".header .btn-icon")].map((b) => b.getBoundingClientRect());
+  const pad = 4;
+  const zone = buttons.length
+    ? {
+        x: Math.min(...buttons.map((r) => r.left)) - pad,
+        y: Math.min(...buttons.map((r) => r.top)) - pad,
+        w: Math.max(...buttons.map((r) => r.right)) - Math.min(...buttons.map((r) => r.left)) + 2 * pad,
+        h: Math.max(...buttons.map((r) => r.bottom)) - Math.min(...buttons.map((r) => r.top)) + 2 * pad,
+      }
+    : null;
+  const key = JSON.stringify(zone);
+  if (key !== lastHotZone) {
+    lastHotZone = key;
+    void backend.setHotZone(zone);
+  }
 }
 
 let lastHeight = 0;

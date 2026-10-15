@@ -13,6 +13,14 @@ import type {
   Snapshot,
 } from "./types";
 
+/** CSS px, relative to the window: the area that stays clickable in click-through mode. */
+export interface HotZone {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 export interface BackendEvents {
   "rift:connection": ConnectionStatus;
   "rift:phase": string;
@@ -36,6 +44,7 @@ export const backend = {
   toggleVisibility: () => invoke<void>("toggle_visibility"),
   fitContent: (height: number) => invoke<void>("fit_content", { height }),
   resetPosition: () => invoke<void>("reset_position"),
+  setHotZone: (zone: HotZone | null) => invoke<void>("set_hot_zone", { zone }),
   setAppearance: (appearance: Appearance) => invoke<void>("set_appearance", { appearance }),
   mock: {
     status: () => invoke<MockStatus>("mock_status"),

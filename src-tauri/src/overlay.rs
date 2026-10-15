@@ -7,7 +7,7 @@
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::Duration;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter, Manager, PhysicalPosition, PhysicalSize, WebviewWindow};
 
 use crate::geometry::{self, Edge, Rect, MARGIN};
@@ -82,6 +82,18 @@ pub struct OverlayState {
     zoom: f64,
     #[serde(skip)]
     snap_to_edge: bool,
+    /// Header buttons that stay clickable in click-through mode (see `spawn_cursor_watch`).
+    #[serde(skip)]
+    hot_zone: Option<HotZone>,
+}
+
+/// A rectangle in CSS px, relative to the window's top-left corner.
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
+pub struct HotZone {
+    pub x: f64,
+    pub y: f64,
+    pub w: f64,
+    pub h: f64,
 }
 
 impl OverlayState {
@@ -98,6 +110,7 @@ impl OverlayState {
             last_applied: None,
             zoom: settings.appearance.zoom(),
             snap_to_edge: settings.appearance.snap_to_edge,
+            hot_zone: None,
         }
     }
 
@@ -137,6 +150,75 @@ pub fn init(app: &AppHandle) {
     });
     sync_mode(app);
     apply(app);
+    spawn_cursor_watch(app);
+}
+
+pub fn set_hot_zone(app: &AppHandle, zone: Option<HotZone>) {
+    with_overlay(app, |o| o.hot_zone = zone);
+}
+
+const CURSOR_POLL: Duration = Duration::from_millis(50);
+/// In game, interactive mode ends once the cursor has been off the panel this long.
+const INTERACTIVE_IDLE_IN_GAME: Duration = Duration::from_millis(1500);
+
+/// League keeps registered hotkeys from reaching other apps while the game has focus, so the
+/// overlay must stay usable with the mouse alone:
+/// - in click-through mode, the header buttons take clicks while the cursor is over them;
+/// - in game, interactive mode switches itself off once the cursor leaves the panel.
+///
+/// Only the cursor position is read (`GetCursorPos`); no input hook.
+fn spawn_cursor_watch(app: &AppHandle) {
+    let app = app.clone();
+    tauri::async_runtime::spawn(async move {
+        let mut hot = false;
+        let mut last_interactive = false;
+        let mut outside_since: Option<std::time::Instant> = None;
+        loop {
+            tokio::time::sleep(CURSOR_POLL).await;
+            let Some(win) = window(&app) else { continue };
+            let (mode, visible, interactive, zone, zoom) =
+                with_overlay(&app, |o| (o.mode, o.visible, o.interactive, o.hot_zone, o.zoom));
+            let (Some((cx, cy)), Ok(pos), Ok(size)) = (win_native::cursor_pos(), win.outer_position(), win.outer_size())
+            else {
+                continue;
+            };
+            let bounds = Rect { x: pos.x, y: pos.y, w: size.width as i32, h: size.height as i32 };
+            // set_interactive just rewrote the click-through bits: re-evaluate from scratch.
+            let force = interactive != last_interactive;
+            last_interactive = interactive;
+
+            if interactive {
+                hot = false;
+                if mode == Mode::InGame && visible && !bounds.contains(cx, cy) {
+                    let since = *outside_since.get_or_insert_with(std::time::Instant::now);
+                    if since.elapsed() >= INTERACTIVE_IDLE_IN_GAME {
+                        outside_since = None;
+                        set_interactive(&app, false);
+                    }
+                } else {
+                    outside_since = None;
+                }
+                continue;
+            }
+            outside_since = None;
+
+            let k = zoom * win.scale_factor().unwrap_or(1.0);
+            let over = visible
+                && zone.is_some_and(|z| {
+                    let r = Rect {
+                        x: pos.x + (z.x * k).floor() as i32,
+                        y: pos.y + (z.y * k).floor() as i32,
+                        w: (z.w * k).ceil() as i32,
+                        h: (z.h * k).ceil() as i32,
+                    };
+                    r.contains(cx, cy)
+                });
+            if over != hot || force {
+                hot = over;
+                set_click_through(&win, !over);
+            }
+        }
+    });
 }
 
 /// Re-derives the mode from the current phase and re-applies placement/visibility if it changed.
@@ -343,6 +425,7 @@ fn apply_geometry(app: &AppHandle, placement: Placement) {
     if current == Some(Rect { x, y, w, h }) {
         return;
     }
+    log::debug!("{placement:?} {mode:?}: {w}x{h} at ({x}, {y})");
     with_overlay(app, |o| o.last_applied = Some((x, y)));
     win_native::set_bounds(&win, x, y, w, h);
 }
@@ -394,6 +477,7 @@ fn on_user_moved(app: &AppHandle) {
         let state = app.state::<AppState>();
         let mut s = state.settings.lock().unwrap();
         s.positions.insert(mode.key().to_string(), SavedPosition { x, y });
+        log::debug!("user moved {mode:?} panel to ({x}, {y}), saved");
         s.dock = dock;
         s.clone()
     };
@@ -415,9 +499,9 @@ fn set_click_through(win: &WebviewWindow, ignore: bool) {
 #[cfg(windows)]
 mod win_native {
     use tauri::WebviewWindow;
-    use windows_sys::Win32::Foundation::HWND;
+    use windows_sys::Win32::Foundation::{HWND, POINT};
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
+        GetCursorPos, GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
         SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_LAYERED,
         WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT,
     };
@@ -472,6 +556,11 @@ mod win_native {
         }
     }
 
+    pub fn cursor_pos() -> Option<(i32, i32)> {
+        let mut p = POINT { x: 0, y: 0 };
+        (unsafe { GetCursorPos(&mut p) } != 0).then_some((p.x, p.y))
+    }
+
     /// Move + resize in one call, so growing upwards does not flash the panel one frame lower.
     pub fn set_bounds(win: &WebviewWindow, x: i32, y: i32, w: i32, h: i32) {
         let Some(h_wnd) = hwnd(win) else { return };
@@ -502,6 +591,9 @@ mod win_native {
     }
     pub fn hide(win: &WebviewWindow) {
         let _ = win.hide();
+    }
+    pub fn cursor_pos() -> Option<(i32, i32)> {
+        None
     }
     pub fn set_bounds(win: &WebviewWindow, x: i32, y: i32, w: i32, h: i32) {
         let _ = win.set_size(tauri::PhysicalSize::new(w as u32, h as u32));

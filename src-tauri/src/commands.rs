@@ -33,6 +33,11 @@ pub fn set_appearance(app: AppHandle, appearance: Appearance) {
 }
 
 #[tauri::command]
+pub fn set_hot_zone(app: AppHandle, zone: Option<overlay::HotZone>) {
+    overlay::set_hot_zone(&app, zone);
+}
+
+#[tauri::command]
 pub fn reset_position(app: AppHandle) {
     overlay::reset_position(&app);
 }

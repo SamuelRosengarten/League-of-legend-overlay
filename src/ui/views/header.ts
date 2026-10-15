@@ -50,6 +50,9 @@ export function headerContent(
   const [tone, label] = connectionLabel(snap.connection);
   const { overlay } = snap;
   const settings = opts.view === "settings";
+  // League keeps hotkeys away from the overlay in game; the buttons work by mouse there.
+  const inGame = overlay.mode === "in-game";
+  const key = overlay.hotkeys.toggleInteractive;
   return [
     h("div", { class: "title", "data-tauri-drag-region": true }, h("div", { class: "brand", "data-tauri-drag-region": true }, "Rift Advisor"), rankLine(snap, resolved)),
     h("span", { class: `status status-${tone}`, title: label }, h("i", { class: "status-dot" }), h("span", { class: "status-text" }, label)),
@@ -68,15 +71,18 @@ export function headerContent(
       "button",
       {
         class: `btn-icon btn-kbd${overlay.interactive ? " on" : ""}`,
-        title: overlay.interactive
-          ? `Interactive — clicks go to the overlay (${overlay.hotkeys.toggleInteractive} for click-through)`
-          : `Click-through — ${overlay.hotkeys.toggleInteractive} to interact`,
+        title: inGame
+          ? overlay.interactive
+            ? "Interactive: clicks go to the overlay. Click for click-through (also ends when the mouse leaves the panel)"
+            : "Click-through: click to interact with the panel"
+          : overlay.interactive
+            ? `Interactive: clicks go to the overlay (${key} for click-through)`
+            : `Click-through: click or press ${key} to interact`,
         "aria-label": "Toggle interactive mode",
         onclick: () => backend.setInteractive(!overlay.interactive),
       },
       icon(overlay.interactive ? "pointer" : "ghost", 15),
-      // Tooltips can't be hovered in click-through mode, so the hotkey stays visible.
-      h("kbd", null, shortHotkey(overlay.hotkeys.toggleInteractive)),
+      inGame ? null : h("kbd", null, shortHotkey(key)),
     ),
     opts.collapsible && !settings
       ? h(

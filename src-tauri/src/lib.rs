@@ -122,6 +122,7 @@ pub fn run() {
             commands::toggle_visibility,
             commands::fit_content,
             commands::reset_position,
+            commands::set_hot_zone,
             commands::set_appearance,
             commands::mock_status,
             commands::mock_load,

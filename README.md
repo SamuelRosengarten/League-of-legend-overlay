@@ -20,7 +20,7 @@ Rift Advisor reads data **only** from Riot's official local APIs:
 | Live Client Data API (`https://127.0.0.1:2999/liveclientdata/allgamedata`) | Champions, levels and items while in game |
 | Data Dragon (`ddragon.leagueoflegends.com`) | Champion list, champion/item/ability icons and splash art, cached locally |
 
-It does **not** use keyboard/mouse hooks, memory reading, screen capture, minimap reading or injection. Global hotkeys are registered with the standard Windows `RegisterHotKey` API. The self-signed Riot certificates are accepted **only for `127.0.0.1`** (see `src-tauri/src/tls.rs`). Every other host gets normal certificate verification.
+It does **not** use keyboard/mouse hooks, memory reading, screen capture, minimap reading or injection. Global hotkeys are registered with the standard Windows `RegisterHotKey` API. To keep the header buttons clickable in click-through mode, the overlay reads the cursor position (`GetCursorPos`, 20 times a second); it never reads keys or clicks meant for the game. The self-signed Riot certificates are accepted **only for `127.0.0.1`** (see `src-tauri/src/tls.rs`). Every other host gets normal certificate verification.
 
 It also never makes decisions for you or gives real-time "go here now" instructions in game. Everything shown is pre-game planning or static reference info. The jungle plan is visible for the first 90 s of the game (loading screen and the first clear), then collapses to a single line.
 
@@ -85,9 +85,9 @@ When new game data makes the panel taller or shorter, it resizes where it is and
 | `Ctrl+Shift+A` | Show / hide the overlay |
 | `Ctrl+Shift+Z` | Toggle interactive mode (click-through off / on) |
 
-**Passive vs interactive.** In passive mode (default) every click goes through the overlay to the game. In interactive mode the overlay receives clicks, scrolling and text selection: an *INTERACTIVE* tag appears on its top border, the frame lights up and the pointer button is highlighted. The overlay never takes keyboard focus in either mode (`WS_EX_NOACTIVATE`), so the game keeps your keyboard and the hotkeys work at any time. As a consequence, Tab navigation inside the overlay is not available; use the mouse in interactive mode. In interactive mode the transparent strip where the companions sit also catches clicks.
+**Passive vs interactive.** In passive mode (default) every click goes through the overlay to the game. In interactive mode the overlay receives clicks, scrolling and text selection: an *INTERACTIVE* tag appears on its top border, the frame lights up and the pointer button is highlighted. The overlay never takes keyboard focus in either mode (`WS_EX_NOACTIVATE`), so the game keeps your keyboard. As a consequence, Tab navigation inside the overlay is not available; use the mouse in interactive mode. In interactive mode the transparent strip where the companions sit also catches clicks.
 
-**If a hotkey does nothing in game.** Run `npm run dev` and watch the console. Every registered hotkey is logged at startup (`hotkey registered: …`) and every press that reaches the app is logged (`hotkey pressed: …`). If a press in game logs nothing, Windows did not deliver it to the overlay: try another combination in `settings.json` (for example `Alt+F9`), and check whether League or Rift Advisor is running as administrator, since a non-elevated app may not receive keys while an elevated game has focus.
+**In game, use the mouse.** While the game has focus, League keeps registered hotkeys from reaching other apps (tested in Practice Tool: no press arrived). So the header buttons always work by mouse, even in click-through mode: point at them and click. Click the pointer button to make the whole panel interactive (drag, scroll, collapse). In game, interactive mode switches itself off 1.5 s after the cursor leaves the panel, so the game never loses clicks for long. The hotkeys still work in the client and in champ select. Every registered hotkey and every press that reaches the app is logged in the `npm run dev` console.
 
 ### Appearance: rank theme, companions, motion
 
@@ -135,8 +135,8 @@ These need a real match and are not covered by the automated tests:
 1. Set League to **Borderless** (*Settings → Video → Window Mode*). Start Rift Advisor; the status dot on the crest turns green once the client is found.
 2. **Champ select:** the full panel appears on its own. Press `Ctrl+Shift+Z`, scroll the guide, open the gear menu, press `Ctrl+Shift+Z` again, then click the client behind the panel: the click must reach the client.
 3. **In game:** the compact panel appears on the right edge. Drag it somewhere else in interactive mode, then buy items and level up: the panel resizes in place and does not jump back. Right-click to move your champion *under* the panel: in passive mode the click must reach the game.
-4. Press `Ctrl+Shift+Z` in game: the panel stays visible, shows *INTERACTIVE*, and the collapse button works. Press it again and go back to playing. Your abilities (Q/W/E/R) must still work without clicking into the game first.
-5. Press `Ctrl+Shift+A` twice: the panel hides and comes back. Alt-Tab out and back: the panel stays on top.
+4. In game, hover the header buttons: they light up. Click the collapse button: the panel collapses, and your next right-click on the map still moves your champion. Click the pointer button: the panel shows *INTERACTIVE*; move the mouse off the panel and after about 1.5 s it goes back to click-through. Your abilities (Q/W/E/R) must still work without clicking into the game first.
+5. In the client, press `Ctrl+Shift+A` twice: the panel hides and comes back. Alt-Tab out and back: the panel stays on top.
 6. End the game: the panel hides on the end-of-game screen and returns in the lobby.
 7. Optional: try Windowed mode (works like Borderless). Exclusive Fullscreen is **not supported**: Windows does not draw other windows over an exclusive-fullscreen game.
 
