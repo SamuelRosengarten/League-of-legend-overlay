@@ -1,5 +1,5 @@
 import { backend } from "../../bridge";
-import { MOTIONS } from "../../theme/appearance";
+import { MOTIONS, SCALE_MAX, SCALE_MIN, clampScale } from "../../theme/appearance";
 import { THEMES, TIER_IDS, type ThemeId } from "../../theme/ranks";
 import type { ResolvedTheme } from "../../theme/theme";
 import type { Appearance, CompanionSettings, RankInfo } from "../../types";
@@ -123,6 +123,30 @@ export function settingsView(a: Appearance, rank: RankInfo | null, resolved: Res
     ),
     reduced ? h("p", { class: "hint warn-text" }, icon("info", 12), " Windows “Animation effects” is off, so animations stay off.") : null,
     h("p", { class: "hint" }, "In game, animations are always calm and ambient particles are off."),
+
+    heading("Layout"),
+    h(
+      "div",
+      { class: "field" },
+      h("label", null, "Scale", h("span", { class: "muted" }, ` ${Math.round(a.scale * 100)}%`)),
+      h("input", {
+        type: "range",
+        min: SCALE_MIN,
+        max: SCALE_MAX,
+        step: 0.05,
+        value: a.scale,
+        "aria-label": "Overlay scale",
+        onchange: (e: Event) => save({ ...a, scale: clampScale(Number((e.target as HTMLInputElement).value)) }),
+      }),
+    ),
+    h("p", { class: "hint" }, "Text, icons and the panel itself grow together. Try 115–130% on 1440p or 4K screens."),
+    toggle("Snap to screen edge in game", a.snapToEdge, (v) => save({ ...a, snapToEdge: v }), "Off: the in-game panel stays exactly where you drop it"),
+    h(
+      "button",
+      { class: "btn", title: "Also in the tray menu", onclick: () => void backend.resetPosition() },
+      icon("refresh", 14),
+      "Reset position",
+    ),
 
     h("button", { class: "btn btn-primary done", onclick: () => store.update({ view: "main" }) }, icon("check", 14), "Done"),
   );

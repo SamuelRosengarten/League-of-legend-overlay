@@ -51,7 +51,7 @@ npm run dev        # run against the real League client
 npm run build      # installer in src-tauri/target/release/bundle/
 ```
 
-Start Rift Advisor before or after the League client; it connects automatically. The tray icon menu has *Show / hide*, *Interactive mode* and *Quit*. Only one copy runs at a time: launching it again just brings the running overlay back on screen. A second copy would otherwise lose the global hotkeys to the first.
+Start Rift Advisor before or after the League client; it connects automatically. The tray icon menu has *Show / hide*, *Interactive mode*, *Reset position* and *Quit*. Only one copy runs at a time: launching it again just brings the running overlay back on screen. A second copy would otherwise lose the global hotkeys to the first.
 
 The header shows the connection state:
 
@@ -71,10 +71,12 @@ The overlay switches mode automatically from the gameflow phase:
 | --- | --- |
 | No client, lobby, matchmaking | idle (small status card) |
 | ChampSelect | full panel (460 px wide) |
-| GameStart / InProgress | compact panel docked to a screen edge |
+| GameStart / InProgress | compact panel (starts on the right edge) |
 | EndOfGame | hidden |
 
-The window is transparent, frameless, always on top and **click-through**, so the game receives every click. Turn on *interactive mode* to scroll, collapse sections or drag the panel by its header. The in-game panel snaps to the nearest screen edge after a drag. Positions are remembered per mode, kept inside the monitor's work area, and are DPI-aware.
+The window is transparent, frameless, always on top and **click-through**, so the game receives every click. Turn on *interactive mode* to scroll, collapse sections or drag the panel by its header. The panel stays where you drop it (turn on *Snap to screen edge in game* under Appearance → Layout for the old docking behaviour). Positions are remembered per mode, kept inside the monitor's work area, and are DPI-aware.
+
+When new game data makes the panel taller or shorter, it resizes where it is and never jumps back to a saved spot. It grows away from the corner it sits in: a panel in the bottom half grows upwards, one in the right half grows to the left. *Reset position* (tray menu or Appearance → Layout) puts the panel back at its default spot.
 
 ### Hotkeys
 
@@ -85,6 +87,8 @@ The window is transparent, frameless, always on top and **click-through**, so th
 
 **Passive vs interactive.** In passive mode (default) every click goes through the overlay to the game. In interactive mode the overlay receives clicks, scrolling and text selection: an *INTERACTIVE* tag appears on its top border, the frame lights up and the pointer button is highlighted. The overlay never takes keyboard focus in either mode (`WS_EX_NOACTIVATE`), so the game keeps your keyboard and the hotkeys work at any time. As a consequence, Tab navigation inside the overlay is not available; use the mouse in interactive mode. In interactive mode the transparent strip where the companions sit also catches clicks.
 
+**If a hotkey does nothing in game.** Run `npm run dev` and watch the console. Every registered hotkey is logged at startup (`hotkey registered: …`) and every press that reaches the app is logged (`hotkey pressed: …`). If a press in game logs nothing, Windows did not deliver it to the overlay: try another combination in `settings.json` (for example `Alt+F9`), and check whether League or Rift Advisor is running as administrator, since a non-elevated app may not receive keys while an elevated game has focus.
+
 ### Appearance: rank theme, companions, motion
 
 Click the gear in the header (in interactive mode) to open **Appearance**. Changes apply immediately and are saved to the settings file.
@@ -93,6 +97,7 @@ Click the gear in the header (in interactive mode) to open **Appearance**. Chang
   Each tier sets the panel frame, background glow, buttons, selections, headings, score meters, LP bar, particles and the gems on the companions. Apex tiers (Master and up) get brighter frame corners, and Challenger adds a light sweep along the top edge. On a rank change the colors cross-fade over about 0.8 s.
 - **Companions.** Gwen and Amumu (art in `src/assets/companions/`) live on the panel frame. Gwen stands and Amumu sits on the top border, both can peek over it, or they dangle below the bottom border (Gwen from a ribbon, Amumu from his bandage). Placements: *Opposite corners* (default), *Top border*, *Hanging below*, *Left corner*, *Right corner*, *Peeking* or *Minimal*. You can also set their size (70–140 %) and whether they stay on the in-game panel. They breathe, blink and sway. With motion set to *Full* they also pull an occasional expression: Gwen goes happy, sleepy, curious, excited or winks; Amumu goes sleepy, curious, happy, surprised or sheds a tear. They also react when you change screens. They never cover advice or controls and never receive mouse clicks.
 - **Motion.** *Full* (idle animations, sparkles, ambient particles), *Calm* (slow breathing and blinking) or *Off*. In game, motion is capped at Calm and particles are off. If Windows *Animation effects* is off (`prefers-reduced-motion`), everything stays still. While the overlay is hidden, all animations pause.
+- **Layout.** *Scale* (80–150 %) zooms text, icons and the panel together; try 115–130 % on 1440p or 4K screens. *Snap to screen edge in game* docks the in-game panel to the nearest left/right edge after a drag (off by default). *Reset position* forgets the saved spot for the current mode.
 
 How the companion art was prepared, and how to replace it, is described in `src/assets/companions/README.md`.
 
@@ -109,13 +114,15 @@ How the companion art was prepared, and how to replace it, is described in `src/
   "appearance": {
     "theme": "auto",
     "motion": "full",
-    "companions": { "gwen": true, "amumu": true, "placement": "corners", "size": 1, "inGame": true }
+    "companions": { "gwen": true, "amumu": true, "placement": "corners", "size": 1, "inGame": true },
+    "scale": 1,
+    "snapToEdge": false
   }
 }
 ```
 
 - `leagueInstallDir`: only needed if the client cannot be found. By default the app looks in `C:\Riot Games\League of Legends`, then next to the running `LeagueClientUx.exe`.
-- `positions` / `dock`: saved window positions and the docking edge. Delete them to reset placement.
+- `positions` / `dock`: saved window positions and the docking edge (used when `snapToEdge` is on). *Reset position* clears them for the current mode.
 - `appearance`: edited from the Appearance view. `theme` is `auto` or a tier id (`iron` … `challenger`, `unranked`). Unknown values fall back to the defaults.
 - `lastRank`: written by the app, the last rank the client reported.
 
@@ -127,7 +134,7 @@ These need a real match and are not covered by the automated tests:
 
 1. Set League to **Borderless** (*Settings → Video → Window Mode*). Start Rift Advisor; the status dot on the crest turns green once the client is found.
 2. **Champ select:** the full panel appears on its own. Press `Ctrl+Shift+Z`, scroll the guide, open the gear menu, press `Ctrl+Shift+Z` again, then click the client behind the panel: the click must reach the client.
-3. **In game:** the compact panel docks to the screen edge. Right-click to move your champion *under* the panel: in passive mode the click must reach the game.
+3. **In game:** the compact panel appears on the right edge. Drag it somewhere else in interactive mode, then buy items and level up: the panel resizes in place and does not jump back. Right-click to move your champion *under* the panel: in passive mode the click must reach the game.
 4. Press `Ctrl+Shift+Z` in game: the panel stays visible, shows *INTERACTIVE*, and the collapse button works. Press it again and go back to playing. Your abilities (Q/W/E/R) must still work without clicking into the game first.
 5. Press `Ctrl+Shift+A` twice: the panel hides and comes back. Alt-Tab out and back: the panel stays on top.
 6. End the game: the panel hides on the end-of-game screen and returns in the lobby.

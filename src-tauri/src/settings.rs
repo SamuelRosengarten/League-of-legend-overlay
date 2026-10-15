@@ -37,6 +37,25 @@ pub struct Appearance {
     /// "full" | "calm" | "off" — "off" also applies when Windows asks for reduced motion.
     pub motion: String,
     pub companions: Companions,
+    /// Overlay zoom (text, icons and window size together), 0.8 – 1.5.
+    pub scale: f64,
+    /// In game, snap the panel to the nearest left/right screen edge after a drag.
+    /// Off: the panel stays exactly where it is dropped.
+    pub snap_to_edge: bool,
+}
+
+pub const SCALE_MIN: f64 = 0.8;
+pub const SCALE_MAX: f64 = 1.5;
+
+impl Appearance {
+    /// The file can be edited by hand; keep the zoom in a usable range.
+    pub fn zoom(&self) -> f64 {
+        if self.scale.is_finite() {
+            self.scale.clamp(SCALE_MIN, SCALE_MAX)
+        } else {
+            1.0
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -54,7 +73,13 @@ pub struct Companions {
 
 impl Default for Appearance {
     fn default() -> Self {
-        Self { theme: "auto".into(), motion: "full".into(), companions: Companions::default() }
+        Self {
+            theme: "auto".into(),
+            motion: "full".into(),
+            companions: Companions::default(),
+            scale: 1.0,
+            snap_to_edge: false,
+        }
     }
 }
 
@@ -146,6 +171,17 @@ mod tests {
         assert_eq!(s.appearance.motion, "full");
         assert!(s.appearance.companions.gwen && !s.appearance.companions.amumu);
         assert_eq!(s.appearance.companions.placement, "corners");
+        assert_eq!(s.appearance.scale, 1.0);
+        assert!(!s.appearance.snap_to_edge);
+    }
+
+    #[test]
+    fn zoom_is_clamped() {
+        let zoom = |scale| Appearance { scale, ..Appearance::default() }.zoom();
+        assert_eq!(zoom(1.25), 1.25);
+        assert_eq!(zoom(9.0), SCALE_MAX);
+        assert_eq!(zoom(0.1), SCALE_MIN);
+        assert_eq!(zoom(f64::NAN), 1.0);
     }
 
     #[test]

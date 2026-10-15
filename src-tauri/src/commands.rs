@@ -33,6 +33,11 @@ pub fn set_appearance(app: AppHandle, appearance: Appearance) {
 }
 
 #[tauri::command]
+pub fn reset_position(app: AppHandle) {
+    overlay::reset_position(&app);
+}
+
+#[tauri::command]
 pub fn fit_content(app: AppHandle, height: f64) {
     overlay::fit_content(&app, height);
 }

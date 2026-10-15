@@ -4,7 +4,7 @@
 //! The window never takes keyboard focus (`WS_EX_NOACTIVATE`), so the game/client keeps
 //! receiving input even while the overlay is shown or clicked.
 
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::time::Duration;
 
 use serde::Serialize;
@@ -77,6 +77,11 @@ pub struct OverlayState {
     /// Last position we set ourselves, to tell user drags apart from our own moves.
     #[serde(skip)]
     last_applied: Option<(i32, i32)>,
+    /// Webview zoom from the Appearance "Scale" setting.
+    #[serde(skip)]
+    zoom: f64,
+    #[serde(skip)]
+    snap_to_edge: bool,
 }
 
 impl OverlayState {
@@ -91,6 +96,8 @@ impl OverlayState {
             visible_override: None,
             content_height: 220.0,
             last_applied: None,
+            zoom: settings.appearance.zoom(),
+            snap_to_edge: settings.appearance.snap_to_edge,
         }
     }
 
@@ -118,8 +125,9 @@ fn emit_state(app: &AppHandle) {
 pub fn init(app: &AppHandle) {
     let Some(win) = window(app) else { return };
     win_native::make_non_activating(&win);
-    let interactive = with_overlay(app, |o| o.interactive);
+    let (interactive, zoom) = with_overlay(app, |o| (o.interactive, o.zoom));
     set_click_through(&win, !interactive);
+    let _ = win.set_zoom(zoom);
 
     let handle = app.clone();
     win.on_window_event(move |event| {
@@ -181,8 +189,44 @@ pub fn fit_content(app: &AppHandle, height: f64) {
         changed && o.mode != Mode::ChampSelect
     });
     if changed {
-        apply_geometry(app);
+        // Content grew or shrank because of new game data: resize where the panel is now.
+        // Moving it back to the saved position here used to undo drags in progress.
+        apply_geometry(app, Placement::KeepInPlace);
     }
+}
+
+/// Appearance changed: apply the zoom and edge snapping.
+pub fn set_layout(app: &AppHandle, zoom: f64, snap_to_edge: bool) {
+    let zoom_changed = with_overlay(app, |o| {
+        o.snap_to_edge = snap_to_edge;
+        let changed = (o.zoom - zoom).abs() > f64::EPSILON;
+        o.zoom = zoom;
+        changed
+    });
+    if !zoom_changed {
+        return;
+    }
+    if let Some(win) = window(app) {
+        let _ = win.set_zoom(zoom);
+    }
+    apply_geometry(app, Placement::KeepInPlace);
+}
+
+/// Forgets the saved position of the current mode and puts the panel back at its default spot.
+pub fn reset_position(app: &AppHandle) {
+    let mode = with_overlay(app, |o| o.mode);
+    let settings = {
+        let state = app.state::<AppState>();
+        let mut s = state.settings.lock().unwrap();
+        s.positions.remove(mode.key());
+        if mode == Mode::InGame {
+            s.dock = Edge::Right;
+        }
+        s.clone()
+    };
+    with_overlay(app, |o| o.dock = settings.dock);
+    settings::save(app, &settings);
+    reveal(app);
 }
 
 /// Applies visibility + placement for the current mode and emits the overlay state.
@@ -193,7 +237,7 @@ fn apply(app: &AppHandle) {
     });
     if let Some(win) = window(app) {
         if visible {
-            apply_geometry(app);
+            apply_geometry(app, Placement::Restore);
             win_native::show_without_activating(&win);
             // Showing can reset tao's style bits; re-assert ours.
             win_native::make_non_activating(&win);
@@ -240,49 +284,82 @@ fn primary_point(win: &WebviewWindow) -> (i32, i32) {
         .unwrap_or((0, 0))
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Placement {
+    /// Mode change / show: go to the saved position for the mode (or its default).
+    Restore,
+    /// Content or zoom change: resize where the window is now.
+    KeepInPlace,
+}
+
 /// Size + position for the current mode, clamped to the target monitor, DPI-aware.
-fn apply_geometry(app: &AppHandle) {
+fn apply_geometry(app: &AppHandle, placement: Placement) {
     let Some(win) = window(app) else { return };
-    let (mode, content_height, dock) = with_overlay(app, |o| (o.mode, o.content_height, o.dock));
+    let (mode, content_height, dock, zoom, snap) =
+        with_overlay(app, |o| (o.mode, o.content_height, o.dock, o.zoom, o.snap_to_edge));
     let saved = app.state::<AppState>().settings.lock().unwrap().positions.get(mode.key()).copied();
+    let current = match (win.outer_position(), win.outer_size()) {
+        (Ok(p), Ok(s)) => Some(Rect { x: p.x, y: p.y, w: s.width as i32, h: s.height as i32 }),
+        _ => None,
+    };
+    let in_place = if placement == Placement::KeepInPlace { current } else { None };
 
     let mons = monitors(&win);
     let works: Vec<Rect> = mons.iter().map(|m| m.work).collect();
-    let anchor = saved.map(|p| (p.x, p.y)).unwrap_or_else(|| primary_point(&win));
+    let anchor = match (in_place, saved) {
+        (Some(r), _) => (r.x + r.w / 2, r.y + r.h / 2),
+        (None, Some(p)) => (p.x, p.y),
+        (None, None) => primary_point(&win),
+    };
     let Some(idx) = geometry::pick_monitor(&works, anchor.0, anchor.1) else { return };
     let MonitorInfo { work, scale } = mons[idx];
 
+    // Content height is reported in CSS px; the webview zoom scales those up.
     let work_h_logical = work.h as f64 / scale;
     let max_h = work_h_logical - 2.0 * MARGIN as f64 / scale;
     let (lw, lh) = match mode {
-        Mode::ChampSelect => (CHAMP_SELECT_WIDTH, CHAMP_SELECT_MAX_HEIGHT.min(max_h)),
-        _ => (COMPACT_WIDTH, content_height.clamp(MIN_HEIGHT, max_h)),
+        Mode::ChampSelect => (CHAMP_SELECT_WIDTH * zoom, (CHAMP_SELECT_MAX_HEIGHT * zoom).min(max_h)),
+        _ => (COMPACT_WIDTH * zoom, (content_height * zoom).clamp(MIN_HEIGHT, max_h)),
     };
     let (w, h) = ((lw * scale).round() as i32, (lh * scale).round() as i32);
 
-    let (x, y) = match (saved, mode) {
-        (Some(p), Mode::InGame) => (geometry::docked_x(dock, w, work), p.y),
-        (Some(p), _) => (p.x, p.y),
-        (None, Mode::ChampSelect) => (geometry::docked_x(Edge::Right, w, work), work.y + (work.h - h) / 2),
-        (None, Mode::InGame) => (geometry::docked_x(dock, w, work), work.y + work.h / 5),
-        (None, _) => (geometry::docked_x(Edge::Right, w, work), work.y + MARGIN),
+    if in_place.is_some() && MOVE_PENDING.load(Ordering::SeqCst) {
+        // Mid-drag: only resize, never pull the window away from the cursor, and leave
+        // `last_applied` alone so the drag is still saved once it settles.
+        let _ = win.set_size(PhysicalSize::new(w as u32, h as u32));
+        return;
+    }
+
+    let (x, y) = match (in_place, saved, mode) {
+        (Some(r), _, _) => geometry::resize_in_place(r, w, h, work),
+        (None, Some(p), Mode::InGame) if snap => (geometry::docked_x(dock, w, work), p.y),
+        (None, Some(p), _) => (p.x, p.y),
+        (None, None, Mode::ChampSelect) => (geometry::docked_x(Edge::Right, w, work), work.y + (work.h - h) / 2),
+        (None, None, Mode::InGame) => (geometry::docked_x(dock, w, work), work.y + work.h / 5),
+        (None, None, _) => (geometry::docked_x(Edge::Right, w, work), work.y + MARGIN),
     };
     let (x, y) = geometry::clamp(x, y, w, h, work);
 
+    if current == Some(Rect { x, y, w, h }) {
+        return;
+    }
     with_overlay(app, |o| o.last_applied = Some((x, y)));
-    let _ = win.set_size(PhysicalSize::new(w as u32, h as u32));
-    let _ = win.set_position(PhysicalPosition::new(x, y));
+    win_native::set_bounds(&win, x, y, w, h);
 }
 
 static MOVE_GENERATION: AtomicU64 = AtomicU64::new(0);
+/// A `Moved` stream is in progress (the user is probably dragging).
+static MOVE_PENDING: AtomicBool = AtomicBool::new(false);
 
 /// Windows emits a stream of `Moved` events while dragging; act once it has been quiet.
 fn schedule_move_settled(app: &AppHandle) {
+    MOVE_PENDING.store(true, Ordering::SeqCst);
     let generation = MOVE_GENERATION.fetch_add(1, Ordering::SeqCst) + 1;
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
         tokio::time::sleep(Duration::from_millis(350)).await;
         if MOVE_GENERATION.load(Ordering::SeqCst) == generation {
+            MOVE_PENDING.store(false, Ordering::SeqCst);
             on_user_moved(&app);
         }
     });
@@ -301,7 +378,7 @@ fn on_user_moved(app: &AppHandle) {
     let work = works[idx];
 
     let mut x = pos.x;
-    if mode == Mode::InGame {
+    if mode == Mode::InGame && with_overlay(app, |o| o.snap_to_edge) {
         let edge = geometry::nearest_edge(pos.x, w, work);
         with_overlay(app, |o| o.dock = edge);
         x = geometry::docked_x(edge, w, work);
@@ -341,7 +418,7 @@ mod win_native {
     use windows_sys::Win32::Foundation::HWND;
     use windows_sys::Win32::UI::WindowsAndMessaging::{
         GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, ShowWindow, GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE,
-        SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_LAYERED,
+        SWP_FRAMECHANGED, SWP_NOMOVE, SWP_NOSIZE, SWP_NOZORDER, SWP_SHOWWINDOW, SW_HIDE, SW_SHOWNOACTIVATE, WS_EX_LAYERED,
         WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TRANSPARENT,
     };
 
@@ -395,6 +472,14 @@ mod win_native {
         }
     }
 
+    /// Move + resize in one call, so growing upwards does not flash the panel one frame lower.
+    pub fn set_bounds(win: &WebviewWindow, x: i32, y: i32, w: i32, h: i32) {
+        let Some(h_wnd) = hwnd(win) else { return };
+        unsafe {
+            SetWindowPos(h_wnd, std::ptr::null_mut(), x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+        }
+    }
+
     /// Must mirror `show_without_activating`: tao never learned the window was shown, so its
     /// own `hide()` would be a no-op.
     pub fn hide(win: &WebviewWindow) {
@@ -417,6 +502,10 @@ mod win_native {
     }
     pub fn hide(win: &WebviewWindow) {
         let _ = win.hide();
+    }
+    pub fn set_bounds(win: &WebviewWindow, x: i32, y: i32, w: i32, h: i32) {
+        let _ = win.set_size(tauri::PhysicalSize::new(w as u32, h as u32));
+        let _ = win.set_position(tauri::PhysicalPosition::new(x, y));
     }
 }
 

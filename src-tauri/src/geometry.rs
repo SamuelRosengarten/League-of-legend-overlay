@@ -74,9 +74,36 @@ pub fn docked_x(edge: Edge, w: i32, work: Rect) -> i32 {
     }
 }
 
+/// New top-left for a window at `old` resized to `w`×`h` without the user moving it.
+///
+/// The side closest to a screen edge stays put, so the panel grows away from the corner it
+/// lives in: a panel in the bottom half grows upwards, one in the right half grows to the left.
+pub fn resize_in_place(old: Rect, w: i32, h: i32, work: Rect) -> (i32, i32) {
+    let in_right_half = old.x + old.w / 2 > work.x + work.w / 2;
+    let in_bottom_half = old.y + old.h / 2 > work.y + work.h / 2;
+    let x = if in_right_half { old.right() - w } else { old.x };
+    let y = if in_bottom_half { old.bottom() - h } else { old.y };
+    clamp(x, y, w, h, work)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn resizes_away_from_the_nearest_corner() {
+        // Top-left panel: top-left corner stays.
+        let tl = Rect { x: 100, y: 100, w: 320, h: 200 };
+        assert_eq!(resize_in_place(tl, 320, 400, MAIN), (100, 100));
+        // Bottom-right panel: bottom-right corner stays, so it grows up and left.
+        let br = Rect { x: 1500, y: 700, w: 320, h: 200 };
+        assert_eq!(resize_in_place(br, 400, 300, MAIN), (1500 + 320 - 400, 700 + 200 - 300));
+        // Shrinking keeps the same corner.
+        assert_eq!(resize_in_place(br, 320, 100, MAIN), (1500, 800));
+        // Growth past the work area is still clamped.
+        let low = Rect { x: 100, y: 900, w: 320, h: 100 };
+        assert_eq!(resize_in_place(low, 320, 2000, MAIN), (100, MARGIN));
+    }
 
     const MAIN: Rect = Rect { x: 0, y: 0, w: 1920, h: 1040 };
     const SIDE: Rect = Rect { x: 1920, y: 0, w: 2560, h: 1400 };

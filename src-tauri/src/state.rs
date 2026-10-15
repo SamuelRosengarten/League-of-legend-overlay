@@ -157,6 +157,7 @@ pub fn mark_rank_cached(app: &AppHandle) {
 }
 
 pub fn set_appearance(app: &AppHandle, appearance: Appearance) {
+    crate::overlay::set_layout(app, appearance.zoom(), appearance.snap_to_edge);
     if update(app, events::APPEARANCE, |s| &mut s.appearance, appearance.clone()) {
         let state = app.state::<AppState>();
         let saved = {

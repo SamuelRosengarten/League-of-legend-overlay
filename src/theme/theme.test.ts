@@ -51,8 +51,21 @@ describe("rank themes", () => {
 
 describe("appearance settings", () => {
   it("repairs hand-edited or partial settings", () => {
-    const a = normalizeAppearance({ theme: "mithril", motion: "wild", companions: { gwen: true, amumu: false, placement: "??", size: 9, inGame: false } });
-    expect(a).toEqual({ theme: "auto", motion: "full", companions: { gwen: true, amumu: false, placement: "corners", size: 1.4, inGame: false } });
+    const a = normalizeAppearance({
+      theme: "mithril",
+      motion: "wild",
+      companions: { gwen: true, amumu: false, placement: "??", size: 9, inGame: false },
+      scale: 3,
+      snapToEdge: true,
+    });
+    expect(a).toEqual({
+      theme: "auto",
+      motion: "full",
+      companions: { gwen: true, amumu: false, placement: "corners", size: 1.4, inGame: false },
+      scale: 1.5,
+      snapToEdge: true,
+    });
+    expect(normalizeAppearance({ scale: Number.NaN }).scale).toBe(1);
     expect(normalizeAppearance(null)).toEqual(DEFAULT_APPEARANCE);
   });
 

@@ -116,6 +116,10 @@ export interface Appearance {
   theme: string;
   motion: string;
   companions: CompanionSettings;
+  /** Overlay zoom, SCALE_MIN – SCALE_MAX (src/theme/appearance.ts). */
+  scale: number;
+  /** In game, snap the panel to the nearest left/right edge after a drag. */
+  snapToEdge: boolean;
 }
 
 export interface Snapshot {

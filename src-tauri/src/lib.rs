@@ -48,14 +48,18 @@ fn register_hotkeys(app: &AppHandle, hotkeys: &Hotkeys) {
     };
     for shortcut in [&ids.visibility, &ids.interactive].into_iter().flatten() {
         // RegisterHotKey under the hood — not a keyboard hook.
-        if let Err(e) = app.global_shortcut().register(*shortcut) {
-            log::warn!("could not register hotkey {shortcut:?}: {e}");
+        match app.global_shortcut().register(*shortcut) {
+            Ok(()) => log::info!("hotkey registered: {}", shortcut.into_string()),
+            // Usually another app (or a second copy) already owns the combination.
+            Err(e) => log::warn!("could not register hotkey {}: {e}", shortcut.into_string()),
         }
     }
     app.manage(ids);
 }
 
 fn on_hotkey(app: &AppHandle, shortcut: &Shortcut) {
+    // If a press in game never shows up here, Windows did not deliver it to us (see README).
+    log::info!("hotkey pressed: {}", shortcut.into_string());
     let ids = app.state::<HotkeyIds>();
     if ids.visibility.as_ref() == Some(shortcut) {
         overlay::toggle_visibility(app);
@@ -68,12 +72,14 @@ fn build_tray(app: &AppHandle, hotkeys: &Hotkeys) -> tauri::Result<()> {
     let toggle = MenuItem::with_id(app, "toggle", format!("Show / hide ({})", hotkeys.toggle_visibility), true, None::<&str>)?;
     let interactive =
         MenuItem::with_id(app, "interactive", format!("Interactive mode ({})", hotkeys.toggle_interactive), true, None::<&str>)?;
+    let reset = MenuItem::with_id(app, "reset-position", "Reset position", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Quit Rift Advisor", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&toggle, &interactive, &quit])?;
+    let menu = Menu::with_items(app, &[&toggle, &interactive, &reset, &quit])?;
     let mut tray = TrayIconBuilder::with_id("main").tooltip("Rift Advisor").menu(&menu).on_menu_event(|app, event| {
         match event.id.as_ref() {
             "toggle" => overlay::toggle_visibility(app),
             "interactive" => overlay::toggle_interactive(app),
+            "reset-position" => overlay::reset_position(app),
             "quit" => app.exit(0),
             _ => {}
         }
@@ -115,6 +121,7 @@ pub fn run() {
             commands::set_interactive,
             commands::toggle_visibility,
             commands::fit_content,
+            commands::reset_position,
             commands::set_appearance,
             commands::mock_status,
             commands::mock_load,

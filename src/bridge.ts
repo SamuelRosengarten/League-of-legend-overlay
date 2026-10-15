@@ -35,6 +35,7 @@ export const backend = {
   setInteractive: (interactive: boolean) => invoke<void>("set_interactive", { interactive }),
   toggleVisibility: () => invoke<void>("toggle_visibility"),
   fitContent: (height: number) => invoke<void>("fit_content", { height }),
+  resetPosition: () => invoke<void>("reset_position"),
   setAppearance: (appearance: Appearance) => invoke<void>("set_appearance", { appearance }),
   mock: {
     status: () => invoke<MockStatus>("mock_status"),

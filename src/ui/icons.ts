@@ -12,6 +12,7 @@ const PATHS = {
   plug: "M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0Zm5.5 8.5V21",
   sword: "M14.5 3.5H20v5.5L9 20l-5-5Z M4 20l3-3",
   clock: "M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z",
+  refresh: "M20 12a8 8 0 1 1-2.3-5.7M20 4v4.5h-4.5",
 } as const;
 
 export type IconName = keyof typeof PATHS;
