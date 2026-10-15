@@ -79,6 +79,31 @@ function ribbonEl(s: Sprite, p: Placed): SVGSVGElement {
   return svg;
 }
 
+/** Side pose: strap height as a fraction of the sprite height (Gwen's waist, Amumu's arm, clear of his eyes). */
+const STRAP_Y: Record<CompanionId, number> = { gwen: 0.46, amumu: 0.62 };
+
+/**
+ * Docked to the client: the sprite leans over the panel's frame (the layer is drawn above the
+ * panel) and a ribbon / bandage strap ties it to the border.
+ */
+function sideEl(s: Sprite, p: Placed, root: HTMLElement): HTMLElement {
+  const inner = el("div", "companion-inner");
+  // The border runs `overlap` px into the box, from the panel's side.
+  const strap = el("i", "strap", {
+    top: `${Math.round(p.spriteHeight * STRAP_Y[p.who])}px`,
+    [p.spot.flip ? "right" : "left"]: `${p.overlap - 8}px`,
+    "--strap": s.ribbon.color,
+    "--strap-edge": s.ribbon.edge,
+  });
+  const bx = p.spot.flip ? 1 - s.bubble.x : s.bubble.x;
+  inner.append(spriteEl(s, p.spriteHeight, 0), strap, el("span", "bubble", { left: pct(bx), top: `${s.bubble.y * p.spriteHeight}px` }));
+  root.style.setProperty("--grip", `${p.overlap}px`);
+  root.style.setProperty("--strap-y", pct(STRAP_Y[p.who]));
+  root.style.top = `calc(${((p.spot.y ?? 0.5) * 100).toFixed(1)}% - ${p.height}px)`;
+  root.append(inner);
+  return root;
+}
+
 function companionEl(p: Placed): HTMLElement {
   const s = SPRITES[p.who];
   const root = el("div", `companion companion-${p.who} pose-${p.spot.pose}${p.spot.flip ? " flip" : ""}`, {
@@ -89,15 +114,10 @@ function companionEl(p: Placed): HTMLElement {
     "--sync": `-${Math.round(performance.now() % 24000)}ms`,
     "--hang-x": pct(p.spot.flip ? 1 - s.hangAt.x : s.hangAt.x),
   });
-  // Border line: top border = --gutter-top; bottom border = bottom of the panel; side = a
-  // ledge at a fraction of the window height, reaching back to the panel's right border.
+  if (p.spot.pose === "side") return sideEl(s, p, root);
+  // Border line: top border = --gutter-top; bottom border = bottom of the panel.
   if (p.spot.pose === "hang") root.style.bottom = `calc(var(--gutter-bottom) - ${p.height}px)`;
-  else if (p.spot.pose === "side") {
-    root.style.top = `calc(${((p.spot.y ?? 0.5) * 100).toFixed(1)}% - ${p.height}px)`;
-    // Gap between the panel's right border and this companion's box.
-    const gutter = p.spot.flip ? "var(--gutter-left)" : "var(--gutter-right)";
-    root.style.setProperty("--ledge", `calc((${gutter} - ${p.width}px) / 2)`);
-  } else root.style.top = `calc(var(--gutter-top) - ${p.seat}px)`;
+  else root.style.top = `calc(var(--gutter-top) - ${p.seat}px)`;
 
   const inner = el("div", "companion-inner");
   if (p.spot.pose === "hang") inner.append(ribbonEl(s, p));

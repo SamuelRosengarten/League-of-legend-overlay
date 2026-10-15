@@ -77,7 +77,7 @@ The overlay switches mode automatically from the gameflow phase:
 
 ### Docked to the client: your stats
 
-Between games the panel sticks to the side of the League client window: right next to it, exactly as tall, following it when you move or resize it. It uses the right side, or the left if there is no room on the right (shrinking to fit before it would ever cover the client), and it only shows while the client is the active window, so it never floats over other apps. Gwen and Amumu stand on ledges off the panel's outer border.
+Between games the panel sticks to the side of the League client window: right next to it, exactly as tall, following it when you move or resize it. It uses the right side, or the left if there is no room on the right (shrinking to fit before it would ever cover the client), and it only shows while the client is the active window, so it never floats over other apps. Gwen and Amumu cling to the panel's outer border: they lean over its frame, tied on by Gwen's ribbon and Amumu's bandage, and sway from the knot. If the client is minimized the panel hides with it.
 
 - **Last game:** result, queue, length, K/D/A, KDA, CS/min and damage/min, with arrows comparing each number to your other games on that champion.
 - **Gwen and Amumu:** wins/losses, win rate, a win/loss strip, average K/D/A, KDA, CS/min, damage/min and mastery level.

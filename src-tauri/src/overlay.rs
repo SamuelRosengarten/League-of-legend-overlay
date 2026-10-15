@@ -100,6 +100,9 @@ pub struct OverlayState {
     /// The client (or this overlay) is the active window.
     #[serde(skip)]
     client_foreground: bool,
+    /// The client window exists but is minimized: stay docked (and hidden), don't float.
+    #[serde(skip)]
+    client_minimized: bool,
 }
 
 /// A rectangle in CSS px, relative to the window's top-left corner.
@@ -129,6 +132,7 @@ impl OverlayState {
             dock_to_client: settings.appearance.dock_to_client,
             client: None,
             client_foreground: false,
+            client_minimized: false,
             docked: false,
             docked_left: false,
         }
@@ -146,7 +150,7 @@ impl OverlayState {
     }
 
     fn should_dock(&self) -> bool {
-        self.dock_to_client && self.mode == Mode::Idle && self.client.is_some()
+        self.dock_to_client && self.mode == Mode::Idle && (self.client.is_some() || self.client_minimized)
     }
 }
 
@@ -335,19 +339,27 @@ pub fn set_layout(app: &AppHandle, zoom: f64, snap_to_edge: bool, dock_to_client
 /// Tracks the League client window for docking; re-applies when it moves, resizes, is
 /// minimized/restored or gains/loses focus.
 fn track_client(app: &AppHandle) {
-    let (dock, prev, prev_fg) = with_overlay(app, |o| (o.dock_to_client, o.client, o.client_foreground));
-    let found = if dock { win_native::client_window(window(app).as_ref()) } else { None };
-    let (client, fg) = match found {
-        Some((r, fg)) => (Some(r), fg),
-        None => (None, false),
+    let (dock, prev) = with_overlay(app, |o| (o.dock_to_client, (o.client, o.client_foreground, o.client_minimized)));
+    let found = if dock { win_native::client_window(window(app).as_ref()) } else { ClientWindow::Missing };
+    let now = match found {
+        ClientWindow::Shown(r, fg) => (Some(r), fg, false),
+        ClientWindow::Minimized => (None, false, true),
+        ClientWindow::Missing => (None, false, false),
     };
-    if client != prev || fg != prev_fg {
-        with_overlay(app, |o| {
-            o.client = client;
-            o.client_foreground = fg;
-        });
+    if now != prev {
+        log::debug!("league client window: {found:?}");
+        with_overlay(app, |o| (o.client, o.client_foreground, o.client_minimized) = now);
         apply(app);
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ClientWindow {
+    /// No League client window (client closed, or only the Riot Client is open).
+    Missing,
+    Minimized,
+    /// Its rect, and whether it (or the overlay) is the active window.
+    Shown(Rect, bool),
 }
 
 /// Forgets the saved position of the current mode and puts the panel back at its default spot.
@@ -514,6 +526,7 @@ fn dock_to_client(app: &AppHandle, win: &WebviewWindow, client: Rect, zoom: f64)
     if current == Some(target) {
         return;
     }
+    log::debug!("docked {} of the client: {target:?}", if left { "left" } else { "right" });
     with_overlay(app, |o| o.last_applied = Some((target.x, target.y)));
     win_native::set_bounds(win, target.x, target.y, target.w, target.h);
 }
@@ -592,6 +605,7 @@ fn set_click_through(win: &WebviewWindow, ignore: bool) {
 #[cfg(windows)]
 mod win_native {
     use tauri::WebviewWindow;
+    use super::ClientWindow;
     use crate::geometry::Rect;
     use windows_sys::Win32::Foundation::{HWND, POINT, RECT};
     use windows_sys::Win32::UI::WindowsAndMessaging::{
@@ -655,22 +669,25 @@ mod win_native {
         (unsafe { GetCursorPos(&mut p) } != 0).then_some((p.x, p.y))
     }
 
-    /// The League client's main window (`RCLIENT`, owned by LeagueClientUx.exe) when it is
-    /// shown and not minimized, and whether it (or `own`, the overlay) is the active window.
-    pub fn client_window(own: Option<&WebviewWindow>) -> Option<(Rect, bool)> {
+    /// The League client's main window (`RCLIENT`, owned by LeagueClientUx.exe), and whether
+    /// it (or `own`, the overlay) is the active window.
+    pub fn client_window(own: Option<&WebviewWindow>) -> ClientWindow {
         let class: Vec<u16> = "RCLIENT\0".encode_utf16().collect();
         unsafe {
             let h = FindWindowW(class.as_ptr(), std::ptr::null());
-            if h.is_null() || IsWindowVisible(h) == 0 || IsIconic(h) != 0 {
-                return None;
+            if h.is_null() || IsWindowVisible(h) == 0 {
+                return ClientWindow::Missing;
+            }
+            if IsIconic(h) != 0 {
+                return ClientWindow::Minimized;
             }
             let mut r = RECT { left: 0, top: 0, right: 0, bottom: 0 };
             if GetWindowRect(h, &mut r) == 0 {
-                return None;
+                return ClientWindow::Missing;
             }
             let fg = GetForegroundWindow();
             let foreground = fg == h || own.and_then(hwnd).is_some_and(|o| o == fg);
-            Some((Rect { x: r.left, y: r.top, w: r.right - r.left, h: r.bottom - r.top }, foreground))
+            ClientWindow::Shown(Rect { x: r.left, y: r.top, w: r.right - r.left, h: r.bottom - r.top }, foreground)
         }
     }
 
@@ -708,8 +725,8 @@ mod win_native {
     pub fn cursor_pos() -> Option<(i32, i32)> {
         None
     }
-    pub fn client_window(_own: Option<&WebviewWindow>) -> Option<(crate::geometry::Rect, bool)> {
-        None
+    pub fn client_window(_own: Option<&WebviewWindow>) -> super::ClientWindow {
+        super::ClientWindow::Missing
     }
     pub fn set_bounds(win: &WebviewWindow, x: i32, y: i32, w: i32, h: i32) {
         let _ = win.set_size(tauri::PhysicalSize::new(w as u32, h as u32));

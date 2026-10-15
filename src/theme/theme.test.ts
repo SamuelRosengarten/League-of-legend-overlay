@@ -100,7 +100,9 @@ describe("companion layout", () => {
     expect([d.gutterTop, d.gutterBottom]).toEqual([0, 0]);
     expect(d.gutterRight).toBeGreaterThan(0);
     for (const p of d.placed) {
-      expect(p.left).toBeGreaterThanOrEqual(410 - d.gutterRight);
+      // Clinging: part of the sprite leans over the panel's border, the rest is in the gutter.
+      expect(p.overlap).toBeGreaterThan(0);
+      expect(p.left + p.overlap).toBe(410 - d.gutterRight);
       expect(p.left + p.width).toBeLessThanOrEqual(410);
     }
     expect(layoutCompanions({ ...settings, gwen: false, amumu: false }, 410, { compact: false, docked: true }).gutterRight).toBe(0);
@@ -110,7 +112,8 @@ describe("companion layout", () => {
     expect([l.gutterLeft, l.gutterRight]).toEqual([d.gutterRight, 0]);
     for (const p of l.placed) {
       expect(p.spot.flip).toBe(true);
-      expect(p.left + p.width).toBeLessThanOrEqual(l.gutterLeft);
+      expect(p.left).toBeGreaterThanOrEqual(0);
+      expect(p.left + p.width - p.overlap).toBe(l.gutterLeft);
     }
   });
 

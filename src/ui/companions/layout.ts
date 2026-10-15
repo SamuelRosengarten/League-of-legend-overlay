@@ -82,9 +82,15 @@ const DOCKED_SPOTS_LEFT: Record<CompanionId, Spot> = {
   gwen: { ...DOCKED_SPOTS.gwen, flip: true },
   amumu: { ...DOCKED_SPOTS.amumu, flip: true },
 };
-const DOCKED_SCALE = 0.72;
+const DOCKED_SCALE = 0.85;
 /** The docked window shrinks to the space beside the client; the gutter never takes more. */
 const DOCKED_MAX_GUTTER = 0.2;
+/**
+ * Share of each docked sprite's width that leans over the panel's frame, measured on the art:
+ * at strap height Gwen's body starts 23% in (her hair is wider), Amumu's bandaged arm reaches
+ * the edge. So Gwen's hair crosses the border and her body touches it; Amumu's arm crosses it.
+ */
+const DOCKED_GRIP: Record<CompanionId, number> = { gwen: 0.2, amumu: 0.12 };
 
 export const DEFAULT_PRESET = "corners";
 export const SIZE_MIN = 0.7;
@@ -107,6 +113,8 @@ export interface Placed {
   seat: number;
   /** Hanging: ribbon length above the sprite. */
   ribbon: number;
+  /** Side pose: sprite px leaning over the panel's frame (past its outer border). */
+  overlap: number;
 }
 
 export interface Layout {
@@ -162,7 +170,7 @@ export function layoutCompanions(
       ribbon = Math.round(RIBBON * size);
       height = ribbon + spriteHeight;
     }
-    placed.push({ who, spot, width, height, left, spriteHeight, seat, ribbon });
+    placed.push({ who, spot, width, height, left, spriteHeight, seat, ribbon, overlap: 0 });
   }
   const gutterTop = Math.max(0, ...placed.filter((p) => p.spot.pose !== "hang").map((p) => p.seat));
   const gutterBottom = Math.max(0, ...placed.filter((p) => p.spot.pose === "hang").map((p) => p.height));
@@ -175,24 +183,28 @@ function layoutDocked(settings: CompanionSettings, windowWidth: number, onLeft: 
   // Widest sprite at this size, then shrink everyone if that would eat too much of the panel.
   const widthAt = (who: CompanionId, s: number) => (SPRITES[who].baseHeight * s * SPRITES[who].width) / SPRITES[who].height;
   const widest = Math.max(0, ...enabled.map((who) => widthAt(who, size)));
-  const fit = widest ? Math.min(1, (windowWidth * DOCKED_MAX_GUTTER - 10) / widest) : 1;
+  const fit = widest ? Math.min(1, (windowWidth * DOCKED_MAX_GUTTER - 4) / (widest * (1 - Math.min(...enabled.map((w) => DOCKED_GRIP[w]))))) : 1;
   const sized = enabled.map((who) => {
     const sprite = SPRITES[who];
     const spriteHeight = Math.round(sprite.baseHeight * size * fit);
     return { who, spriteHeight, width: Math.round((spriteHeight * sprite.width) / sprite.height) };
   });
   if (!sized.length) return { placed: [], gutterTop: 0, gutterBottom: 0, gutterRight: 0, gutterLeft: 0 };
-  const gutter = Math.max(...sized.map((s) => s.width)) + 10;
-  const placed = sized.map(({ who, spriteHeight, width }) => ({
+  // Each one leans over the frame (drawn on top of it), so they cling to the panel instead of
+  // floating beside it; the gutter only holds the part outside the border.
+  const gripped = sized.map((s) => ({ ...s, overlap: Math.round(s.width * DOCKED_GRIP[s.who]) }));
+  const gutter = Math.max(...gripped.map((s) => s.width - s.overlap)) + 4;
+  const placed = gripped.map(({ who, spriteHeight, width, overlap }) => ({
     who,
     spot: (onLeft ? DOCKED_SPOTS_LEFT : DOCKED_SPOTS)[who],
     width,
     height: spriteHeight,
-    // Centered in the gutter beside the panel's outer border.
-    left: (onLeft ? 0 : windowWidth - gutter) + Math.round((gutter - width) / 2),
+    // `overlap` px of the sprite sit over the panel, the rest in the gutter.
+    left: onLeft ? gutter + overlap - width : windowWidth - gutter - overlap,
     spriteHeight,
     seat: spriteHeight,
     ribbon: 0,
+    overlap,
   }));
   return { placed, gutterTop: 0, gutterBottom: 0, gutterRight: onLeft ? 0 : gutter, gutterLeft: onLeft ? gutter : 0 };
 }
