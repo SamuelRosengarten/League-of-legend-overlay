@@ -36,7 +36,7 @@ export const PRESETS: PlacementPreset[] = [
     id: "top",
     label: "Top border",
     description: "Gwen and Amumu on the top border, with Fiddlesticks lurking at the end.",
-    spots: { gwen: { pose: "perch", x: 0.15 }, amumu: { pose: "perch", x: 0.5 }, fiddlesticks: { pose: "perch", x: 0.85 } },
+    spots: { gwen: { pose: "perch", x: 0.15 }, amumu: { pose: "perch", x: 0.5, flip: true }, fiddlesticks: { pose: "perch", x: 0.85 } },
   },
   {
     id: "bottom",
@@ -48,7 +48,7 @@ export const PRESETS: PlacementPreset[] = [
     id: "left",
     label: "Left corner",
     description: "Side by side on the top-left of the frame.",
-    spots: { gwen: { pose: "perch", x: 0.13 }, amumu: { pose: "perch", x: 0.36 }, fiddlesticks: { pose: "perch", x: 0.58 } },
+    spots: { gwen: { pose: "perch", x: 0.13 }, amumu: { pose: "perch", x: 0.36, flip: true }, fiddlesticks: { pose: "perch", x: 0.58 } },
   },
   {
     id: "right",

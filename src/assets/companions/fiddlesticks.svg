@@ -76,22 +76,24 @@
   <path d="M 244 94 q -7 6 -3 18 q 9 -5 3 -18 z" fill="#17131d" stroke="#09070d" stroke-width="1.2"/>
   <path d="M 238 80 L 236 92" stroke="#3a2d28" stroke-width="1.2"/>
   <ellipse cx="236" cy="97" rx="3.2" ry="4.6" fill="#d9d0b8" stroke="#5a4a38" stroke-width="1"/>
-  <!-- ============ legs ============ -->
-  <g>
-    <path d="M 122 384 l -4 44 l 9 0 l 5 -44 z" fill="url(#wood)" stroke="#150d07" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 160 384 l 4 44 l 9 0 l -4 -44 z" fill="url(#wood)" stroke="#150d07" stroke-width="2" stroke-linejoin="round"/>
-    <circle cx="124" cy="404" r="4.6" fill="url(#wood)" stroke="#150d07" stroke-width="1.6"/>
-    <circle cx="166" cy="404" r="4.6" fill="url(#wood)" stroke="#150d07" stroke-width="1.6"/>
-    <path d="M 120 392 l 12 -3 M 161 392 l 11 3" stroke="#c09a64" stroke-width="2.6" stroke-linecap="round"/>
-    <path d="M 122 428 l -18 7 l 12 2 l 6 -3 l 10 3 z M 172 428 l 18 7 l -12 2 l -6 -3 l -10 3 z" fill="#2c1e14" stroke="#0e0804" stroke-width="1.6" stroke-linejoin="round"/>
-    <path d="M 108 435 l -5 3 M 114 438 l -3 3 M 188 435 l 5 3 M 182 438 l 3 3" stroke="#6e6a68" stroke-width="2" stroke-linecap="round"/>
-  </g>
-
-  <!-- knee spikes and splints -->
-  <path d="M 118 404 l -9 -3 l 6 -5 z M 176 404 l 9 -3 l -6 -5 z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.2" stroke-linejoin="round"/>
+  <!-- ============ legL ============ -->
+  <path d="M 122 384 l -4 44 l 9 0 l 5 -44 z" fill="url(#wood)" stroke="#150d07" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="124" cy="404" r="4.6" fill="url(#wood)" stroke="#150d07" stroke-width="1.6"/>
+  <path d="M 120 392 l 12 -3" stroke="#c09a64" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 122 428 l -18 7 l 12 2 l 6 -3 l 10 3 z" fill="#2c1e14" stroke="#0e0804" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M 108 435 l -5 3 M 114 438 l -3 3" stroke="#6e6a68" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 118 404 l -9 -3 l 6 -5 z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.2" stroke-linejoin="round"/>
   <rect x="119" y="412" width="12" height="4" rx="1.5" fill="url(#iron)" stroke="#120b0c" stroke-width="1"/>
+  <g stroke="url(#straw)" stroke-width="3" stroke-linecap="round"><path d="M 120 398 l -9 4 M 124 418 l -6 5"/></g>
+  <!-- ============ legR ============ -->
+  <path d="M 160 384 l 4 44 l 9 0 l -4 -44 z" fill="url(#wood)" stroke="#150d07" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="166" cy="404" r="4.6" fill="url(#wood)" stroke="#150d07" stroke-width="1.6"/>
+  <path d="M 161 392 l 11 3" stroke="#c09a64" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 172 428 l 18 7 l -12 2 l -6 -3 l -10 3 z" fill="#2c1e14" stroke="#0e0804" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M 188 435 l 5 3 M 182 438 l 3 3" stroke="#6e6a68" stroke-width="2" stroke-linecap="round"/>
+  <path d="M 176 404 l 9 -3 l -6 -5 z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.2" stroke-linejoin="round"/>
   <rect x="163" y="412" width="12" height="4" rx="1.5" fill="url(#iron)" stroke="#120b0c" stroke-width="1"/>
-  <g stroke="url(#straw)" stroke-width="3" stroke-linecap="round"><path d="M 120 398 l -9 4 M 174 398 l 9 4 M 124 418 l -6 5"/></g>
+  <g stroke="url(#straw)" stroke-width="3" stroke-linecap="round"><path d="M 174 398 l 9 4"/></g>
   <!-- ============ layered rag cloak ============ -->
   <g filter="url(#fray)">
   <path d="M 96 250 L 190 250 L 198 392 L 184 380 L 174 406 L 158 384 L 144 412 L 130 386 L 116 408 L 100 384 L 82 396 Z" fill="url(#dark)" stroke="#0f0a07" stroke-width="2.4" stroke-linejoin="round"/>

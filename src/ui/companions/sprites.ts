@@ -11,8 +11,11 @@ import fidArmL from "../../assets/companions/fiddlesticks/armL.svg";
 import fidArmR from "../../assets/companions/fiddlesticks/armR.svg";
 import fidBody from "../../assets/companions/fiddlesticks/body.svg";
 import fidHead from "../../assets/companions/fiddlesticks/head.svg";
-import fidLegs from "../../assets/companions/fiddlesticks/legs.svg";
+import fidLegL from "../../assets/companions/fiddlesticks/legL.svg";
+import fidLegR from "../../assets/companions/fiddlesticks/legR.svg";
 import gwenUrl from "../../assets/companions/gwen.png";
+import type { RigDef } from "./mesh-core";
+import { AMUMU_RIG, GWEN_RIG } from "./rigs";
 
 export type CompanionId = "gwen" | "amumu" | "fiddlesticks";
 /** Left-to-right order used for layout and the settings tiles. */
@@ -36,7 +39,7 @@ export interface Eye {
 }
 
 /** A separately animated layer of a sprite (same box as the sprite; rotates around `origin`). */
-export type PartName = "legs" | "body" | "armL" | "armR" | "head";
+export type PartName = "legL" | "legR" | "body" | "armL" | "armR" | "head";
 export interface Part {
   name: PartName;
   url: string;
@@ -50,6 +53,8 @@ export interface Sprite {
   url: string;
   /** Optional animated layers, back to front. The eyelids and eye glow attach to the `head` layer. */
   parts?: Part[];
+  /** Skeleton for the painted art: the picture is bent by bones (see mesh-core.ts) instead of moved flat. */
+  rig?: RigDef;
   /** Natural pixel size of the PNG (aspect ratio). */
   width: number;
   height: number;
@@ -78,6 +83,7 @@ export const SPRITES: Record<CompanionId, Sprite> = {
     id: "gwen",
     name: "Gwen",
     url: gwenUrl,
+    rig: GWEN_RIG,
     width: 414,
     height: 480,
     baseHeight: 124,
@@ -103,6 +109,7 @@ export const SPRITES: Record<CompanionId, Sprite> = {
     id: "amumu",
     name: "Amumu",
     url: amumuUrl,
+    rig: AMUMU_RIG,
     width: 358,
     height: 420,
     baseHeight: 100,
@@ -126,7 +133,8 @@ export const SPRITES: Record<CompanionId, Sprite> = {
     url: fiddlesticksUrl,
     // Layers (see scripts/split-fiddlesticks.mjs). Pivots: hip, shoulders, neck.
     parts: [
-      { name: "legs", url: fidLegs, origin: { x: 0.5, y: 0.87 } },
+      { name: "legL", url: fidLegL, origin: { x: 0.446, y: 0.877 } },
+      { name: "legR", url: fidLegR, origin: { x: 0.593, y: 0.877 } },
       { name: "body", url: fidBody, origin: { x: 0.5, y: 0.87 } },
       { name: "armL", url: fidArmL, origin: { x: 0.379, y: 0.596 } },
       { name: "armR", url: fidArmR, origin: { x: 0.636, y: 0.592 } },

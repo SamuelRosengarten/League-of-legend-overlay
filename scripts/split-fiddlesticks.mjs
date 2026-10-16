@@ -1,5 +1,5 @@
 // Splits the master artwork (src/assets/companions/fiddlesticks.svg) into the layers the overlay
-// animates separately: legs, body, left arm (+ lantern), right arm (+ scythe), head. Every layer
+// animates separately: two legs, body, left arm (+ lantern), right arm (+ scythe), head. Every layer
 // shares the master's viewBox, so they stack exactly; the animation code only rotates each one
 // around its joint (see PARTS in src/ui/companions/sprites.ts).
 //
@@ -20,7 +20,8 @@ const find = (marker) => {
 };
 const at = {
   scythe: find("============ scythe (behind)"),
-  legs: find("============ legs ============"),
+  legL: find("============ legL"),
+  legR: find("============ legR"),
   cloak: find("============ layered rag cloak"),
   armL: find("============ left arm"),
   armR: find("============ right arm to the scythe"),
@@ -52,10 +53,11 @@ hw.forEach((l, i) => {
 });
 
 const parts = {
-  legs: slice(at.legs, at.cloak),
+  legL: slice(at.legL, at.legR),
+  legR: slice(at.legR, at.cloak),
   body: [...slice(at.cloak, at.armL), ...slice(at.neck, at.hardware), ...hwBody],
   armL: [...slice(at.armL, at.armR), ...hwLeft],
-  armR: [...slice(at.scythe, at.legs), ...slice(at.armR, at.neck), ...hwRight],
+  armR: [...slice(at.scythe, at.legL), ...slice(at.armR, at.neck), ...hwRight],
   head: slice(at.head, at.end),
 };
 

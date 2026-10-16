@@ -14,6 +14,9 @@
 // only fires while motion is "full" and the overlay is visible. Scenes (see scenes.ts) are played by
 // the Director, one at a time, on a randomized but bounded schedule.
 import { Director, type DirectorHost, type PuppetNodes } from "./director";
+import { MeshRenderer } from "./mesh-gl";
+import type { Raw } from "./motion";
+import { poseAmumu, poseFiddle, poseGwen } from "./rig-pose";
 import type { Layout, Placed } from "./layout";
 import { type Cast, type SceneId, SCENE_IDS, eligibleScenes, planScene } from "./scenes";
 import { COMPANION_IDS, type CompanionId, type Expression, SPRITES, type Sprite } from "./sprites";
@@ -50,7 +53,14 @@ function spriteEl(s: Sprite, height: number, top: number): HTMLElement {
   const box = el("div", `sprite${s.parts ? " layered" : ""}`, { top: `${top}px`, height: `${height}px`, width: `${Math.round((height * s.width) / s.height)}px` });
   // Eyelids and the eye glow ride on the head layer when the sprite has layers.
   let face: HTMLElement = box;
-  if (s.parts) {
+  if (s.rig) {
+    // Painted art that is bent by bones during scenes: the plain image stays until then, and the
+    // face (eyelids, tears) rides on the head bone.
+    box.classList.add("meshed");
+    box.append(img(s.url, "sprite-img"));
+    face = el("div", "face");
+    box.append(face);
+  } else if (s.parts) {
     for (const part of s.parts) {
       const layer = el("div", `part part-${part.name}`, { "--ox": pct(part.origin.x), "--oy": pct(part.origin.y) });
       layer.append(img(part.url, "part-img"));
@@ -78,7 +88,7 @@ function spriteEl(s: Sprite, height: number, top: number): HTMLElement {
     // One tear per eye: they roll now and then, and stream while he cries.
     s.eyes.forEach((e, i) => {
       const at = { left: pct(e.x - e.w * (i ? -0.1 : 0.18)), top: pct(e.y + e.h * 0.32) };
-      box.append(el("i", `tear tear-${i ? "r" : "l"}`, at), el("i", `tear tear-x tear-${i ? "r" : "l"}`, at));
+      face.append(el("i", `tear tear-${i ? "r" : "l"}`, at), el("i", `tear tear-x tear-${i ? "r" : "l"}`, at));
     });
   }
   if (s.id === "fiddlesticks") {
@@ -169,6 +179,86 @@ function companionEl(p: Placed): HTMLElement {
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
+/**
+ * Hooks a companion up to the director. Painted characters (Gwen, Amumu) get a WebGL canvas that draws
+ * the art bent by its skeleton; Fiddlesticks' layers are rotated around their joints.
+ */
+function puppetFor(p: Placed, root: HTMLElement, puppet: HTMLElement, sprite: HTMLElement, room: number): PuppetNodes {
+  const s = SPRITES[p.who];
+  const natural: 1 | -1 = p.spot.flip ? 1 : -1;
+  // A mirrored layout flips the art on screen, so rotations (hair trailing, leaning) must flip with it.
+  const flip = p.spot.flip ? -1 : 1;
+  // css px per texture px
+  const cs = p.spriteHeight / s.height;
+  const base = { root, room, natural };
+  if (s.rig) {
+    const def = s.rig;
+    const art = new Image();
+    art.src = s.url;
+    const mesh = new MeshRenderer(def, art);
+    sprite.append(mesh.canvas);
+    const face = sprite.querySelector<HTMLElement>(".face")!;
+    const headIdx = def.bones.findIndex((b) => b.name === "head");
+    const pose = p.who === "gwen" ? poseGwen : poseAmumu;
+    let shown = false;
+    let dpr = 0;
+    let facing = 2;
+    return {
+      ...base,
+      apply(raw: Raw) {
+        const d = Math.min(3, window.devicePixelRatio || 1);
+        if (d !== dpr && mesh.ready) {
+          dpr = d;
+          mesh.resize(cs, d);
+        }
+        const world = mesh.render(pose(flip === 1 ? raw : { ...raw, facing: raw.facing * flip }, 1 / cs));
+        if (mesh.ready && !shown) {
+          shown = true;
+          sprite.classList.add("mesh-on");
+        }
+        const h = world[headIdx]!;
+        face.style.transform = `matrix(${h[0].toFixed(4)},${h[1].toFixed(4)},${h[2].toFixed(4)},${h[3].toFixed(4)},${(h[4] * cs).toFixed(2)},${(h[5] * cs).toFixed(2)})`;
+        if (Math.abs(raw.facing - facing) > 0.002) {
+          facing = raw.facing;
+          puppet.style.transform = `scaleX(${facing.toFixed(3)})`;
+        }
+      },
+      activate(on: boolean) {
+        if (!on) {
+          shown = false;
+          sprite.classList.remove("mesh-on");
+          face.style.removeProperty("transform");
+          puppet.style.removeProperty("transform");
+          facing = 2;
+        } else dpr = 0;
+      },
+    };
+  }
+  // Fiddlesticks: separate layers (arms, legs, head, cloak) around their joints.
+  return {
+    ...base,
+    apply(raw: Raw) {
+      const v = poseFiddle(flip === 1 ? raw : { ...raw, facing: raw.facing * flip });
+      const st = sprite.style;
+      st.setProperty("--p-head", `${v.head.toFixed(2)}deg`);
+      st.setProperty("--p-armL", `${v.armL.toFixed(2)}deg`);
+      st.setProperty("--p-armR", `${v.armR.toFixed(2)}deg`);
+      st.setProperty("--p-legL", `${v.legL.toFixed(2)}deg`);
+      st.setProperty("--p-legR", `${v.legR.toFixed(2)}deg`);
+      st.setProperty("--p-legLy", `${v.legLy.toFixed(2)}px`);
+      st.setProperty("--p-legRy", `${v.legRy.toFixed(2)}px`);
+      st.setProperty("--p-body", `${v.body.toFixed(2)}deg`);
+      puppet.style.transform = `translateY(${(-v.lift).toFixed(2)}px) rotate(${v.rot.toFixed(2)}deg) scale(${(v.sx * raw.facing).toFixed(3)},${v.sy.toFixed(3)})`;
+    },
+    activate(on: boolean) {
+      if (!on) {
+        for (const n of ["--p-head", "--p-armL", "--p-armR", "--p-legL", "--p-legR", "--p-legLy", "--p-legRy", "--p-body"]) sprite.style.removeProperty(n);
+        puppet.style.removeProperty("transform");
+      }
+    },
+  };
+}
+
 /** First scene shortly after the overlay settles, then one every minute or so (randomized, bounded). */
 const FIRST_SCENE_MS: [number, number] = [20000, 40000];
 const NEXT_SCENE_MS: [number, number] = [50000, 100000];
@@ -193,6 +283,7 @@ export class CompanionLayer implements DirectorHost {
     this.el = document.createElement("div");
     this.el.className = "companions";
     this.el.setAttribute("aria-hidden", "true");
+    document.addEventListener("visibilitychange", () => this.director.sync(this.lively()));
   }
 
   /** Rebuilds only if the placement changed. `scenes` = the user's "Companion scenes" setting. */
@@ -212,8 +303,7 @@ export class CompanionLayer implements DirectorHost {
         const puppet = root?.querySelector<HTMLElement>(".puppet");
         const sprite = root?.querySelector<HTMLElement>(".sprite");
         if (root && puppet && sprite && p.spot.pose === "perch") {
-          const n: PuppetNodes = { root, puppet, sprite, layered: !!SPRITES[p.who].parts, room: this.gutterTop - p.seat };
-          this.director.register(p.who, n);
+          this.director.register(p.who, puppetFor(p, root, puppet, sprite, this.gutterTop - p.seat));
         }
       }
     }
@@ -225,6 +315,7 @@ export class CompanionLayer implements DirectorHost {
         this.sceneTimer = 0;
       }
     }
+    this.director.sync(this.lively());
     if (this.scenesOn && !this.sceneTimer) this.scheduleScene(true);
   }
 
@@ -240,14 +331,25 @@ export class CompanionLayer implements DirectorHost {
     return d.motion === "full" && d.paused !== "true" && !document.hidden;
   }
 
-  fx(who: CompanionId, kind: "snip") {
-    if (kind !== "snip") return;
+  fx(who: CompanionId, kind: "snip" | "dust") {
+    if (kind === "dust") return this.dust(who);
     const target = this.node(who)?.querySelector(".sprite");
     if (!target) return;
     const fx = el("i", "fx-snip", { left: "86%", top: "20%" });
     fx.textContent = "✂";
     target.append(fx);
     window.setTimeout(() => fx.remove(), 700);
+  }
+
+  /** A little puff of dust at the feet (footfalls, landings), kicked up behind the direction of travel. */
+  private dust(who: CompanionId) {
+    const root = this.node(who);
+    const p = this.placed.find((x) => x.who === who);
+    if (!root || !p || root.querySelectorAll(".dust").length > 8) return;
+    const dir = Math.sign(this.director.velocityOf(who)) || 1;
+    const d = el("i", "dust", { left: pct(0.38 + Math.random() * 0.24), top: `${p.seat - 4}px`, "--dx": `${(-dir * (8 + Math.random() * 10)).toFixed(1)}px` });
+    root.append(d);
+    window.setTimeout(() => d.remove(), 600);
   }
 
   /** Keeps visible bubbles inside the window while their companion moves. */

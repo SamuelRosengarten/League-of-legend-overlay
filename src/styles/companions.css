@@ -344,7 +344,9 @@ html[data-motion="calm"] .tear-r { animation: none; }
 .sprite.layered { filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.55)); }
 .part { position: absolute; inset: 0; transform-origin: var(--ox) var(--oy); }
 .part-img { display: block; width: 100%; height: 100%; }
-.part-legs { transform: skewX(var(--p-legs, 0deg)); }
+.part-legL { transform: translateY(var(--p-legLy, 0px)) rotate(var(--p-legL, 0deg)); }
+.part-legR { transform: translateY(var(--p-legRy, 0px)) rotate(var(--p-legR, 0deg)); }
+.part-body { transform: skewX(var(--p-body, 0deg)); }
 .part-armL { transform: rotate(var(--p-armL, 0deg)); }
 .part-armR { transform: rotate(var(--p-armR, 0deg)); }
 .part-head { transform: rotate(var(--p-head, 0deg)); }
@@ -354,3 +356,29 @@ html[data-motion="calm"] .tear-r { animation: none; }
 @keyframes c-lantern { from { transform: rotate(-2.2deg); } to { transform: rotate(2.6deg); } }
 @keyframes c-scythe { from { transform: rotate(-1deg); } to { transform: rotate(1.4deg); } }
 html[data-motion="calm"] .part-img { animation: none; }
+
+/* ---- painted companions (Gwen, Amumu): the plain image until a scene or the idle sway starts, then
+        a WebGL canvas that draws the same painting bent by its skeleton (mesh-gl.ts) ---- */
+.sprite-mesh { position: absolute; display: none; pointer-events: none; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.55)); }
+.sprite.mesh-on .sprite-mesh { display: block; }
+.sprite.mesh-on .sprite-img { visibility: hidden; }
+/* The face (eyelids, tears) rides on the head bone: the animator sets its transform. */
+.face { position: absolute; inset: 0; transform-origin: 0 0; pointer-events: none; }
+
+/* Dust kicked up at footfalls and landings. */
+.dust {
+  position: absolute;
+  width: 11px;
+  height: 7px;
+  margin-left: -5px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(225, 238, 242, 0.6), rgba(225, 238, 242, 0));
+  opacity: 0;
+  animation: c-dust 0.55s ease-out forwards;
+}
+@keyframes c-dust {
+  0% { transform: translate(0, 0) scale(0.35); opacity: 0.75; }
+  100% { transform: translate(var(--dx, -10px), -7px) scale(1.7); opacity: 0; }
+}
+/* The ground shadow shrinks and fades as they leave the ground (--lift is set by the director). */
+.companion.pose-perch::before { transform: scaleX(calc(1 - var(--lift, 0) * 0.03)); opacity: calc(1 - var(--lift, 0) * 0.05); }
