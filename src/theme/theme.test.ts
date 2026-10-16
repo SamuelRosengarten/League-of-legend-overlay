@@ -130,6 +130,25 @@ describe("companion layout", () => {
   });
 });
 
+describe("companions sharing a border", () => {
+  it("keep a clear gap between neighbours, even on a narrow panel", () => {
+    for (const placement of ["corners", "top", "left", "right", "peek", "minimal"]) {
+      for (const width of [300, 320, 380, 460]) {
+        const { placed } = layoutCompanions({ ...DEFAULT_APPEARANCE.companions, placement }, width, { compact: true });
+        const row = placed.filter((p) => p.spot.pose !== "hang").sort((a, b) => a.left - b.left);
+        for (let i = 1; i < row.length; i++) {
+          const overlap = row[i - 1]!.left + row[i - 1]!.width - row[i]!.left;
+          expect(overlap, `${placement} @${width}`).toBeLessThanOrEqual(-5);
+        }
+        for (const p of placed) {
+          expect(p.left).toBeGreaterThanOrEqual(0);
+          expect(p.left + p.width).toBeLessThanOrEqual(width + 0.001);
+        }
+      }
+    }
+  });
+});
+
 describe("docked companions on a narrow window", () => {
   it("shrink so the gutter stays at most a fifth of the window", () => {
     const narrow = layoutCompanions(DEFAULT_APPEARANCE.companions, 300, { compact: false, docked: true });

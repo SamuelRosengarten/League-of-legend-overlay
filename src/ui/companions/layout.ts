@@ -110,6 +110,8 @@ export const SIZE_MAX = 1.4;
 const COMPACT_SCALE = 0.8;
 /** Ribbon / bandage length for hanging companions, CSS px at size 1. */
 const RIBBON = 16;
+/** Clear space between neighbours on one border (CSS px at size 1), so silhouettes never merge. */
+const MIN_GAP = 6;
 
 export interface Placed {
   who: CompanionId;
@@ -159,29 +161,52 @@ export function layoutCompanions(
   if (opts.docked) return layoutDocked(settings, panelWidth, !!opts.dockedLeft);
   const preset = presetById(settings.placement);
   const size = clampSize(settings.size) * (opts.compact ? COMPACT_SCALE : 1);
-  const placed: Placed[] = [];
-  for (const who of COMPANION_IDS) {
-    if (!settings[who]) continue;
+  // Sprites that share a border (top or bottom) are sized and spaced together so they never
+  // pile onto each other on a narrow panel: shrink if they cannot fit, then push apart.
+  const items = COMPANION_IDS.flatMap((who) => {
     const spot = preset.spots[who];
-    if (!spot) continue;
-    const sprite = SPRITES[who];
-    const spriteHeight = Math.round(sprite.baseHeight * size * (spot.scale ?? 1));
-    const width = Math.round((spriteHeight * sprite.width) / sprite.height);
-    const left = Math.round(Math.min(Math.max(spot.x * panelWidth - width / 2, 0), Math.max(0, panelWidth - width)));
-    let height = spriteHeight;
-    let seat = 0;
-    let ribbon = 0;
-    if (spot.pose === "perch") {
-      seat = Math.round(spriteHeight * sprite.seat);
-    } else if (spot.pose === "peek") {
-      // Only the head shows; the element clips the rest just below the border.
-      seat = Math.round(spriteHeight * sprite.peek);
-      height = seat + 2;
-    } else {
-      ribbon = Math.round(RIBBON * size);
-      height = ribbon + spriteHeight;
+    return settings[who] && spot ? [{ who, spot, sprite: SPRITES[who] }] : [];
+  });
+  const heightAt = (it: (typeof items)[number], fit: number) => Math.round(it.sprite.baseHeight * size * fit * (it.spot.scale ?? 1));
+  const widthOf = (it: (typeof items)[number], h: number) => Math.round((h * it.sprite.width) / it.sprite.height);
+  const placed: Placed[] = [];
+  for (const hanging of [false, true]) {
+    const group = items.filter((it) => (it.spot.pose === "hang") === hanging).sort((x, y) => x.spot.x - y.spot.x);
+    if (!group.length) continue;
+    const total = group.reduce((s, it) => s + widthOf(it, heightAt(it, 1)), 0);
+    const gaps = MIN_GAP * (group.length - 1);
+    const fit = Math.min(1, (panelWidth - 4 - gaps) / total);
+    const boxes = group.map((it) => {
+      const spriteHeight = heightAt(it, fit);
+      const width = widthOf(it, spriteHeight);
+      return { it, spriteHeight, width, left: it.spot.x * panelWidth - width / 2 };
+    });
+    const allow = () => -MIN_GAP;
+    for (let i = 1; i < boxes.length; i++) boxes[i]!.left = Math.max(boxes[i]!.left, boxes[i - 1]!.left + boxes[i - 1]!.width - allow());
+    for (let i = boxes.length - 1; i >= 0; i--) {
+      const limit = i === boxes.length - 1 ? panelWidth - boxes[i]!.width : boxes[i + 1]!.left + allow() - boxes[i]!.width;
+      boxes[i]!.left = Math.min(boxes[i]!.left, limit);
     }
-    placed.push({ who, spot, width, height, left, spriteHeight, seat, ribbon, overlap: 0 });
+    for (let i = 0; i < boxes.length; i++) {
+      const prev = boxes[i - 1];
+      boxes[i]!.left = Math.max(0, boxes[i]!.left, prev ? prev.left + prev.width - allow() : 0);
+    }
+    for (const { it, spriteHeight, width, left } of boxes) {
+      let height = spriteHeight;
+      let seat = 0;
+      let ribbon = 0;
+      if (it.spot.pose === "perch") {
+        seat = Math.round(spriteHeight * it.sprite.seat);
+      } else if (it.spot.pose === "peek") {
+        // Only the head shows; the element clips the rest just below the border.
+        seat = Math.round(spriteHeight * it.sprite.peek);
+        height = seat + 2;
+      } else {
+        ribbon = Math.round(RIBBON * size);
+        height = ribbon + spriteHeight;
+      }
+      placed.push({ who: it.who, spot: it.spot, width, height, left: Math.round(left), spriteHeight, seat, ribbon, overlap: 0 });
+    }
   }
   const gutterTop = Math.max(0, ...placed.filter((p) => p.spot.pose !== "hang").map((p) => p.seat));
   const gutterBottom = Math.max(0, ...placed.filter((p) => p.spot.pose === "hang").map((p) => p.height));

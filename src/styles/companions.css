@@ -14,6 +14,19 @@
   pointer-events: none;
 }
 .companion { position: absolute; pointer-events: none; }
+
+/* One shared backlight behind the trio, resting on the frame, so they read as a group lit by the
+   same light as the panel instead of three separate cut-outs. */
+.companions::before {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: calc(var(--gutter-top) - 62px);
+  height: 66px;
+  background: radial-gradient(70% 100% at 50% 100%, color-mix(in srgb, var(--rank-glow) 60%, transparent), transparent 72%);
+  opacity: 0.8;
+}
 .companion.pose-peek { overflow: hidden; }
 .companion-inner { position: absolute; inset: 0; }
 
@@ -42,9 +55,9 @@
   position: absolute;
   left: 18%;
   right: 18%;
-  bottom: -3px;
-  height: 8px;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.55), transparent);
+  bottom: -4px;
+  height: 9px;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.7), transparent);
 }
 
 /* ---- eyelids: --lid 0 = open, 1 = closed ---- */
