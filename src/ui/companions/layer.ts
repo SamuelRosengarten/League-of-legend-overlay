@@ -82,7 +82,7 @@ function ribbonEl(s: Sprite, p: Placed): SVGSVGElement {
 }
 
 /** Side pose: sway pivot height as a fraction of the sprite height (Gwen's waist, Amumu's arm, Fiddlesticks' hand). */
-const STRAP_Y: Record<CompanionId, number> = { gwen: 0.46, amumu: 0.62, fiddlesticks: 0.68 };
+const STRAP_Y: Record<CompanionId, number> = { gwen: 0.46, amumu: 0.62, fiddlesticks: 0.72 };
 /** Hang line thickness: [outer edge, inner color] in px. */
 const ROPE_WIDTH: Record<CompanionId, [number, number]> = { gwen: [4.2, 2.8], amumu: [6, 4.6], fiddlesticks: [4.6, 3.2] };
 

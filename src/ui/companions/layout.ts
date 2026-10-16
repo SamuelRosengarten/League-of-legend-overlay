@@ -48,16 +48,16 @@ export const PRESETS: PlacementPreset[] = [
     id: "left",
     label: "Left corner",
     description: "Side by side on the top-left of the frame.",
-    spots: { gwen: { pose: "perch", x: 0.12 }, fiddlesticks: { pose: "perch", x: 0.34 }, amumu: { pose: "perch", x: 0.54 } },
+    spots: { gwen: { pose: "perch", x: 0.13 }, fiddlesticks: { pose: "perch", x: 0.37 }, amumu: { pose: "perch", x: 0.58 } },
   },
   {
     id: "right",
     label: "Right corner",
     description: "Side by side on the top-right of the frame.",
     spots: {
-      amumu: { pose: "perch", x: 0.46, flip: true },
-      fiddlesticks: { pose: "perch", x: 0.66, flip: true },
-      gwen: { pose: "perch", x: 0.88, flip: true },
+      amumu: { pose: "perch", x: 0.42, flip: true },
+      fiddlesticks: { pose: "perch", x: 0.63, flip: true },
+      gwen: { pose: "perch", x: 0.87, flip: true },
     },
   },
   {
@@ -101,7 +101,7 @@ const DOCKED_MAX_GUTTER = 0.2;
  * the edge, and Fiddlesticks' outstretched hand reaches it. So Gwen's hair crosses the border and
  * her body touches it; Amumu's arm and Fiddlesticks' hand cross it.
  */
-const DOCKED_GRIP: Record<CompanionId, number> = { gwen: 0.2, amumu: 0.12, fiddlesticks: 0.12 };
+const DOCKED_GRIP: Record<CompanionId, number> = { gwen: 0.2, amumu: 0.12, fiddlesticks: 0.2 };
 
 export const DEFAULT_PRESET = "corners";
 export const SIZE_MIN = 0.7;
