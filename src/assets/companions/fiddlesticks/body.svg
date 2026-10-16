@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -16 280 456" width="280" height="456">
+  <!-- Chibi-horror Fiddlesticks: hunched, crooked, layered rags. Original fan art drawn for this
+       overlay, inspired by the project's reference picture. Not official Riot artwork. -->
+  <defs>
+    <pattern id="weave" width="4.5" height="4.5" patternUnits="userSpaceOnUse" patternTransform="rotate(10)">
+      <path d="M 0 2.25 H 4.5 M 2.25 0 V 4.5" stroke="#2a1c0e" stroke-width="0.7" opacity="0.34"/>
+    </pattern>
+    <linearGradient id="burlap" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#d1b57f"/><stop offset="0.5" stop-color="#9a7f50"/><stop offset="1" stop-color="#5b4628"/>
+    </linearGradient>
+    <linearGradient id="grey" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8d8372"/><stop offset="1" stop-color="#453d34"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#4a3f35"/><stop offset="1" stop-color="#1c1613"/>
+    </linearGradient>
+    <linearGradient id="maroon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a02838"/><stop offset="1" stop-color="#4a0d18"/>
+    </linearGradient>
+    <linearGradient id="straw" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4d98f"/><stop offset="1" stop-color="#b38836"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a46"/><stop offset="0.5" stop-color="#52391f"/><stop offset="1" stop-color="#2a1b0e"/>
+    </linearGradient>
+    <linearGradient id="iron" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a8c86"/><stop offset="0.5" stop-color="#524646"/><stop offset="1" stop-color="#211a1d"/>
+    </linearGradient>
+    <radialGradient id="hollow" cx="50%" cy="46%" r="62%">
+      <stop offset="0" stop-color="#2a100c"/><stop offset="0.7" stop-color="#0d0504"/><stop offset="1" stop-color="#050202"/>
+    </radialGradient>
+    <radialGradient id="eye" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#fff0bd"/><stop offset="0.35" stop-color="#ff9a3c"/><stop offset="1" stop-color="#d02a12"/>
+    </radialGradient>
+    <radialGradient id="mouth" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#ff7a2e"/><stop offset="0.45" stop-color="#b3200f"/><stop offset="1" stop-color="#2a0503"/></radialGradient>
+    <linearGradient id="tooth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c8"/><stop offset="1" stop-color="#e8a45a"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff4a1c" stop-opacity="0.5"/><stop offset="1" stop-color="#ff4a1c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff9a4a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff9a4a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flame" cx="50%" cy="62%" r="55%">
+      <stop offset="0" stop-color="#ffe09a"/><stop offset="0.5" stop-color="#ff5a2a"/><stop offset="1" stop-color="#7a0f14"/>
+    </radialGradient>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="11" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 -0.14" result="a"/>
+      <feComposite in="SourceGraphic" in2="a" operator="in" result="t"/>
+      <feBlend in="SourceGraphic" in2="t" mode="multiply"/>
+    </filter>
+    <filter id="fray" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="3" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+    <clipPath id="hoodClip">
+      <path d="M 62 206 C 50 134, 70 74, 118 54 C 146 44, 170 44, 192 20 C 190 38, 204 52, 218 74 C 236 104, 228 162, 218 206 L 204 230 L 190 212 L 174 238 L 158 214 L 142 240 L 126 214 L 110 236 L 96 210 L 80 232 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- ============ layered rag cloak ============ -->
+  <g filter="url(#fray)">
+  <path d="M 96 250 L 190 250 L 198 392 L 184 380 L 174 406 L 158 384 L 144 412 L 130 386 L 116 408 L 100 384 L 82 396 Z" fill="url(#dark)" stroke="#0f0a07" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 100 264 L 132 264 L 128 372 L 114 402 L 104 374 L 90 384 Z" fill="url(#grey)" stroke="#0f0a07" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 130 266 L 162 264 L 168 362 L 152 396 L 140 360 L 124 374 Z" fill="url(#burlap)" stroke="#0f0a07" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 160 258 L 188 262 L 196 374 L 180 388 L 172 362 L 162 392 Z" fill="url(#grey)" stroke="#0f0a07" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="130" y="266" width="38" height="110" fill="url(#weave)" opacity="0.8"/>
+  <rect x="100" y="266" width="30" height="110" fill="url(#weave)" opacity="0.35"/>
+  <path d="M 112 300 L 178 312 L 176 328 L 110 316 Z" fill="url(#maroon)" stroke="#2a050c" stroke-width="1.8" stroke-linejoin="round"/>
+  </g>
+  <!-- depth: shadow under the hood and scarf, fold creases, dark hem -->
+  <path d="M 100 252 L 188 252 L 190 300 C 160 292, 128 292, 98 300 Z" fill="url(#shade)"/>
+  <path d="M 112 330 C 108 350, 108 372, 106 396 M 128 300 C 126 330, 128 360, 126 380 M 168 322 C 170 344, 176 366, 174 384 M 150 270 C 148 300, 146 330, 148 356" stroke="#0e0906" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round"/>
+  <!-- rim light on the lantern side, torn edges, stitches, patch -->
+  <path d="M 100 266 L 92 384 M 104 266 L 96 330" stroke="#e8b878" stroke-width="1.6" opacity="0.55" stroke-linecap="round"/>
+  <path d="M 132 268 L 129 360 M 164 266 L 167 352 M 188 266 L 195 366" stroke="#d9bd84" stroke-width="1.2" opacity="0.45"/>
+  <path d="M 140 330 l 22 -2 l 3 22 l -22 3 z" fill="#6f5238" stroke="#2a1d10" stroke-width="1.4" stroke-dasharray="3 2.5"/>
+  <path d="M 143 336 l 14 12 M 157 335 l -14 13" stroke="#2a1d10" stroke-width="1.4"/>
+  <path d="M 112 336 l 8 6 M 108 352 l 8 5 M 176 346 l -9 5" stroke="#8d7b5e" stroke-width="1.4" stroke-dasharray="3 3"/>
+  <ellipse cx="78" cy="334" rx="44" ry="50" fill="url(#warm)"/>
+  <!-- rope belt with knot -->
+  <path d="M 98 296 C 128 312, 160 312, 188 298" fill="none" stroke="#150d07" stroke-width="5.6" stroke-linecap="round"/>
+  <path d="M 98 296 C 128 312, 160 312, 188 298" fill="none" stroke="#c09a64" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M 140 308 l -6 16 M 146 308 l 4 18" stroke="#c09a64" stroke-width="2.6" stroke-linecap="round"/>
+
+  <!-- body details: stitched sack patch, skull charm, frayed rags -->
+  <path d="M 106 338 l 22 -3 l 3 24 l -22 3 z" fill="#5b4a3a" stroke="#1c140e" stroke-width="1.4" stroke-dasharray="3 2.5"/>
+  <path d="M 110 344 l 14 12 M 124 343 l -14 13" stroke="#1c140e" stroke-width="1.2"/>
+  <path d="M 176 308 L 178 318" stroke="#c09a64" stroke-width="1.6"/>
+  <g>
+    <ellipse cx="178" cy="324" rx="7.5" ry="6.4" fill="#e1d8bf" stroke="#4d3f2f" stroke-width="1.2"/>
+    <rect x="174.5" y="328" width="7" height="4.6" rx="1" fill="#d6ccb0" stroke="#4d3f2f" stroke-width="1"/>
+    <circle cx="175.2" cy="323.4" r="1.9" fill="#1a110c"/><circle cx="181" cy="323.4" r="1.9" fill="#1a110c"/>
+    <path d="M 177 326.6 l 1 1.6 l 1 -1.6 M 176 330 l 0 2.6 M 178 330 l 0 2.6 M 180 330 l 0 2.6" stroke="#4d3f2f" stroke-width="0.8" fill="none"/>
+    <circle cx="177" cy="321" r="0.9" fill="#ff5a2a" opacity="0.7"/>
+  </g>
+  <g fill="#8a4a22" opacity="0.5"><circle cx="150" cy="352" r="1.6"/><circle cx="166" cy="372" r="1.3"/><circle cx="118" cy="372" r="1.4"/></g>
+  <path d="M 94 388 l -6 14 l 8 -6 l 2 10 l 6 -14 z M 188 392 l 6 12 l -8 -5 l -2 9 l -5 -13 z" fill="#2c241d" stroke="#0f0a07" stroke-width="1.2" stroke-linejoin="round"/>
+  <!-- neck, scarf, collar straw -->
+  <rect x="132" y="224" width="13" height="28" rx="3" fill="url(#wood)" stroke="#150d07" stroke-width="1.8"/>
+  <path d="M 104 244 C 128 266, 160 264, 184 246 L 182 262 C 160 282, 128 284, 106 260 Z" fill="url(#maroon)" stroke="#2a050c" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 150 270 C 152 296, 158 322, 152 354 l 8 -8 l 5 13 l 3 -22 C 168 306, 166 288, 166 270 Z" fill="url(#maroon)" stroke="#2a050c" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 112 252 C 128 266, 150 268, 170 258" fill="none" stroke="#e0607a" stroke-width="1.2" opacity="0.5"/>
+  <g stroke="url(#straw)" stroke-width="3.6" stroke-linecap="round">
+    <path d="M 108 256 l -14 8 M 118 262 l -10 12 M 176 262 l 12 10 M 186 256 l 14 6 M 86 392 l -8 8 M 196 392 l 9 8 M 100 302 l -12 4 M 184 304 l 12 6"/>
+  </g>
+
+  <path d="M 126 232 l 4 -10 l 4 8 l 4 -10 l 4 10 l 4 -8 l 3 10 l -6 6 l -17 0 z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.3" stroke-linejoin="round"/>
+
+</svg>

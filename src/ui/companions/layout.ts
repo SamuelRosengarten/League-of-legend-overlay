@@ -35,8 +35,8 @@ export const PRESETS: PlacementPreset[] = [
   {
     id: "top",
     label: "Top border",
-    description: "Gwen and Fiddlesticks stand and Amumu sits on the top border.",
-    spots: { gwen: { pose: "perch", x: 0.15 }, fiddlesticks: { pose: "perch", x: 0.5 }, amumu: { pose: "perch", x: 0.85 } },
+    description: "Gwen and Amumu on the top border, with Fiddlesticks lurking at the end.",
+    spots: { gwen: { pose: "perch", x: 0.15 }, amumu: { pose: "perch", x: 0.5 }, fiddlesticks: { pose: "perch", x: 0.85 } },
   },
   {
     id: "bottom",
@@ -48,16 +48,16 @@ export const PRESETS: PlacementPreset[] = [
     id: "left",
     label: "Left corner",
     description: "Side by side on the top-left of the frame.",
-    spots: { gwen: { pose: "perch", x: 0.13 }, fiddlesticks: { pose: "perch", x: 0.37 }, amumu: { pose: "perch", x: 0.58 } },
+    spots: { gwen: { pose: "perch", x: 0.13 }, amumu: { pose: "perch", x: 0.36 }, fiddlesticks: { pose: "perch", x: 0.58 } },
   },
   {
     id: "right",
     label: "Right corner",
     description: "Side by side on the top-right of the frame.",
     spots: {
-      amumu: { pose: "perch", x: 0.42, flip: true },
-      fiddlesticks: { pose: "perch", x: 0.63, flip: true },
-      gwen: { pose: "perch", x: 0.87, flip: true },
+      gwen: { pose: "perch", x: 0.46, flip: true },
+      amumu: { pose: "perch", x: 0.67, flip: true },
+      fiddlesticks: { pose: "perch", x: 0.88, flip: true },
     },
   },
   {
@@ -112,6 +112,8 @@ const COMPACT_SCALE = 0.8;
 const RIBBON = 16;
 /** Clear space between neighbours on one border (CSS px at size 1), so silhouettes never merge. */
 const MIN_GAP = 6;
+/** Space kept above the tallest standing companion (CSS px): room for hops and speech bubbles. */
+const HEADROOM = 24;
 
 export interface Placed {
   who: CompanionId;
@@ -208,7 +210,9 @@ export function layoutCompanions(
       placed.push({ who: it.who, spot: it.spot, width, height, left: Math.round(left), spriteHeight, seat, ribbon, overlap: 0 });
     }
   }
-  const gutterTop = Math.max(0, ...placed.filter((p) => p.spot.pose !== "hang").map((p) => p.seat));
+  const standing = placed.filter((p) => p.spot.pose !== "hang").map((p) => p.seat);
+  // A little headroom so hops and lunges are never clipped by the window's top edge.
+  const gutterTop = standing.length ? Math.max(...standing) + HEADROOM : 0;
   const gutterBottom = Math.max(0, ...placed.filter((p) => p.spot.pose === "hang").map((p) => p.height));
   return { placed, gutterTop, gutterBottom, gutterRight: 0, gutterLeft: 0 };
 }

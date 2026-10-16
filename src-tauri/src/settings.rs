@@ -67,6 +67,8 @@ pub struct Companions {
     pub gwen: bool,
     pub amumu: bool,
     pub fiddlesticks: bool,
+    /// Occasional scenes between the companions (chase, snipping, scare).
+    pub scenes: bool,
     /// Placement preset id, e.g. "top", "corners", "bottom", "left", "right", "hanging", "minimal".
     pub placement: String,
     /// Scale factor, 0.7 – 1.4.
@@ -90,7 +92,7 @@ impl Default for Appearance {
 
 impl Default for Companions {
     fn default() -> Self {
-        Self { gwen: true, amumu: true, fiddlesticks: true, placement: "corners".into(), size: 1.0, in_game: true }
+        Self { gwen: true, amumu: true, fiddlesticks: true, scenes: true, placement: "corners".into(), size: 1.0, in_game: true }
     }
 }
 

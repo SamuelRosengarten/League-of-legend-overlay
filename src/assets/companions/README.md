@@ -10,7 +10,7 @@ characters (columns ~870–990 of 1690), so the split is lossless:
    Amumu 615×722 → 358×420. That is about 2.5× their display size on a 200 % display at the
    default companion size.
 
-`fiddlesticks.svg` is not from the sheet: it is hand-drawn vector art (viewBox 360×440) in the same chibi style, so it scales cleanly at any size.
+`fiddlesticks.svg` is not from the sheet: it is hand-drawn vector art (viewBox 280×456) in the same chibi style, so it scales cleanly at any size. It is the master: `node scripts/split-fiddlesticks.mjs` cuts it into the layers in `fiddlesticks/` (legs, body, left arm + lantern, right arm + scythe, head). Every layer shares the master's viewBox, and the overlay turns each one around its joint (pivots in `sprites.ts`) so his arms, scythe, head and legs move separately while he strides. Edit the master, then re-run the script. Gwen and Amumu are single flat PNGs: scenes can only move, tilt, squash and skew them as a whole (plus the eyelids and tears); layered versions of their art would allow hair, dress and bandage motion.
 
 The art is fan art inspired by the champions. It is not official Riot artwork.
 

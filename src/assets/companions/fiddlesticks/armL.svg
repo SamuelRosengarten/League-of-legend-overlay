@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -16 280 456" width="280" height="456">
+  <!-- Chibi-horror Fiddlesticks: hunched, crooked, layered rags. Original fan art drawn for this
+       overlay, inspired by the project's reference picture. Not official Riot artwork. -->
+  <defs>
+    <pattern id="weave" width="4.5" height="4.5" patternUnits="userSpaceOnUse" patternTransform="rotate(10)">
+      <path d="M 0 2.25 H 4.5 M 2.25 0 V 4.5" stroke="#2a1c0e" stroke-width="0.7" opacity="0.34"/>
+    </pattern>
+    <linearGradient id="burlap" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#d1b57f"/><stop offset="0.5" stop-color="#9a7f50"/><stop offset="1" stop-color="#5b4628"/>
+    </linearGradient>
+    <linearGradient id="grey" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8d8372"/><stop offset="1" stop-color="#453d34"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#4a3f35"/><stop offset="1" stop-color="#1c1613"/>
+    </linearGradient>
+    <linearGradient id="maroon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a02838"/><stop offset="1" stop-color="#4a0d18"/>
+    </linearGradient>
+    <linearGradient id="straw" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4d98f"/><stop offset="1" stop-color="#b38836"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a46"/><stop offset="0.5" stop-color="#52391f"/><stop offset="1" stop-color="#2a1b0e"/>
+    </linearGradient>
+    <linearGradient id="iron" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a8c86"/><stop offset="0.5" stop-color="#524646"/><stop offset="1" stop-color="#211a1d"/>
+    </linearGradient>
+    <radialGradient id="hollow" cx="50%" cy="46%" r="62%">
+      <stop offset="0" stop-color="#2a100c"/><stop offset="0.7" stop-color="#0d0504"/><stop offset="1" stop-color="#050202"/>
+    </radialGradient>
+    <radialGradient id="eye" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#fff0bd"/><stop offset="0.35" stop-color="#ff9a3c"/><stop offset="1" stop-color="#d02a12"/>
+    </radialGradient>
+    <radialGradient id="mouth" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#ff7a2e"/><stop offset="0.45" stop-color="#b3200f"/><stop offset="1" stop-color="#2a0503"/></radialGradient>
+    <linearGradient id="tooth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c8"/><stop offset="1" stop-color="#e8a45a"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff4a1c" stop-opacity="0.5"/><stop offset="1" stop-color="#ff4a1c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff9a4a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff9a4a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flame" cx="50%" cy="62%" r="55%">
+      <stop offset="0" stop-color="#ffe09a"/><stop offset="0.5" stop-color="#ff5a2a"/><stop offset="1" stop-color="#7a0f14"/>
+    </radialGradient>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="11" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 -0.14" result="a"/>
+      <feComposite in="SourceGraphic" in2="a" operator="in" result="t"/>
+      <feBlend in="SourceGraphic" in2="t" mode="multiply"/>
+    </filter>
+    <filter id="fray" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="3" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+    <clipPath id="hoodClip">
+      <path d="M 62 206 C 50 134, 70 74, 118 54 C 146 44, 170 44, 192 20 C 190 38, 204 52, 218 74 C 236 104, 228 162, 218 206 L 204 230 L 190 212 L 174 238 L 158 214 L 142 240 L 126 214 L 110 236 L 96 210 L 80 232 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- ============ left arm (long, hunched forward), lantern ============ -->
+  <path d="M 106 256 C 88 262, 76 280, 72 300 C 70 316, 72 328, 76 338" fill="none" stroke="#150d07" stroke-width="9.5" stroke-linecap="round"/>
+  <path d="M 106 256 C 88 262, 76 280, 72 300 C 70 316, 72 328, 76 338" fill="none" stroke="url(#wood)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 106 256 C 88 262, 76 280, 72 300 C 70 316, 72 328, 76 338" fill="none" stroke="#d6b27a" stroke-width="1" stroke-dasharray="7 6" opacity="0.55" transform="translate(-1.2 -1)"/>
+  <circle cx="73" cy="296" r="5.2" fill="url(#wood)" stroke="#150d07" stroke-width="1.6"/>
+  <path d="M 84 270 l 9 5 M 70 312 l 9 3" stroke="#c09a64" stroke-width="2.8" stroke-linecap="round"/>
+  <g fill="url(#iron)" stroke="#120b0c" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M 72 336 l -12 16 l 7 -2 l 5 -5 z"/><path d="M 76 340 l -2 20 l 7 -10 z"/><path d="M 80 338 l 9 16 l 0 -16 z"/>
+  </g>
+  <path d="M 62 350 l 4 -2 M 74 358 l 1 -3" stroke="#ff5a2a" stroke-width="1.3" stroke-linecap="round"/>
+  <path d="M 76 342 L 70 354" stroke="#3a2d28" stroke-width="1.6"/>
+  <g>
+    <ellipse cx="66" cy="378" rx="24" ry="28" fill="url(#glow)"/>
+    <path d="M 58 356 l 16 0 l -2 -7 l -12 0 z" fill="#2a1d1d" stroke="#0e0707" stroke-width="1.6"/>
+    <rect x="56" y="356" width="20" height="27" rx="2.5" fill="url(#flame)" stroke="#24100f" stroke-width="2.4"/>
+    <path d="M 66 356 l 0 27 M 56 369 l 20 0" stroke="#24100f" stroke-width="1.8"/>
+    <path d="M 54 384 l 24 0 l -3 7 l -18 0 z" fill="#2a1d1d" stroke="#0e0707" stroke-width="1.6"/>
+    <path d="M 66 349 L 70 354" stroke="#3a2d28" stroke-width="1.6"/>
+  </g>
+
+  <path d="M 88 258 C 92 240, 112 236, 128 246 L 124 264 L 94 270 Z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M 94 250 l -4 -16 l 10 10 z M 104 244 l 0 -18 l 8 14 z M 116 244 l 5 -15 l 3 15 z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M 92 262 C 100 250, 116 248, 126 254" fill="none" stroke="#d98b52" stroke-width="1.2" opacity="0.7"/>
+  <circle cx="102" cy="258" r="1.8" fill="#2a1e1a"/><circle cx="116" cy="256" r="1.8" fill="#2a1e1a"/>
+  <path d="M 90 266 l 6 8 M 100 268 l 3 9" stroke="#8a4a22" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+  <g stroke="url(#straw)" stroke-width="3.2" stroke-linecap="round"><path d="M 98 296 l -14 -2 M 70 292 l -12 -4 M 74 302 l -14 4"/></g>
+  <rect x="64" y="316" width="14" height="8" rx="2" transform="rotate(-6 71 320)" fill="url(#iron)" stroke="#120b0c" stroke-width="1.4"/>
+  <circle cx="68" cy="320" r="1.2" fill="#2a1e1a"/><circle cx="75" cy="319" r="1.2" fill="#2a1e1a"/>
+</svg>

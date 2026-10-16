@@ -7,6 +7,11 @@
 // (eyelids, tear, sparkles) stay aligned at any display size.
 import amumuUrl from "../../assets/companions/amumu.png";
 import fiddlesticksUrl from "../../assets/companions/fiddlesticks.svg";
+import fidArmL from "../../assets/companions/fiddlesticks/armL.svg";
+import fidArmR from "../../assets/companions/fiddlesticks/armR.svg";
+import fidBody from "../../assets/companions/fiddlesticks/body.svg";
+import fidHead from "../../assets/companions/fiddlesticks/head.svg";
+import fidLegs from "../../assets/companions/fiddlesticks/legs.svg";
 import gwenUrl from "../../assets/companions/gwen.png";
 
 export type CompanionId = "gwen" | "amumu" | "fiddlesticks";
@@ -16,7 +21,10 @@ export const COMPANION_IDS: CompanionId[] = ["gwen", "fiddlesticks", "amumu"];
  * the top border; hang = dangling below the bottom border from a ribbon / bandage;
  * side = standing on a ledge off the right border (docked to the League client). */
 export type Pose = "perch" | "peek" | "hang" | "side";
-export type Expression = "happy" | "sleepy" | "curious" | "excited" | "wink" | "surprised" | "cry";
+export type Expression =
+  | "happy" | "sleepy" | "curious" | "excited" | "wink" | "surprised" | "cry"
+  // used by the scenes: frightened, fretful, creepy stare, head twist, sulk, snip, scare, comfort
+  | "scared" | "worried" | "stare" | "twist" | "pout" | "snip" | "boo" | "comfort";
 
 export interface Eye {
   x: number;
@@ -27,10 +35,21 @@ export interface Eye {
   rot: number;
 }
 
+/** A separately animated layer of a sprite (same box as the sprite; rotates around `origin`). */
+export type PartName = "legs" | "body" | "armL" | "armR" | "head";
+export interface Part {
+  name: PartName;
+  url: string;
+  /** Pivot (the joint) as fractions of the sprite box. */
+  origin: { x: number; y: number };
+}
+
 export interface Sprite {
   id: CompanionId;
   name: string;
   url: string;
+  /** Optional animated layers, back to front. The eyelids and eye glow attach to the `head` layer. */
+  parts?: Part[];
   /** Natural pixel size of the PNG (aspect ratio). */
   width: number;
   height: number;
@@ -105,24 +124,32 @@ export const SPRITES: Record<CompanionId, Sprite> = {
     id: "fiddlesticks",
     name: "Fiddlesticks",
     url: fiddlesticksUrl,
+    // Layers (see scripts/split-fiddlesticks.mjs). Pivots: hip, shoulders, neck.
+    parts: [
+      { name: "legs", url: fidLegs, origin: { x: 0.5, y: 0.87 } },
+      { name: "body", url: fidBody, origin: { x: 0.5, y: 0.87 } },
+      { name: "armL", url: fidArmL, origin: { x: 0.379, y: 0.596 } },
+      { name: "armR", url: fidArmR, origin: { x: 0.636, y: 0.592 } },
+      { name: "head", url: fidHead, origin: { x: 0.5, y: 0.54 } },
+    ],
     width: 280,
-    height: 440,
+    height: 456,
     baseHeight: 120,
     eyes: [
-      { x: 0.362, y: 0.33, w: 0.104, h: 0.075, rot: -7 },
-      { x: 0.5625, y: 0.325, w: 0.124, h: 0.088, rot: -7 },
+      { x: 0.348, y: 0.335, w: 0.107, h: 0.076, rot: -7 },
+      { x: 0.569, y: 0.33, w: 0.136, h: 0.092, rot: -7 },
     ],
     lid: ["#2a1210", "#1a0a08"],
     lash: "#ff6a4a",
     seat: 0.955,
-    peek: 0.56,
-    hangAt: { x: 0.52, y: 0.07 },
+    peek: 0.58,
+    hangAt: { x: 0.56, y: 0.06 },
     ribbon: { color: "#b08a58", edge: "#4d3516" },
     sparkles: [
-      { x: 0.5, y: 0.06 },
-      { x: 0.24, y: 0.85 },
+      { x: 0.52, y: 0.1 },
+      { x: 0.24, y: 0.88 },
     ],
     bubble: { x: 0.8, y: 0.08 },
-    expressions: ["curious", "wink", "excited", "happy", "surprised"],
+    expressions: ["curious", "wink", "stare", "twist", "stare", "happy"],
   },
 };

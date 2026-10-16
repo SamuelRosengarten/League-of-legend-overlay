@@ -136,6 +136,8 @@ export interface CompanionSettings {
   gwen: boolean;
   amumu: boolean;
   fiddlesticks: boolean;
+  /** Occasional little scenes between the companions (chase, snipping, scare). */
+  scenes: boolean;
   placement: string;
   size: number;
   inGame: boolean;

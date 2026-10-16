@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -16 280 456" width="280" height="456">
+  <!-- Chibi-horror Fiddlesticks: hunched, crooked, layered rags. Original fan art drawn for this
+       overlay, inspired by the project's reference picture. Not official Riot artwork. -->
+  <defs>
+    <pattern id="weave" width="4.5" height="4.5" patternUnits="userSpaceOnUse" patternTransform="rotate(10)">
+      <path d="M 0 2.25 H 4.5 M 2.25 0 V 4.5" stroke="#2a1c0e" stroke-width="0.7" opacity="0.34"/>
+    </pattern>
+    <linearGradient id="burlap" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#d1b57f"/><stop offset="0.5" stop-color="#9a7f50"/><stop offset="1" stop-color="#5b4628"/>
+    </linearGradient>
+    <linearGradient id="grey" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8d8372"/><stop offset="1" stop-color="#453d34"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#4a3f35"/><stop offset="1" stop-color="#1c1613"/>
+    </linearGradient>
+    <linearGradient id="maroon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a02838"/><stop offset="1" stop-color="#4a0d18"/>
+    </linearGradient>
+    <linearGradient id="straw" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4d98f"/><stop offset="1" stop-color="#b38836"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a46"/><stop offset="0.5" stop-color="#52391f"/><stop offset="1" stop-color="#2a1b0e"/>
+    </linearGradient>
+    <linearGradient id="iron" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a8c86"/><stop offset="0.5" stop-color="#524646"/><stop offset="1" stop-color="#211a1d"/>
+    </linearGradient>
+    <radialGradient id="hollow" cx="50%" cy="46%" r="62%">
+      <stop offset="0" stop-color="#2a100c"/><stop offset="0.7" stop-color="#0d0504"/><stop offset="1" stop-color="#050202"/>
+    </radialGradient>
+    <radialGradient id="eye" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#fff0bd"/><stop offset="0.35" stop-color="#ff9a3c"/><stop offset="1" stop-color="#d02a12"/>
+    </radialGradient>
+    <radialGradient id="mouth" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#ff7a2e"/><stop offset="0.45" stop-color="#b3200f"/><stop offset="1" stop-color="#2a0503"/></radialGradient>
+    <linearGradient id="tooth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c8"/><stop offset="1" stop-color="#e8a45a"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff4a1c" stop-opacity="0.5"/><stop offset="1" stop-color="#ff4a1c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff9a4a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff9a4a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flame" cx="50%" cy="62%" r="55%">
+      <stop offset="0" stop-color="#ffe09a"/><stop offset="0.5" stop-color="#ff5a2a"/><stop offset="1" stop-color="#7a0f14"/>
+    </radialGradient>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="11" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 -0.14" result="a"/>
+      <feComposite in="SourceGraphic" in2="a" operator="in" result="t"/>
+      <feBlend in="SourceGraphic" in2="t" mode="multiply"/>
+    </filter>
+    <filter id="fray" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="3" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+    <clipPath id="hoodClip">
+      <path d="M 62 206 C 50 134, 70 74, 118 54 C 146 44, 170 44, 192 20 C 190 38, 204 52, 218 74 C 236 104, 228 162, 218 206 L 204 230 L 190 212 L 174 238 L 158 214 L 142 240 L 126 214 L 110 236 L 96 210 L 80 232 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- ============ legs ============ -->
+  <g>
+    <path d="M 122 384 l -4 44 l 9 0 l 5 -44 z" fill="url(#wood)" stroke="#150d07" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 160 384 l 4 44 l 9 0 l -4 -44 z" fill="url(#wood)" stroke="#150d07" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="124" cy="404" r="4.6" fill="url(#wood)" stroke="#150d07" stroke-width="1.6"/>
+    <circle cx="166" cy="404" r="4.6" fill="url(#wood)" stroke="#150d07" stroke-width="1.6"/>
+    <path d="M 120 392 l 12 -3 M 161 392 l 11 3" stroke="#c09a64" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M 122 428 l -18 7 l 12 2 l 6 -3 l 10 3 z M 172 428 l 18 7 l -12 2 l -6 -3 l -10 3 z" fill="#2c1e14" stroke="#0e0804" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 108 435 l -5 3 M 114 438 l -3 3 M 188 435 l 5 3 M 182 438 l 3 3" stroke="#6e6a68" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <!-- knee spikes and splints -->
+  <path d="M 118 404 l -9 -3 l 6 -5 z M 176 404 l 9 -3 l -6 -5 z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.2" stroke-linejoin="round"/>
+  <rect x="119" y="412" width="12" height="4" rx="1.5" fill="url(#iron)" stroke="#120b0c" stroke-width="1"/>
+  <rect x="163" y="412" width="12" height="4" rx="1.5" fill="url(#iron)" stroke="#120b0c" stroke-width="1"/>
+  <g stroke="url(#straw)" stroke-width="3" stroke-linecap="round"><path d="M 120 398 l -9 4 M 174 398 l 9 4 M 124 418 l -6 5"/></g>
+</svg>

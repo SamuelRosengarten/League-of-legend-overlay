@@ -54,7 +54,7 @@ describe("appearance settings", () => {
     const a = normalizeAppearance({
       theme: "mithril",
       motion: "wild",
-      companions: { gwen: true, amumu: false, fiddlesticks: true, placement: "??", size: 9, inGame: false },
+      companions: { gwen: true, amumu: false, fiddlesticks: true, scenes: false, placement: "??", size: 9, inGame: false },
       scale: 3,
       snapToEdge: true,
       dockToClient: false,
@@ -62,7 +62,7 @@ describe("appearance settings", () => {
     expect(a).toEqual({
       theme: "auto",
       motion: "full",
-      companions: { gwen: true, amumu: false, fiddlesticks: true, placement: "corners", size: 1.4, inGame: false },
+      companions: { gwen: true, amumu: false, fiddlesticks: true, scenes: false, placement: "corners", size: 1.4, inGame: false },
       scale: 1.5,
       snapToEdge: true,
       dockToClient: false,

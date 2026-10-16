@@ -125,7 +125,7 @@ export function render(root: HTMLElement, state: UiState) {
   // Companions: hidden in game unless the user wants them there.
   const showCompanions = mode !== "hidden" && (mode !== "in-game" || appearance.companions.inGame);
   const layout = layoutCompanions(
-    showCompanions ? appearance.companions : { ...appearance.companions, gwen: false, amumu: false, fiddlesticks: false },
+    showCompanions ? appearance.companions : { ...appearance.companions, gwen: false, amumu: false, fiddlesticks: false, scenes: false },
     window.innerWidth,
     { compact: mode === "in-game", docked, dockedLeft: snap.overlay.dockedLeft },
   );
@@ -133,7 +133,7 @@ export function render(root: HTMLElement, state: UiState) {
   s.stage.style.setProperty("--gutter-bottom", `${layout.gutterBottom}px`);
   s.stage.style.setProperty("--gutter-right", `${layout.gutterRight}px`);
   s.stage.style.setProperty("--gutter-left", `${layout.gutterLeft}px`);
-  s.companions.update(layout);
+  s.companions.update(layout, { scenes: showCompanions && appearance.companions.scenes });
   s.particles.update(html.dataset.motion === "full" && mode !== "in-game", resolved.theme.prestige);
 
   // Screen changes (mode, settings, collapse) get a short fade and a companion hop.

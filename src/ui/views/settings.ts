@@ -111,6 +111,7 @@ export function settingsView(a: Appearance, rank: RankInfo | null, resolved: Res
         onchange: (e: Event) => setC({ size: Number((e.target as HTMLInputElement).value) }),
       }),
     ),
+    toggle("Companion scenes", c.scenes, (v) => setC({ scenes: v }), "Now and then they chase, scare and tease each other (full motion only, never in game)"),
     toggle("Show during games", c.inGame, (v) => setC({ inGame: v }), "They sit on the compact in-game panel (animations are always calm in game)"),
 
     heading("Motion"),

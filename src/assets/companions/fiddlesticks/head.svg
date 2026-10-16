@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -16 280 456" width="280" height="456">
+  <!-- Chibi-horror Fiddlesticks: hunched, crooked, layered rags. Original fan art drawn for this
+       overlay, inspired by the project's reference picture. Not official Riot artwork. -->
+  <defs>
+    <pattern id="weave" width="4.5" height="4.5" patternUnits="userSpaceOnUse" patternTransform="rotate(10)">
+      <path d="M 0 2.25 H 4.5 M 2.25 0 V 4.5" stroke="#2a1c0e" stroke-width="0.7" opacity="0.34"/>
+    </pattern>
+    <linearGradient id="burlap" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0" stop-color="#d1b57f"/><stop offset="0.5" stop-color="#9a7f50"/><stop offset="1" stop-color="#5b4628"/>
+    </linearGradient>
+    <linearGradient id="grey" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8d8372"/><stop offset="1" stop-color="#453d34"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#4a3f35"/><stop offset="1" stop-color="#1c1613"/>
+    </linearGradient>
+    <linearGradient id="maroon" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a02838"/><stop offset="1" stop-color="#4a0d18"/>
+    </linearGradient>
+    <linearGradient id="straw" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4d98f"/><stop offset="1" stop-color="#b38836"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a6a46"/><stop offset="0.5" stop-color="#52391f"/><stop offset="1" stop-color="#2a1b0e"/>
+    </linearGradient>
+    <linearGradient id="iron" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#9a8c86"/><stop offset="0.5" stop-color="#524646"/><stop offset="1" stop-color="#211a1d"/>
+    </linearGradient>
+    <radialGradient id="hollow" cx="50%" cy="46%" r="62%">
+      <stop offset="0" stop-color="#2a100c"/><stop offset="0.7" stop-color="#0d0504"/><stop offset="1" stop-color="#050202"/>
+    </radialGradient>
+    <radialGradient id="eye" cx="50%" cy="50%" r="55%">
+      <stop offset="0" stop-color="#fff0bd"/><stop offset="0.35" stop-color="#ff9a3c"/><stop offset="1" stop-color="#d02a12"/>
+    </radialGradient>
+    <radialGradient id="mouth" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#ff7a2e"/><stop offset="0.45" stop-color="#b3200f"/><stop offset="1" stop-color="#2a0503"/></radialGradient>
+    <linearGradient id="tooth" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0c8"/><stop offset="1" stop-color="#e8a45a"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff4a1c" stop-opacity="0.5"/><stop offset="1" stop-color="#ff4a1c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="warm" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff9a4a" stop-opacity="0.45"/><stop offset="1" stop-color="#ff9a4a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="flame" cx="50%" cy="62%" r="55%">
+      <stop offset="0" stop-color="#ffe09a"/><stop offset="0.5" stop-color="#ff5a2a"/><stop offset="1" stop-color="#7a0f14"/>
+    </radialGradient>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="11" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 -0.14" result="a"/>
+      <feComposite in="SourceGraphic" in2="a" operator="in" result="t"/>
+      <feBlend in="SourceGraphic" in2="t" mode="multiply"/>
+    </filter>
+    <filter id="fray" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.07" numOctaves="2" seed="3" result="w"/><feDisplacementMap in="SourceGraphic" in2="w" scale="4.5" xChannelSelector="R" yChannelSelector="G"/></filter>
+    <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0.55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+    <clipPath id="hoodClip">
+      <path d="M 62 206 C 50 134, 70 74, 118 54 C 146 44, 170 44, 192 20 C 190 38, 204 52, 218 74 C 236 104, 228 162, 218 206 L 204 230 L 190 212 L 174 238 L 158 214 L 142 240 L 126 214 L 110 236 L 96 210 L 80 232 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- ============ head (crooked, tilted) ============ -->
+  <g transform="translate(140 230) rotate(-7) scale(1.1) translate(-140 -230)">
+    <!-- torn cloth tails hanging from the hood -->
+    <path d="M 56 200 L 44 262 L 62 242 L 66 276 L 80 222 Z" fill="url(#grey)" stroke="#160f09" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M 214 206 L 226 246 L 212 236 L 208 262 L 198 220 Z" fill="url(#dark)" stroke="#160f09" stroke-width="1.6" stroke-linejoin="round"/>
+    <!-- back hood layer: grey cloth -->
+    <path d="M 52 214 C 38 136, 56 70, 108 48 C 124 42, 134 40, 140 38 C 136 56, 120 66, 112 76 C 90 100, 80 150, 86 214 Z" fill="url(#grey)" stroke="#160f09" stroke-width="2.2" stroke-linejoin="round"/>
+    <!-- main burlap hood -->
+    <g filter="url(#rough)">
+      <path d="M 62 206 C 50 134, 70 74, 118 54 C 146 44, 170 44, 192 20 C 190 38, 204 52, 218 74 C 236 104, 228 162, 218 206 L 204 230 L 190 212 L 174 238 L 158 214 L 142 240 L 126 214 L 110 236 L 96 210 L 80 232 Z" fill="url(#burlap)"/>
+    </g>
+    <g clip-path="url(#hoodClip)">
+      <rect x="30" y="10" width="230" height="250" fill="url(#weave)"/>
+      <path d="M 58 80 C 80 58, 112 50, 142 48 C 112 66, 88 100, 76 150 C 62 136, 54 106, 58 80 Z" fill="#fff0c4" opacity="0.32"/>
+      <path d="M 204 84 C 236 118, 232 172, 216 216 L 232 216 L 240 100 Z" fill="#1a0f06" opacity="0.55"/>
+      <path d="M 66 216 C 100 238, 190 238, 218 216 L 218 240 L 66 240 Z" fill="#1a0f06" opacity="0.45"/>
+      <path d="M 90 66 C 100 60, 114 56, 128 54 M 74 120 C 78 104, 84 92, 92 82" stroke="#fff0c4" stroke-width="1.4" opacity="0.45" fill="none"/>
+    </g>
+    <path d="M 62 206 C 50 134, 70 74, 118 54 C 146 44, 170 44, 192 20 C 190 38, 204 52, 218 74 C 236 104, 228 162, 218 206 L 204 230 L 190 212 L 174 238 L 158 214 L 142 240 L 126 214 L 110 236 L 96 210 L 80 232 Z" fill="none" stroke="#24180b" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M 70 150 C 76 170, 84 190, 96 208 M 66 130 C 72 160, 78 180, 88 204 M 214 140 C 218 160, 212 186, 204 206" stroke="#2a1c0e" stroke-width="1.4" fill="none" opacity="0.5" stroke-linecap="round"/>
+    <!-- seams, rope, patch -->
+    <path d="M 118 56 C 116 70, 122 84, 116 98" stroke="#2c1f10" stroke-width="1.8" stroke-dasharray="4 3" fill="none"/>
+    <path d="M 70 104 C 104 86, 180 86, 216 102" fill="none" stroke="#150d07" stroke-width="5.6" stroke-linecap="round"/>
+    <path d="M 70 104 C 104 86, 180 86, 216 102" fill="none" stroke="#c09a64" stroke-width="3.6" stroke-linecap="round"/>
+    <path d="M 70 104 C 104 86, 180 86, 216 102" fill="none" stroke="#4d3a20" stroke-width="1.1" stroke-dasharray="3 4"/>
+    <path d="M 94 92 l -5 20 M 198 92 l 5 18 M 196 98 l 10 14" stroke="#c09a64" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M 186 116 l 22 -2 l 3 20 l -22 3 z" fill="#7a5a3c" stroke="#2a1d10" stroke-width="1.4" stroke-dasharray="3 2.5"/>
+    <path d="M 190 120 l 14 12 M 204 119 l -14 13" stroke="#2a1d10" stroke-width="1.2"/>
+    <!-- face hollow -->
+    <path d="M 86 152 C 86 106, 114 88, 142 88 C 172 88, 196 106, 196 152 C 196 194, 172 216, 142 216 C 112 216, 86 194, 86 152 Z" fill="url(#hollow)" stroke="#2a1a0c" stroke-width="2.4"/>
+    <path d="M 90 160 C 90 124, 106 100, 126 94" fill="none" stroke="#ff5a2a" stroke-width="1.2" opacity="0.4"/>
+    <!-- eyes: left smaller and half hidden by a torn flap, right wide open -->
+    <ellipse cx="112" cy="140" rx="26" ry="28" fill="url(#glow)"/>
+    <ellipse cx="168" cy="146" rx="30" ry="34" fill="url(#glow)"/>
+    <ellipse cx="112" cy="141" rx="12.5" ry="14" fill="#1c0707" stroke="#4a140e" stroke-width="1.3"/>
+    <ellipse cx="168" cy="146" rx="15.5" ry="18" fill="#1c0707" stroke="#4a140e" stroke-width="1.4"/>
+    <ellipse cx="112" cy="141" rx="9.5" ry="11.5" fill="url(#eye)" stroke="#ffc46a" stroke-width="0.9" transform="rotate(10 112 141)"/>
+    <ellipse cx="168" cy="146" rx="12.5" ry="15" fill="url(#eye)" stroke="#ffc46a" stroke-width="1" transform="rotate(-8 168 146)"/>
+    <ellipse cx="112" cy="142" rx="2.4" ry="8.5" fill="#240505" transform="rotate(10 112 142)"/>
+    <ellipse cx="168" cy="147" rx="3" ry="11.5" fill="#240505" transform="rotate(-8 168 147)"/>
+    <circle cx="108" cy="136" r="2.8" fill="#fff" opacity="0.9"/>
+    <circle cx="163" cy="139" r="3.6" fill="#fff" opacity="0.9"/>
+    <!-- heavy angular brows and the torn flap over the left eye -->
+    <path d="M 90 128 L 130 138 L 128 146 L 90 138 Z" fill="#150906" stroke="#050202" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M 196 124 L 150 136 L 152 144 L 196 134 Z" fill="#150906" stroke="#050202" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M 88 96 L 130 108 L 118 122 L 124 132 L 102 124 L 92 136 L 84 118 Z" fill="url(#grey)" stroke="#160f09" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- jagged grin: emissive cavity with irregular sharp teeth -->
+    <path d="M 98 176 C 98 200, 118 214, 144 214 C 170 214, 190 202, 194 178 C 170 172, 120 172, 98 176 Z" fill="url(#mouth)" stroke="#050101" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M 108 196 C 124 206, 164 208, 184 192" fill="none" stroke="#ff9a4a" stroke-width="1.2" opacity="0.5"/>
+    <path d="M 102 174 L 105 187 L 110 173 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 112 175 L 117 184 L 122 174 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 122 174 L 127.5 193 L 131 173 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 133 175 L 138.5 186 L 144 174 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 145 174 L 149.5 191 L 154 173 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 155 175 L 161 184 L 165 174 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 166 174 L 171.5 192 L 177 173 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 178 175 L 182.5 185 L 187 174 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 187 176 L 191 188 L 195 175 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 106 204 L 109.5 194 L 115 204 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 118 208 L 121 194 L 126 208 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 130 210 L 133.5 201 L 139 210 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 142 211 L 146 196 L 152 211 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 155 210 L 160 201 L 163 210 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 166 208 L 169.5 195 L 175 208 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 178 204 L 181 195 L 186 204 Z" fill="url(#tooth)" stroke="#6b1409" stroke-width="0.9" stroke-linejoin="round"/>
+    <path d="M 98 176 C 120 171, 170 171, 194 178" fill="none" stroke="#2a0a05" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M 98 176 l -10 -6 M 194 178 l 9 -5 M 98 176 l -8 4" stroke="#2a1a0c" stroke-width="2" stroke-linecap="round"/>
+    <!-- splinters and chipped wood around the head -->
+    <path d="M 58 214 l -10 14 l 12 -4 z M 226 218 l 12 12 l -14 -2 z M 118 238 l -4 12 l 8 -6 z M 164 240 l 2 12 l 7 -8 z" fill="#4b3622" stroke="#150d07" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M 96 224 l 14 0 M 150 226 l 16 0" stroke="#3a2915" stroke-width="1.4" stroke-dasharray="2 2"/>
+    <!-- cracks, nails, stitching and an iron collar on the hood -->
+    <path d="M 150 60 l -7 15 l 9 6 l -7 13" fill="none" stroke="#2a1b0c" stroke-width="1.7" stroke-linejoin="round"/>
+    <path d="M 143 75 l -9 3 M 152 81 l 8 2" stroke="#2a1b0c" stroke-width="1.1"/>
+    <path d="M 212 150 C 214 168, 208 190, 200 206 M 70 160 C 72 178, 80 196, 92 210" fill="none" stroke="#2a1c0e" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <g fill="#6a6258" stroke="#1a1410" stroke-width="1"><circle cx="97" cy="72" r="2.3"/><circle cx="196" cy="66" r="2.3"/><circle cx="82" cy="140" r="1.9"/></g>
+    <path d="M 84 228 C 110 244, 172 248, 202 230 L 200 241 C 170 258, 112 254, 86 241 Z" fill="url(#iron)" stroke="#120b0c" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M 90 232 C 114 246, 170 250, 198 234" fill="none" stroke="#d98b52" stroke-width="1" opacity="0.6"/>
+    <g fill="#2a1e1a"><circle cx="100" cy="239" r="1.6"/><circle cx="122" cy="246" r="1.6"/><circle cx="146" cy="249" r="1.6"/><circle cx="170" cy="246" r="1.6"/><circle cx="190" cy="238" r="1.6"/></g>
+    <path d="M 108 252 l -3 8 l 6 -3 z M 168 253 l 2 8 l 5 -5 z" fill="url(#iron)" stroke="#120b0c" stroke-width="1" stroke-linejoin="round"/>
+    <!-- straw bursting from the hood -->
+    <g stroke="url(#straw)" stroke-width="3.8" stroke-linecap="round">
+      <path d="M 64 192 l -18 8 M 68 208 l -20 14 M 214 192 l 18 8 M 210 208 l 20 14 M 82 232 l -14 12 M 206 232 l 14 12"/>
+      <path d="M 104 56 l -12 -16 M 120 50 l -6 -22 M 140 46 l -2 -22 M 158 44 l 6 -22 M 204 38 l 16 -10 M 210 52 l 20 -6 M 98 62 l -16 -10"/>
+    </g>
+    <g stroke="#6e5220" stroke-width="0.8" stroke-linecap="round" opacity="0.7">
+      <path d="M 64 192 l -18 8 M 214 192 l 18 8 M 104 56 l -12 -16 M 140 46 l -2 -22"/>
+    </g>
+    <!-- crow -->
+    <g>
+      <path d="M 54 90 C 44 74, 58 56, 80 60 C 94 62, 100 74, 96 84 C 88 96, 70 98, 54 90 Z" fill="#1d1823" stroke="#09070d" stroke-width="1.8"/>
+      <path d="M 62 70 l -10 -6 l 6 10 z M 62 94 l -6 8 l 12 -4 z" fill="#100d15"/>
+      <path d="M 78 61 C 82 54, 91 54, 96 59 l 13 3 l -13 5 z" fill="#332c3a" stroke="#09070d" stroke-width="1.5"/>
+      <circle cx="88" cy="63" r="2.5" fill="#ff4a2a"/>
+      <path d="M 70 70 C 74 66, 82 68, 90 74" stroke="#4b4258" stroke-width="1.2" fill="none" opacity="0.8"/>
+    </g>
+  </g>
+</svg>

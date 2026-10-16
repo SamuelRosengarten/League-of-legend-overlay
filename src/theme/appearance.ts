@@ -20,7 +20,7 @@ export function clampScale(scale: number): number {
 export const DEFAULT_APPEARANCE: Appearance = {
   theme: "auto",
   motion: "full",
-  companions: { gwen: true, amumu: true, fiddlesticks: true, placement: DEFAULT_PRESET, size: 1, inGame: true },
+  companions: { gwen: true, amumu: true, fiddlesticks: true, scenes: true, placement: DEFAULT_PRESET, size: 1, inGame: true },
   scale: 1,
   snapToEdge: false,
   dockToClient: true,
@@ -36,6 +36,7 @@ export function normalizeAppearance(a: Partial<Appearance> | null | undefined): 
       gwen: !!c.gwen,
       amumu: !!c.amumu,
       fiddlesticks: !!c.fiddlesticks,
+      scenes: !!c.scenes,
       placement: PRESETS.some((p) => p.id === c.placement) ? c.placement : DEFAULT_PRESET,
       size: clampSize(Number(c.size)),
       inGame: !!c.inGame,
