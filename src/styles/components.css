@@ -548,7 +548,7 @@ h3 .count {
   color: var(--rank-on-primary);
   background: var(--rank-metal);
 }
-.companion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.companion-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .companion-tile { padding: 8px 4px 6px; }
 .companion-tile:not(.selected) .companion-face { filter: grayscale(0.85) brightness(0.7); }
 .companion-face {
@@ -561,6 +561,7 @@ h3 .count {
 }
 .face-gwen { background-position: 46% 6%; }
 .face-amumu { background-position: 30% 62%; background-size: 150% auto; }
+.face-fiddlesticks { background-position: 50% 0%; background-size: 125% auto; }
 
 .field { display: flex; flex-direction: column; gap: 5px; }
 .field label { font-size: 11px; font-weight: 600; color: var(--text-dim); }

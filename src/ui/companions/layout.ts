@@ -4,7 +4,7 @@
 // Companions only ever live ABOVE the top border (perching, peeking) or BELOW the bottom
 // border (hanging), so they never cover the panel's content or controls.
 import type { CompanionSettings } from "../../types";
-import { type CompanionId, type Pose, SPRITES } from "./sprites";
+import { COMPANION_IDS, type CompanionId, type Pose, SPRITES } from "./sprites";
 
 export interface PlacementPreset {
   id: string;
@@ -29,44 +29,52 @@ export const PRESETS: PlacementPreset[] = [
   {
     id: "corners",
     label: "Opposite corners",
-    description: "Gwen stands on the top-left of the frame, Amumu dangles from the bottom-right corner.",
-    spots: { gwen: { pose: "perch", x: 0.2 }, amumu: { pose: "hang", x: 0.84 } },
+    description: "Gwen and Fiddlesticks stand on the top-left of the frame, Amumu dangles from the bottom-right corner.",
+    spots: { gwen: { pose: "perch", x: 0.15 }, fiddlesticks: { pose: "perch", x: 0.4 }, amumu: { pose: "hang", x: 0.84 } },
   },
   {
     id: "top",
     label: "Top border",
-    description: "Gwen stands and Amumu sits on the top border.",
-    spots: { gwen: { pose: "perch", x: 0.22 }, amumu: { pose: "perch", x: 0.8 } },
+    description: "Gwen and Fiddlesticks stand and Amumu sits on the top border.",
+    spots: { gwen: { pose: "perch", x: 0.15 }, fiddlesticks: { pose: "perch", x: 0.5 }, amumu: { pose: "perch", x: 0.85 } },
   },
   {
     id: "bottom",
     label: "Hanging below",
-    description: "Both dangle from the bottom border — Gwen on a ribbon, Amumu on his bandage.",
-    spots: { gwen: { pose: "hang", x: 0.22 }, amumu: { pose: "hang", x: 0.78 } },
+    description: "All dangle from the bottom border — Gwen on a ribbon, Fiddlesticks on a rope, Amumu on his bandage.",
+    spots: { gwen: { pose: "hang", x: 0.16 }, fiddlesticks: { pose: "hang", x: 0.5 }, amumu: { pose: "hang", x: 0.84 } },
   },
   {
     id: "left",
     label: "Left corner",
     description: "Side by side on the top-left of the frame.",
-    spots: { gwen: { pose: "perch", x: 0.15 }, amumu: { pose: "perch", x: 0.36 } },
+    spots: { gwen: { pose: "perch", x: 0.12 }, fiddlesticks: { pose: "perch", x: 0.34 }, amumu: { pose: "perch", x: 0.54 } },
   },
   {
     id: "right",
     label: "Right corner",
     description: "Side by side on the top-right of the frame.",
-    spots: { amumu: { pose: "perch", x: 0.64, flip: true }, gwen: { pose: "perch", x: 0.85, flip: true } },
+    spots: {
+      amumu: { pose: "perch", x: 0.46, flip: true },
+      fiddlesticks: { pose: "perch", x: 0.66, flip: true },
+      gwen: { pose: "perch", x: 0.88, flip: true },
+    },
   },
   {
     id: "peek",
     label: "Peeking",
-    description: "Both peek over the top border.",
-    spots: { gwen: { pose: "peek", x: 0.28 }, amumu: { pose: "peek", x: 0.72 } },
+    description: "All peek over the top border.",
+    spots: { gwen: { pose: "peek", x: 0.18 }, fiddlesticks: { pose: "peek", x: 0.5 }, amumu: { pose: "peek", x: 0.82 } },
   },
   {
     id: "minimal",
     label: "Minimal",
-    description: "Two small heads peeking over the top-right corner.",
-    spots: { gwen: { pose: "peek", x: 0.72, scale: 0.72 }, amumu: { pose: "peek", x: 0.88, scale: 0.72 } },
+    description: "Small heads peeking over the top-right corner.",
+    spots: {
+      gwen: { pose: "peek", x: 0.55, scale: 0.72 },
+      fiddlesticks: { pose: "peek", x: 0.73, scale: 0.72 },
+      amumu: { pose: "peek", x: 0.88, scale: 0.72 },
+    },
   },
 ];
 
@@ -75,11 +83,13 @@ export const PRESETS: PlacementPreset[] = [
  * left when the panel sits on the client's left). Mirrored on the left so they face the panel.
  */
 const DOCKED_SPOTS: Record<CompanionId, Spot> = {
-  gwen: { pose: "side", x: 0, y: 0.34 },
-  amumu: { pose: "side", x: 0, y: 0.78 },
+  gwen: { pose: "side", x: 0, y: 0.3 },
+  fiddlesticks: { pose: "side", x: 0, y: 0.57 },
+  amumu: { pose: "side", x: 0, y: 0.84 },
 };
 const DOCKED_SPOTS_LEFT: Record<CompanionId, Spot> = {
   gwen: { ...DOCKED_SPOTS.gwen, flip: true },
+  fiddlesticks: { ...DOCKED_SPOTS.fiddlesticks, flip: true },
   amumu: { ...DOCKED_SPOTS.amumu, flip: true },
 };
 const DOCKED_SCALE = 0.85;
@@ -88,9 +98,10 @@ const DOCKED_MAX_GUTTER = 0.2;
 /**
  * Share of each docked sprite's width that leans over the panel's frame, measured on the art:
  * at strap height Gwen's body starts 23% in (her hair is wider), Amumu's bandaged arm reaches
- * the edge. So Gwen's hair crosses the border and her body touches it; Amumu's arm crosses it.
+ * the edge, and Fiddlesticks' outstretched hand reaches it. So Gwen's hair crosses the border and
+ * her body touches it; Amumu's arm and Fiddlesticks' hand cross it.
  */
-const DOCKED_GRIP: Record<CompanionId, number> = { gwen: 0.2, amumu: 0.12 };
+const DOCKED_GRIP: Record<CompanionId, number> = { gwen: 0.2, amumu: 0.12, fiddlesticks: 0.12 };
 
 export const DEFAULT_PRESET = "corners";
 export const SIZE_MIN = 0.7;
@@ -149,7 +160,7 @@ export function layoutCompanions(
   const preset = presetById(settings.placement);
   const size = clampSize(settings.size) * (opts.compact ? COMPACT_SCALE : 1);
   const placed: Placed[] = [];
-  for (const who of ["gwen", "amumu"] as const) {
+  for (const who of COMPANION_IDS) {
     if (!settings[who]) continue;
     const spot = preset.spots[who];
     if (!spot) continue;
@@ -178,7 +189,7 @@ export function layoutCompanions(
 }
 
 function layoutDocked(settings: CompanionSettings, windowWidth: number, onLeft: boolean): Layout {
-  const enabled = (["gwen", "amumu"] as const).filter((who) => settings[who]);
+  const enabled = COMPANION_IDS.filter((who) => settings[who]);
   const size = clampSize(settings.size) * DOCKED_SCALE;
   // Widest sprite at this size, then shrink everyone if that would eat too much of the panel.
   const widthAt = (who: CompanionId, s: number) => (SPRITES[who].baseHeight * s * SPRITES[who].width) / SPRITES[who].height;

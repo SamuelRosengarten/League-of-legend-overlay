@@ -1,12 +1,12 @@
 # Rift Advisor
 
-A small desktop overlay for League of Legends with pre-game matchup notes for **Gwen (top)** and **Amumu (jungle)**:
+A small desktop overlay for League of Legends with pre-game matchup notes for **Gwen (top)**, **Fiddlesticks (support)** and **Amumu (jungle)**:
 
 - **Champ select:** threat ranking of the enemy team with the reason for every point, lane matchup card (tips, danger abilities, power spikes, item/rune adjustments), team-comp warnings and, for Amumu, a pre-game jungle path plan.
 - **In game:** a compact panel docked to a screen edge with the same reference info, item counters the enemy has bought, and the lane opponent's level spikes.
 
 - **Your rank, your theme:** the whole overlay takes on the look of your current ranked tier, from Iron to Challenger, with the official crest in the header.
-- **Gwen and Amumu companions** sit on, peek over or hang from the panel's borders. Optional and configurable.
+- **Gwen, Fiddlesticks and Amumu companions** sit on, peek over or hang from the panel's borders. Optional and configurable.
 
 Built with Tauri 2 (Rust) and TypeScript.
 
@@ -24,7 +24,7 @@ It does **not** use keyboard/mouse hooks, memory reading, screen capture, minima
 
 It also never makes decisions for you or gives real-time "go here now" instructions in game. Everything shown is pre-game planning or static reference info. The jungle plan is visible for the first 90 s of the game (loading screen and the first clear), then collapses to a single line.
 
-> Rift Advisor isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, League of Legends and all associated properties are trademarks or registered trademarks of Riot Games, Inc. The ranked emblems (`src/assets/ranks/`) come from Riot's developer portal and the champion art from Data Dragon. The Gwen and Amumu companions are original fan art, not Riot artwork.
+> Rift Advisor isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, League of Legends and all associated properties are trademarks or registered trademarks of Riot Games, Inc. The ranked emblems (`src/assets/ranks/`) come from Riot's developer portal and the champion art from Data Dragon. The Gwen, Fiddlesticks and Amumu companions are original fan art, not Riot artwork.
 >
 > Rift Advisor is designed to stay within Riot's third-party application rules (official APIs only, no automation, no information the game does not already give you), but you use it at your own risk. Check Riot's current developer policies before you distribute it.
 
@@ -60,7 +60,7 @@ The header shows the connection state:
 | Client not running | No League client `lockfile` was found. Start the client, or set `leagueInstallDir` (see below) if League is installed somewhere unusual. |
 | API unreachable | The lockfile exists but the client did not answer (it is starting up or shutting down). It retries every 3 s. |
 | Connected · websocket / polling | Live events, or the 1 s polling fallback. |
-| Unsupported champion | You picked something other than Gwen or Amumu. The overlay shows a short note and stays out of the way. |
+| Unsupported champion | You picked something other than Gwen, Fiddlesticks or Amumu. The overlay shows a short note and stays out of the way. |
 | Missing data | No curated data file for your champion, or the file failed validation. Run `npm run validate:data` to see why. |
 
 ### Display modes
@@ -80,7 +80,7 @@ The overlay switches mode automatically from the gameflow phase:
 Between games the panel sticks to the side of the League client window: right next to it, exactly as tall, following it when you move or resize it. It uses the right side, or the left if there is no room on the right (shrinking to fit before it would ever cover the client), and it only shows while the client is the active window, so it never floats over other apps. Gwen and Amumu cling to the panel's outer border: they lean over its frame, tied on by Gwen's ribbon and Amumu's bandage, and sway from the knot. If the client is minimized the panel hides with it.
 
 - **Last game:** result, queue, length, K/D/A, KDA, CS/min and damage/min, with arrows comparing each number to your other games on that champion.
-- **Gwen and Amumu:** wins/losses, win rate, a win/loss strip, average K/D/A, KDA, CS/min, damage/min and mastery level.
+- **Gwen, Fiddlesticks and Amumu:** wins/losses, win rate, a win/loss strip, average K/D/A, KDA, CS/min, damage/min and mastery level.
 
 The numbers come from the client's match history (`/lol-match-history/…/current-summoner/matches`) and mastery (`/lol-champion-mastery/v1/local-player/champion-mastery`). The client only shares your **last 20 games**. Champion stats count Summoner's Rift only (Classic and Swiftplay); Practice Tool, custom games and remakes under 5 minutes are left out. History reloads 5 and 30 seconds after each game, since the client adds the game a little after the post-game screen opens. Turn docking off under Appearance → Layout → *Dock to the League client*.
 

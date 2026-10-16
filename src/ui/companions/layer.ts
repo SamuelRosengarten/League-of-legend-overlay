@@ -7,7 +7,7 @@
 // (transform/opacity only); occasional expressions are a class toggled by a slow timer that
 // only fires while motion is "full" and the overlay is visible.
 import type { Layout, Placed } from "./layout";
-import { type CompanionId, type Expression, SPRITES, type Sprite } from "./sprites";
+import { COMPANION_IDS, type CompanionId, type Expression, SPRITES, type Sprite } from "./sprites";
 
 const pct = (v: number) => `${(v * 100).toFixed(2)}%`;
 
@@ -58,7 +58,7 @@ function spriteEl(s: Sprite, height: number, top: number): HTMLElement {
   return box;
 }
 
-/** Ribbon (Gwen) or bandage strip (Amumu) from the border down to the top of the head. */
+/** Ribbon (Gwen), bandage strip (Amumu) or rope (Fiddlesticks) from the border down to the top of the head. */
 function ribbonEl(s: Sprite, p: Placed): SVGSVGElement {
   const x = (p.spot.flip ? 1 - s.hangAt.x : s.hangAt.x) * p.width;
   const y2 = p.ribbon + s.hangAt.y * p.spriteHeight + 3;
@@ -70,17 +70,21 @@ function ribbonEl(s: Sprite, p: Placed): SVGSVGElement {
   const knot =
     s.id === "gwen"
       ? `<path d="M ${x} 3 c -6 -5 -10 1 -6 4 c 2 1.5 4 0 6 -4 z M ${x} 3 c 6 -5 10 1 6 4 c -2 1.5 -4 0 -6 -4 z" fill="${s.ribbon.color}" stroke="${s.ribbon.edge}" stroke-width="0.8"/><circle cx="${x}" cy="3" r="1.8" fill="var(--rank-accent, #8ff0ff)"/>`
-      : `<rect x="${x - 4.5}" y="0" width="9" height="5" rx="1.5" fill="${s.ribbon.color}" stroke="${s.ribbon.edge}" stroke-width="0.8"/>`;
+      : s.id === "fiddlesticks"
+        ? `<path d="M ${x - 5} 1 q 5 7 10 0 M ${x - 4} 5 q 4 5 8 0" fill="none" stroke="${s.ribbon.edge}" stroke-width="1.6" stroke-linecap="round"/>`
+        : `<rect x="${x - 4.5}" y="0" width="9" height="5" rx="1.5" fill="${s.ribbon.color}" stroke="${s.ribbon.edge}" stroke-width="0.8"/>`;
   // Static, self-authored markup (numbers + palette constants only).
   svg.innerHTML = `
-    <path d="M ${x} 2 C ${x - 2} ${y2 * 0.4}, ${x + 2} ${y2 * 0.7}, ${x} ${y2}" fill="none" stroke="${s.ribbon.edge}" stroke-width="${s.id === "gwen" ? 4.2 : 6}" stroke-linecap="round"/>
-    <path d="M ${x} 2 C ${x - 2} ${y2 * 0.4}, ${x + 2} ${y2 * 0.7}, ${x} ${y2}" fill="none" stroke="${s.ribbon.color}" stroke-width="${s.id === "gwen" ? 2.8 : 4.6}" stroke-linecap="round"/>
+    <path d="M ${x} 2 C ${x - 2} ${y2 * 0.4}, ${x + 2} ${y2 * 0.7}, ${x} ${y2}" fill="none" stroke="${s.ribbon.edge}" stroke-width="${ROPE_WIDTH[s.id][0]}" stroke-linecap="round"/>
+    <path d="M ${x} 2 C ${x - 2} ${y2 * 0.4}, ${x + 2} ${y2 * 0.7}, ${x} ${y2}" fill="none" stroke="${s.ribbon.color}" stroke-width="${ROPE_WIDTH[s.id][1]}" stroke-linecap="round"/>
     ${knot}`;
   return svg;
 }
 
-/** Side pose: sway pivot height as a fraction of the sprite height (Gwen's waist, Amumu's arm). */
-const STRAP_Y: Record<CompanionId, number> = { gwen: 0.46, amumu: 0.62 };
+/** Side pose: sway pivot height as a fraction of the sprite height (Gwen's waist, Amumu's arm, Fiddlesticks' hand). */
+const STRAP_Y: Record<CompanionId, number> = { gwen: 0.46, amumu: 0.62, fiddlesticks: 0.68 };
+/** Hang line thickness: [outer edge, inner color] in px. */
+const ROPE_WIDTH: Record<CompanionId, [number, number]> = { gwen: [4.2, 2.8], amumu: [6, 4.6], fiddlesticks: [4.6, 3.2] };
 
 /**
  * Docked to the client: the sprite leans over the panel's frame (the layer is drawn above the
@@ -164,9 +168,12 @@ export class CompanionLayer {
           const list = SPRITES[who].expressions;
           const expr = list[Math.floor(Math.random() * list.length)]!;
           this.express(who, expr);
-          // Now and then the other one joins in.
-          const other: CompanionId = who === "gwen" ? "amumu" : "gwen";
-          if (expr === "happy" && Math.random() < 0.5) window.setTimeout(() => this.express(other, "happy"), 350);
+          // Now and then another one joins in.
+          if (expr === "happy" && Math.random() < 0.5) {
+            const others = COMPANION_IDS.filter((id) => id !== who);
+            const other = others[Math.floor(Math.random() * others.length)]!;
+            window.setTimeout(() => this.express(other, "happy"), 350);
+          }
         }
         this.schedule(who);
       }, rand(9000, 17000)),
@@ -186,6 +193,7 @@ export class CompanionLayer {
   react() {
     if (!this.lively()) return;
     this.express("gwen", "excited", 1400);
+    window.setTimeout(() => this.express("fiddlesticks", "curious", 1500), 90);
     window.setTimeout(() => this.express("amumu", "surprised", 1300), 180);
   }
 }

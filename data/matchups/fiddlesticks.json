@@ -1,0 +1,394 @@
+{
+  "$schema": "../schema/matchups.schema.json",
+  "champion": "Fiddlesticks",
+  "role": "utility",
+  "threatWeights": {
+    "hard-engage": 1.5,
+    "spell-shield": 2,
+    "cleanse": 1,
+    "untargetable": 1,
+    "high-mobility": 1.5,
+    "point-click-cc": 1.5,
+    "burst": 1.5,
+    "ranged-poke": 1,
+    "lane-bully": 1,
+    "gank-setup": 1,
+    "anti-engage": 1,
+    "invisibility": 1,
+    "early-game": 0.5,
+    "aoe-cc": 1
+  },
+  "genericAdvice": {
+    "hard-engage": { "text": "Hard engage: stay behind your wave or in a bush until they commit, then answer with Terrify / Reap instead of trying to out-range them." },
+    "spell-shield": { "text": "Spell shield can eat your first Terrify or Reap: bait it with the lesser spell, then follow up with the real one and Crowstorm." },
+    "cleanse": { "text": "They can cleanse: don't rely on a single Terrify to win a fight; chain Reap's silence right after it." },
+    "untargetable": { "text": "Untargetable / stasis wastes Crowstorm: wait for the effect to end before you channel." },
+    "high-mobility": { "text": "Mobile champion: Crowstorm channels are easy to leave; use Terrify first to pin them in place, then channel." },
+    "point-click-cc": { "text": "Targeted CC interrupts your channels: don't start Bountiful Harvest or Crowstorm while their CC is up." },
+    "burst": { "text": "Burst threat: don't stand in front of them; ambush from a bush and keep your Flash for your own Crowstorm." },
+    "ranged-poke": { "text": "Poke lane: stay behind minions, sit in a bush to look like a scarecrow, and heal back with Bountiful Harvest on minions." },
+    "lane-bully": { "text": "Strong early laner: play safe under tower until level 6, then threaten with Crowstorm." },
+    "gank-setup": { "text": "Gank setup: ward your flank; Crowstorm and Terrify are good tools to peel when their jungler arrives." },
+    "anti-engage": { "text": "Anti-engage: wait until their disengage is down before you flash into Crowstorm." },
+    "invisibility": { "text": "Invisible threat: carry a Control Ward and ward your own bush so your scarecrow trick is not turned against you." },
+    "aoe-cc": { "text": "Area CC: spread from your carry and don't channel in the middle of their combo." },
+    "early-game": { "text": "Early-game champion: concede the first trades and look for a level-6 Crowstorm flash." }
+  },
+  "matchups": {
+    "Leona": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 2, "note": "Full engage kit: Zenith Blade plus Shield of Daybreak is lethal with her carry." },
+        { "kind": "level", "level": 6, "note": "Solar Flare is a big AoE lockdown on top of her engage." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Zenith Blade", "note": "Dash and root: dodge it sideways or sit behind minions." },
+        { "key": "R", "name": "Solar Flare", "note": "AoE stun interrupts your channels; don't start Crowstorm while it is up." }
+      ],
+      "tips": [
+        { "text": "Stay behind your minions in the bush: if Zenith Blade hits a minion she cannot reach you." },
+        { "text": "Terrify her when she commits, then Reap to stop her from casting." },
+        { "text": "Don't channel Bountiful Harvest while she can engage." },
+        { "text": "Level 6 Crowstorm after she uses her engage is your counter-engage." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "Tenacity cuts her stun and root.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [
+        { "rune": "Unflinching / Second Wind", "note": "Helps you survive early poke while you wait for level 6.", "confidence": "low" }
+      ],
+      "threatTags": ["hard-engage", "point-click-cc", "early-game"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium",
+      "reviewNotes": "Draft written from champion kits, not match data; verify against your own games."
+    },
+    "Nautilus": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Hook plus Depth Charge makes his lane dangerous." },
+        { "kind": "level", "level": 6, "note": "Depth Charge is a point-and-click lockdown." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Dredge Line", "note": "Hook: stay behind minions so it cannot reach you." },
+        { "key": "R", "name": "Depth Charge", "note": "Targeted knockup interrupts your channel from the side." }
+      ],
+      "tips": [
+        { "text": "Stay behind minions: a hook that hits a minion pulls him, not you." },
+        { "text": "After he misses his hook, step up and Terrify him to start your own trade." },
+        { "text": "Don't channel Crowstorm when his R is ready." }
+      ],
+      "itemAdjustments": [
+        { "item": 3111, "name": "Mercury's Treads", "note": "Tenacity shortens his hook root.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["hard-engage", "point-click-cc"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Thresh": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "The Box makes his team's engage much stronger." },
+        { "kind": "other", "note": "Lantern saves his carry from your ambush; kill the lantern carrier first." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Death Sentence", "note": "Pull: stay behind minions." },
+        { "key": "E", "name": "Flay", "note": "Knockback interrupts your channels and pushes you out of range." }
+      ],
+      "tips": [
+        { "text": "Reap him when his Q is on cooldown to stop his follow-up." },
+        { "text": "Be careful when you stand in the bush: he can still hook you out of it." },
+        { "text": "Target the lantern holder before you commit; Thresh will cancel your channel if you do not." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["hard-engage", "anti-engage"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Blitzcrank": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 2, "note": "Rocket Grab with Power Fist combo can kill squishies early." },
+        { "kind": "level", "level": 6, "note": "Static Field pulses silence and make the ambush dangerous." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Rocket Grab", "note": "Long-range pull that wrecks your trade." },
+        { "key": "R", "name": "Static Field", "note": "AoE silence that stops your Terrify and Reap, so don't group up with it." }
+      ],
+      "tips": [
+        { "text": "Never step in a straight line from him; stay behind minions or in bush." },
+        { "text": "He is easy to ambush once his grab is on cooldown: Terrify then Reap." },
+        { "text": "Ward the river so he cannot grab you from fog." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["hard-engage", "gank-setup", "burst"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Alistar": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 2, "note": "Headbutt into Pulverize is a short, strong engage." },
+        { "kind": "level", "level": 6, "note": "Unbreakable Will cuts the CC he takes and makes him hard to kill in a fight." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Headbutt", "note": "Targeted knockback: don't stand next to your carry when it is ready." },
+        { "key": "R", "name": "Unbreakable Will", "note": "Removes CC and reduces damage, so he can walk through Terrify." }
+      ],
+      "tips": [
+        { "text": "Wait for him to use Headbutt, then trade with Terrify and Reap." },
+        { "text": "Save Crowstorm for his carry, not for him." },
+        { "text": "He is easy to out-range and poke from behind the wave." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["hard-engage", "point-click-cc"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Pyke": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "them", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Death from Below executes low-health targets, and his team resets fights." },
+        { "kind": "other", "note": "Stealth plus hook makes bush ambushes dangerous for both of you." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Bone Skewer", "note": "Pull; stay behind minions." },
+        { "key": "E", "name": "Phantom Undertow", "note": "Dash and stun: he can reset onto you after you commit." },
+        { "key": "R", "name": "Death from Below", "note": "Execute that can be dodged only by staying healthy." }
+      ],
+      "tips": [
+        { "text": "Carry a Control Ward: his stealth can turn your bush ambush around." },
+        { "text": "Don't stay low in his range: Death from Below executes low-health targets." },
+        { "text": "Terrify him first when he dashes in, so his follow-up is wasted." }
+      ],
+      "itemAdjustments": [
+        { "item": 2055, "name": "Control Ward", "note": "Reveals his stealth so your ambush is safe.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["hard-engage", "invisibility", "burst"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Morgana": {
+      "difficulty": 4,
+      "threat": 4,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Dark Binding plus Tormented Shadow poke makes early trades hard." },
+        { "kind": "level", "level": 6, "note": "Soul Shackles is an AoE lockdown." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Black Shield", "note": "Spell shield that blocks your fear and silence; bait it first." },
+        { "key": "Q", "name": "Dark Binding", "note": "Skillshot root that interrupts your channel." },
+        { "key": "R", "name": "Soul Shackles", "note": "AoE chain: don't stay close to her carry in a fight." }
+      ],
+      "tips": [
+        { "text": "Wait for her to use Black Shield on a teammate, then commit your Terrify and Reap." },
+        { "text": "Stay behind minions: her root is the whole lane." },
+        { "text": "Don't start Crowstorm if her shield is up." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["spell-shield", "anti-engage", "point-click-cc"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Lulu": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "them", "late": "them" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Wild Growth makes her carry hard to burst." },
+        { "kind": "other", "note": "Polymorph (Whimsy) cancels your channel and Crowstorm." }
+      ],
+      "dangerAbilities": [
+        { "key": "W", "name": "Whimsy", "note": "Targeted polymorph: interrupts your channel." },
+        { "key": "E", "name": "Help, Pix!", "note": "Shield she uses to save her carry from your Terrify." }
+      ],
+      "tips": [
+        { "text": "Don't start a channel when her Whimsy is up." },
+        { "text": "Target her carry, not her; she will shield and disengage." },
+        { "text": "You out-scale her lane, so you can concede the first trade." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["point-click-cc", "shields-allies", "anti-engage"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Janna": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "them", "late": "them" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Monsoon heals and pushes you out of Crowstorm." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Howling Gale", "note": "Knockup that interrupts a channel." },
+        { "key": "R", "name": "Monsoon", "note": "Knockback that pushes you out of your fight." }
+      ],
+      "tips": [
+        { "text": "Reap her first: her whole kit needs her to cast." },
+        { "text": "Bait her Monsoon before you flash into Crowstorm." },
+        { "text": "She is easy to trade with at level 1 and 2." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["anti-engage", "kite"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Nami": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Aquatic Prison plus Ebb and Flow poke is strong in lane." },
+        { "kind": "level", "level": 6, "note": "Tidal Wave is a big engage and a chase tool." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Aquatic Prison", "note": "Bubble stun interrupts your channel." },
+        { "key": "R", "name": "Tidal Wave", "note": "Knock-up that can catch you after your Crowstorm." }
+      ],
+      "tips": [
+        { "text": "Stay behind the wave and keep your hits to Reap / Terrify." },
+        { "text": "Wait until her bubble is on cooldown before you channel." },
+        { "text": "She is squishy: a single Terrify and Reap combo is a big threat." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["ranged-poke", "point-click-cc", "healing"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Soraka": {
+      "difficulty": 2,
+      "threat": 2,
+      "phaseAdvantage": { "early": "even", "mid": "me", "late": "me" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Wish heals the whole team after your Crowstorm." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Equinox", "note": "Silence and root zone that will stop your channel." }
+      ],
+      "tips": [
+        { "text": "She is immobile: Terrify then Reap is a free combo." },
+        { "text": "Bountiful Harvest on her wave heals you out of her poke." },
+        { "text": "Reap's silence cuts her heal and Equinox." }
+      ],
+      "itemAdjustments": [
+        { "item": 3011, "name": "Chemtech Putrifier", "note": "Grievous Wounds if the enemy team relies on her healing.", "confidence": "medium" }
+      ],
+      "runeAdjustments": [],
+      "threatTags": ["healing", "anti-engage"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Lux": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Light Binding plus Lucent Singularity poke is strong." },
+        { "kind": "level", "level": 6, "note": "Final Spark is a long range burst." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Light Binding", "note": "Root that interrupts your channel and sets up her burst." },
+        { "key": "R", "name": "Final Spark", "note": "Long-range burst; don't stand low behind your carry." }
+      ],
+      "tips": [
+        { "text": "Stay behind minions to block Light Binding." },
+        { "text": "Ambush her from a bush when her Q is on cooldown." },
+        { "text": "Terrify her, then run her down before she can cast." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["ranged-poke", "burst", "gank-setup"],
+      "lastReviewedPatch": "draft",
+      "confidence": "medium"
+    },
+    "Zyra": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 3, "note": "Plants and Grasping Roots are a strong poke and zoning combo." },
+        { "kind": "level", "level": 6, "note": "Stranglethorns is a big AoE engage." }
+      ],
+      "dangerAbilities": [
+        { "key": "E", "name": "Grasping Roots", "note": "Long-range root that interrupts your channel." },
+        { "key": "R", "name": "Stranglethorns", "note": "AoE knockup; don't clump in the fight." }
+      ],
+      "tips": [
+        { "text": "Kill her plants only when it's safe; otherwise ignore them." },
+        { "text": "Stay behind minions to dodge her root." },
+        { "text": "She has no escape: Terrify plus Reap wins your lane." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["ranged-poke", "aoe-cc", "gank-setup"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Brand": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "them", "mid": "even", "late": "even" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Pyroclasm bounces and is a strong teamfight burst." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Sear", "note": "Stun if the target is already burning." },
+        { "key": "R", "name": "Pyroclasm", "note": "Bounces between squishy targets; don't group tightly." }
+      ],
+      "tips": [
+        { "text": "Stay out of Sear range and behind minions." },
+        { "text": "Brand has no escape: Terrify then Reap kills him." },
+        { "text": "Don't channel Crowstorm into a Brand who still has Sear up." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["ranged-poke", "burst", "percent-hp-damage"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    },
+    "Senna": {
+      "difficulty": 3,
+      "threat": 3,
+      "phaseAdvantage": { "early": "even", "mid": "me", "late": "them" },
+      "powerSpikes": [
+        { "kind": "level", "level": 6, "note": "Dawning Shadow gives a global shield and helps her carry." },
+        { "kind": "other", "note": "Her range grows as she stacks Mist; she out-scales you if she is fed." }
+      ],
+      "dangerAbilities": [
+        { "key": "Q", "name": "Piercing Darkness", "note": "Long-range poke that also heals her." },
+        { "key": "W", "name": "Last Embrace", "note": "Root that interrupts your channel." }
+      ],
+      "tips": [
+        { "text": "Shove the wave and Terrify her when she steps up to farm." },
+        { "text": "She is squishy: look for a Crowstorm flash-engage." },
+        { "text": "Keep your lane push controlled; she stacks Mist from minions." }
+      ],
+      "itemAdjustments": [],
+      "runeAdjustments": [],
+      "threatTags": ["ranged-poke", "healing"],
+      "lastReviewedPatch": "draft",
+      "confidence": "low"
+    }
+  }
+}

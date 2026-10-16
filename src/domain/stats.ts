@@ -5,11 +5,12 @@ import type { History, RecentGame } from "../types";
 /** LCU numeric champion keys. */
 export const GWEN_KEY = 887;
 export const AMUMU_KEY = 32;
+export const FIDDLESTICKS_KEY = 9;
 
 /** Shorter games are remakes: they say nothing about how the player played. */
 export const REMAKE_SECS = 5 * 60;
 
-/** Summoner's Rift modes the Gwen/Amumu advice is about (ARAM, Arena… are left out). */
+/** Summoner's Rift modes the Gwen/Fiddlesticks/Amumu advice is about (ARAM, Arena… are left out). */
 const RIFT_MODES = new Set(["CLASSIC", "SWIFTPLAY"]);
 
 const QUEUES: Record<number, string> = {

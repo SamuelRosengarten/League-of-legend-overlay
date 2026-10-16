@@ -47,4 +47,4 @@ function normalize(name: string): string {
 }
 
 // Keeps the overlay usable for the supported champions if Data Dragon has never been reachable.
-const FALLBACK_KEYS: Record<number, string> = { 887: "Gwen", 32: "Amumu" };
+const FALLBACK_KEYS: Record<number, string> = { 887: "Gwen", 32: "Amumu", 9: "Fiddlesticks" };

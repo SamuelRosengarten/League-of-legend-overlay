@@ -1,7 +1,7 @@
 // The panel docked to the League client (between games): last-game recap and the player's
-// own Gwen / Amumu numbers, so they don't have to dig through the client's profile tabs.
+// own Gwen / Fiddlesticks / Amumu numbers, so they don't have to dig through the client's profile tabs.
 import type { ChampionIndex } from "../../domain/champions";
-import { AMUMU_KEY, type ChampStats, GWEN_KEY, type Rates, type Recap, champStats, lastGameRecap, queueName, timeAgo } from "../../domain/stats";
+import { AMUMU_KEY, type ChampStats, FIDDLESTICKS_KEY, GWEN_KEY, type Rates, type Recap, champStats, lastGameRecap, queueName, timeAgo } from "../../domain/stats";
 import type { History } from "../../types";
 import { h } from "../h";
 import { champIcon, heading, notice } from "./common";
@@ -64,9 +64,11 @@ function formStrip(form: boolean[]): HTMLElement {
   );
 }
 
+const FALLBACK_NAMES: Record<number, string> = { [GWEN_KEY]: "Gwen", [AMUMU_KEY]: "Amumu", [FIDDLESTICKS_KEY]: "Fiddlesticks" };
+
 function champCard(key: number, s: ChampStats | null, champs: ChampionIndex): HTMLElement {
   const id = champs.idForKey(key);
-  const name = id ? champs.name(id) : key === GWEN_KEY ? "Gwen" : "Amumu";
+  const name = id ? champs.name(id) : (FALLBACK_NAMES[key] ?? "Champion");
   const mastery = s?.mastery ? h("span", { class: "mastery", title: `${s.mastery.points.toLocaleString("en-US")} mastery points` }, `M${s.mastery.level}`) : null;
   const head = h(
     "div",
@@ -111,6 +113,7 @@ export function clientView(history: History | null, champs: ChampionIndex, now =
     heading("Your champions"),
     champCard(GWEN_KEY, champStats(history, GWEN_KEY), champs),
     champCard(AMUMU_KEY, champStats(history, AMUMU_KEY), champs),
+    champCard(FIDDLESTICKS_KEY, champStats(history, FIDDLESTICKS_KEY), champs),
     h(
       "p",
       { class: "hint" },

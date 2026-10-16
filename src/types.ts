@@ -135,6 +135,7 @@ export interface RankInfo {
 export interface CompanionSettings {
   gwen: boolean;
   amumu: boolean;
+  fiddlesticks: boolean;
   placement: string;
   size: number;
   inGame: boolean;

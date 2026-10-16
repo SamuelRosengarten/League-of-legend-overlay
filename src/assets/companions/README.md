@@ -10,6 +10,8 @@ characters (columns ~870–990 of 1690), so the split is lossless:
    Amumu 615×722 → 358×420. That is about 2.5× their display size on a 200 % display at the
    default companion size.
 
+`fiddlesticks.svg` is not from the sheet: it is hand-drawn vector art (viewBox 360×440) in the same chibi style, so it scales cleanly at any size.
+
 The art is fan art inspired by the champions. It is not official Riot artwork.
 
 ## How the overlay uses it
@@ -22,7 +24,7 @@ The art is fan art inspired by the champions. It is not official Riot artwork.
 | `lid`, `lash` | Eyelid colors sampled from the art (Gwen's skin, Amumu's bandages). |
 | `seat` | Where the feet or bottom rest on the frame when perching. |
 | `peek` | How much of the sprite shows above the border when peeking (head and eyes). |
-| `hangAt` | Where Gwen's ribbon or Amumu's bandage ties on when hanging below the panel. |
+| `hangAt` | Where Gwen's ribbon, Amumu's bandage or Fiddlesticks' rope ties on when hanging below the panel. |
 | `sparkles`, `bubble` | Anchors for sparkles (Gwen's scissor gem, blade tip) and the expression bubble. |
 
 ## Replacing the art

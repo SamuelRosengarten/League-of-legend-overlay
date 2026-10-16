@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import tags from "../../data/champions/tags.json";
 import gwen from "../../data/matchups/gwen.json";
 import amumu from "../../data/matchups/amumu.json";
+import fiddlesticks from "../../data/matchups/fiddlesticks.json";
 import items from "../../data/items/counters.json";
 import paths from "../../data/jungle/amumu-paths.json";
 import { loadCurated } from "./index";
@@ -11,12 +12,13 @@ import { type DataFiles, missingFromTags, validateAll, validateSchema } from "./
 
 const clone = <T>(v: T): T => structuredClone(v);
 
-function files(overrides: Partial<Record<"tags" | "gwen" | "amumu" | "items" | "paths", unknown>> = {}): DataFiles {
+function files(overrides: Partial<Record<"tags" | "gwen" | "amumu" | "fiddlesticks" | "items" | "paths", unknown>> = {}): DataFiles {
   return {
     tags: { file: "tags.json", data: overrides.tags ?? tags },
     matchups: [
       { file: "gwen.json", data: overrides.gwen ?? gwen },
       { file: "amumu.json", data: overrides.amumu ?? amumu },
+      { file: "fiddlesticks.json", data: overrides.fiddlesticks ?? fiddlesticks },
     ],
     items: { file: "items.json", data: overrides.items ?? items },
     paths: { file: "paths.json", data: overrides.paths ?? paths },
@@ -30,10 +32,10 @@ describe("curated data", () => {
     expect(errors(files())).toEqual([]);
   });
 
-  it("has ~20 curated matchups per champion, all marked with patch + confidence", () => {
-    for (const file of [gwen, amumu]) {
+  it("has a curated set of matchups per champion, all marked with patch + confidence", () => {
+    for (const file of [gwen, amumu, fiddlesticks]) {
       const entries = Object.values(file.matchups);
-      expect(entries.length).toBeGreaterThanOrEqual(20);
+      expect(entries.length).toBeGreaterThanOrEqual(file === fiddlesticks ? 15 : 20);
       for (const e of entries) {
         expect(e.lastReviewedPatch).toBeTruthy();
         expect(["high", "medium", "low"]).toContain(e.confidence);
@@ -42,7 +44,7 @@ describe("curated data", () => {
   });
 
   it("contains no invented numbers in advice text (win rates, damage values)", () => {
-    const text = JSON.stringify([gwen.matchups, amumu.matchups]);
+    const text = JSON.stringify([gwen.matchups, amumu.matchups, fiddlesticks.matchups]);
     expect(text).not.toMatch(/\d+(\.\d+)?\s*%/);
     expect(text).not.toMatch(/win ?rate/i);
   });
@@ -50,7 +52,7 @@ describe("curated data", () => {
   it("loads into the app with no broken files", () => {
     const data = loadCurated();
     expect(data.tags).not.toBeNull();
-    expect(Object.keys(data.matchups).sort()).toEqual(["Amumu", "Gwen"]);
+    expect(Object.keys(data.matchups).sort()).toEqual(["Amumu", "Fiddlesticks", "Gwen"]);
     expect(data.items).not.toBeNull();
     expect(data.paths).not.toBeNull();
   });

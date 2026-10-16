@@ -3,7 +3,7 @@ import { MOTIONS, SCALE_MAX, SCALE_MIN, clampScale } from "../../theme/appearanc
 import { THEMES, TIER_IDS, type ThemeId } from "../../theme/ranks";
 import type { ResolvedTheme } from "../../theme/theme";
 import type { Appearance, CompanionSettings, RankInfo } from "../../types";
-import { type CompanionId, SPRITES } from "../companions/sprites";
+import { COMPANION_IDS, type CompanionId, SPRITES } from "../companions/sprites";
 import { PRESETS, SIZE_MAX, SIZE_MIN } from "../companions/layout";
 import { crestArt } from "../crest";
 import { h } from "../h";
@@ -46,7 +46,7 @@ function toggle(label: string, on: boolean, onChange: (v: boolean) => void, hint
 
 function companionTile(who: CompanionId, c: CompanionSettings, a: Appearance): HTMLElement {
   const on = c[who];
-  const name = who === "gwen" ? "Gwen" : "Amumu";
+  const name = SPRITES[who].name;
   // Head-and-shoulders crop of the companion sprite.
   const face = h("span", { class: `companion-face face-${who}`, style: `background-image:url("${SPRITES[who].url}")` });
   return h(
@@ -67,7 +67,7 @@ export function settingsView(a: Appearance, rank: RankInfo | null, resolved: Res
   const c = a.companions;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const setC = (patch: Partial<CompanionSettings>) => save({ ...a, companions: { ...c, ...patch } });
-  const anyCompanion = c.gwen || c.amumu;
+  const anyCompanion = COMPANION_IDS.some((who) => c[who]);
 
   return h(
     "section",
@@ -79,7 +79,7 @@ export function settingsView(a: Appearance, rank: RankInfo | null, resolved: Res
     h("p", { class: "hint" }, "“My rank” follows your Solo/Duo tier (Flex if unranked in Solo). Unranked accounts get the neutral hextech theme."),
 
     heading("Companions"),
-    h("div", { class: "companion-grid" }, companionTile("gwen", c, a), companionTile("amumu", c, a)),
+    h("div", { class: "companion-grid" }, COMPANION_IDS.map((who) => companionTile(who, c, a))),
     h(
       "div",
       { class: `field${anyCompanion ? "" : " disabled"}` },

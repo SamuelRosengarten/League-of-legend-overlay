@@ -1,14 +1,18 @@
 // Companion sprites: Gwen and Amumu cut from the user's reference sheet
 // ("Chibi Seamstress and Sad Mummy Duo.png", project root) into separate transparent PNGs.
+// Fiddlesticks is a hand-drawn SVG in the same chibi style.
 // Fan art inspired by the champions — not official Riot artwork.
 //
 // All coordinates are fractions (0–1) of the sprite's width / height, so the overlays
 // (eyelids, tear, sparkles) stay aligned at any display size.
 import amumuUrl from "../../assets/companions/amumu.png";
+import fiddlesticksUrl from "../../assets/companions/fiddlesticks.svg";
 import gwenUrl from "../../assets/companions/gwen.png";
 
-export type CompanionId = "gwen" | "amumu";
-/** perch = natural pose on the top border (Gwen stands, Amumu sits); peek = head only above
+export type CompanionId = "gwen" | "amumu" | "fiddlesticks";
+/** Left-to-right order used for layout and the settings tiles. */
+export const COMPANION_IDS: CompanionId[] = ["gwen", "fiddlesticks", "amumu"];
+/** perch = natural pose on the top border (Gwen and Fiddlesticks stand, Amumu sits); peek = head only above
  * the top border; hang = dangling below the bottom border from a ribbon / bandage;
  * side = standing on a ledge off the right border (docked to the League client). */
 export type Pose = "perch" | "peek" | "hang" | "side";
@@ -96,5 +100,29 @@ export const SPRITES: Record<CompanionId, Sprite> = {
     sparkles: [{ x: 0.86, y: 0.2 }],
     bubble: { x: 0.7, y: 0.3 },
     expressions: ["sleepy", "curious", "happy", "surprised", "cry"],
+  },
+  fiddlesticks: {
+    id: "fiddlesticks",
+    name: "Fiddlesticks",
+    url: fiddlesticksUrl,
+    width: 360,
+    height: 440,
+    baseHeight: 112,
+    eyes: [
+      { x: 0.406, y: 0.377, w: 0.128, h: 0.118, rot: 0 },
+      { x: 0.6, y: 0.377, w: 0.128, h: 0.118, rot: 0 },
+    ],
+    lid: ["#2a1210", "#1a0a08"],
+    lash: "#ff6a4a",
+    seat: 0.975,
+    peek: 0.64,
+    hangAt: { x: 0.5, y: 0.03 },
+    ribbon: { color: "#b08a58", edge: "#4d3516" },
+    sparkles: [
+      { x: 0.3, y: 0.1 },
+      { x: 0.33, y: 0.84 },
+    ],
+    bubble: { x: 0.8, y: 0.1 },
+    expressions: ["curious", "wink", "excited", "happy", "surprised"],
   },
 };

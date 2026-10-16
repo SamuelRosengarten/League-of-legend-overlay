@@ -14,9 +14,9 @@ type OkAdvice = Extract<Advice, { status: "ok" }>;
 export function adviceStatus(advice: Advice, champs: ChampionIndex): HTMLElement | null {
   switch (advice.status) {
     case "no-champion":
-      return notice("muted", "Lock in Gwen or Amumu", "The matchup advisor starts once your champion is locked.");
+      return notice("muted", "Lock in Gwen, Fiddlesticks or Amumu", "The matchup advisor starts once your champion is locked.");
     case "unsupported":
-      return notice("muted", `Unsupported champion: ${champs.name(advice.championId)}`, "Rift Advisor only covers Gwen (top) and Amumu (jungle).");
+      return notice("muted", `Unsupported champion: ${champs.name(advice.championId)}`, "Rift Advisor only covers Gwen (top), Fiddlesticks (support) and Amumu (jungle).");
     case "missing-data":
       return notice("warn", `Matchup data for ${champs.name(advice.championId)} is missing or invalid`, "Run `npm run validate:data` to see what is wrong.");
     case "ok":

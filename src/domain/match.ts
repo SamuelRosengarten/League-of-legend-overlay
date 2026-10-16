@@ -5,7 +5,7 @@ import type { ChampionIndex } from "./champions";
 export type Role = "top" | "jungle" | "middle" | "bottom" | "utility";
 export type Side = "blue" | "red";
 
-export const SUPPORTED: Record<string, Role> = { Gwen: "top", Amumu: "jungle" };
+export const SUPPORTED: Record<string, Role> = { Gwen: "top", Amumu: "jungle", Fiddlesticks: "utility" };
 export const SMITE_SPELL_ID = 11;
 
 export interface Slot {

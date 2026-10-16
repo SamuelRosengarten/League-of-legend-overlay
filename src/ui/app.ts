@@ -125,7 +125,7 @@ export function render(root: HTMLElement, state: UiState) {
   // Companions: hidden in game unless the user wants them there.
   const showCompanions = mode !== "hidden" && (mode !== "in-game" || appearance.companions.inGame);
   const layout = layoutCompanions(
-    showCompanions ? appearance.companions : { ...appearance.companions, gwen: false, amumu: false },
+    showCompanions ? appearance.companions : { ...appearance.companions, gwen: false, amumu: false, fiddlesticks: false },
     window.innerWidth,
     { compact: mode === "in-game", docked, dockedLeft: snap.overlay.dockedLeft },
   );

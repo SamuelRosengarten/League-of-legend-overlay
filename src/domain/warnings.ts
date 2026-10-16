@@ -63,6 +63,25 @@ export function teamWarnings(
     }
   }
 
+  if (me === "Fiddlesticks") {
+    const shields = withTag("spell-shield", "cleanse");
+    if (shields.length >= 1) {
+      out.push({ id: "fear-blocked", level: "warn", text: `${names(shields)} can block or cleanse Terrify / Reap → bait the shield or cleanse first, then commit Crowstorm.`, champions: shields });
+    }
+    const engage = withTag("hard-engage", "gank-setup");
+    if (engage.length >= 2) {
+      out.push({ id: "engage-heavy", level: "warn", text: `Engage-heavy comp (${names(engage)}) → stay behind your team in brush and don't channel Bountiful Harvest in their range.`, champions: engage });
+    }
+    const mobile = withTag("high-mobility", "untargetable");
+    if (mobile.length >= 2) {
+      out.push({ id: "slippery", level: "info", text: `${names(mobile)} can leave Crowstorm or dodge your fear → wait for their dash before you channel.`, champions: mobile });
+    }
+    const heal = withTag("healing", "shields-allies");
+    if (heal.length >= 2) {
+      out.push({ id: "sustain", level: "info", text: `Sustain-heavy comp (${names(heal)}) → burst the healer first; Reap's silence cuts their heals.`, champions: heal });
+    }
+  }
+
   if (me === "Gwen") {
     const poke = withTag("ranged-poke");
     if (poke.length >= 2) {

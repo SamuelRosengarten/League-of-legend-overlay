@@ -6,7 +6,7 @@ import { loadCurated } from "../data";
 import type { ChampSelectSession, LiveGame } from "../types";
 import { buildAdvice } from "./advisor";
 import { ChampionIndex } from "./champions";
-import { fromChampSelect, fromLive } from "./match";
+import { type MatchView, type Slot, fromChampSelect, fromLive } from "./match";
 
 const data = loadCurated();
 // Minimal Data Dragon stand-in: keys used by the fixtures.
@@ -17,7 +17,7 @@ const champs = new ChampionIndex({
     Gwen: 887, Fiora: 114, Amumu: 32, LeeSin: 64, Yasuo: 157, Darius: 122, Jinx: 222, Thresh: 412, Lux: 99,
     Ezreal: 81, Vi: 254, Viego: 234, Kaisa: 145, Nautilus: 111, Morgana: 25, Ahri: 103, Orianna: 61,
     Renekton: 58, Syndra: 134, Teemo: 17, Graves: 104, Caitlyn: 51, Leona: 89, Sejuani: 113, Malphite: 54,
-    Senna: 235, Zed: 238, Ashe: 22,
+    Senna: 235, Zed: 238, Ashe: 22, Fiddlesticks: 9,
   }).map(([id, key]) => ({ id, key, name: id, tags: [] })),
 });
 
@@ -84,5 +84,34 @@ describe("advisor over fixtures", () => {
   it("waits while my champion is only hovered", () => {
     const first = scenario("gwen-vs-fiora")[1]!.champSelect!;
     expect(buildAdvice(fromChampSelect(first, champs), champs, data)).toEqual({ status: "no-champion" });
+  });
+});
+
+describe("Fiddlesticks as a support", () => {
+  const slot = (championId: string | null, position: Slot["position"], isMe = false): Slot => ({
+    championId, hovering: false, position, hasSmite: false, isMe, level: null, items: [],
+  });
+  const match: MatchView = {
+    source: "champ-select",
+    side: "blue",
+    me: slot("Fiddlesticks", "utility", true),
+    allies: [slot("Fiddlesticks", "utility", true)],
+    enemies: [slot("Jinx", "bottom"), slot("Morgana", "utility"), slot("Leona", "top"), slot("Lux", "middle")],
+    gameTime: null,
+  };
+
+  it("is supported in the utility role, with the enemy support as lane opponent", () => {
+    const advice = buildAdvice(match, champs, data);
+    if (advice.status !== "ok") throw new Error(advice.status);
+    expect(advice.role).toBe("utility");
+    expect(advice.laneOpponent).toMatchObject({ championId: "Morgana", assignment: { role: "utility", source: "api" } });
+    expect(advice.laneOpponent?.entry?.dangerAbilities[0]!.name).toBe("Black Shield");
+    expect(advice.plan).toBeNull();
+  });
+
+  it("warns about shields / cleanses and engage-heavy comps", () => {
+    const advice = buildAdvice(match, champs, data);
+    if (advice.status !== "ok") throw new Error(advice.status);
+    expect(advice.warnings.map((w) => w.id)).toContain("engage-heavy");
   });
 });

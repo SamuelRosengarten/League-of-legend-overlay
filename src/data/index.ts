@@ -3,6 +3,7 @@
 import tagsJson from "../../data/champions/tags.json";
 import gwenJson from "../../data/matchups/gwen.json";
 import amumuJson from "../../data/matchups/amumu.json";
+import fiddlesticksJson from "../../data/matchups/fiddlesticks.json";
 import itemsJson from "../../data/items/counters.json";
 import pathsJson from "../../data/jungle/amumu-paths.json";
 import type { ChampionTagsFile, ItemCountersFile, JunglePathsFile, MatchupFile } from "./types";
@@ -21,6 +22,7 @@ const FILES = {
   matchups: [
     { file: "data/matchups/gwen.json", data: gwenJson as unknown },
     { file: "data/matchups/amumu.json", data: amumuJson as unknown },
+    { file: "data/matchups/fiddlesticks.json", data: fiddlesticksJson as unknown },
   ],
   items: { file: "data/items/counters.json", data: itemsJson as unknown },
   paths: { file: "data/jungle/amumu-paths.json", data: pathsJson as unknown },
